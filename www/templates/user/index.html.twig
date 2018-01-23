@@ -1,0 +1,10 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<h1>User index</h1>
+<ul>
+	{% for user in userList %}
+		<li>{{user}}</li>
+	{% endfor %}
+</ul>
+{% endblock %}
