@@ -1,8 +1,8 @@
 FROM php:7.0-apache
  
-RUN docker-php-ext-install pdo mysqli
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends git zip
+    apt-get install -y --no-install-recommends git zip zlib1g-dev
+RUN docker-php-ext-install pdo mysqli zip
  
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
