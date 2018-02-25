@@ -4,4 +4,5 @@
 /public/bundles/
 /var/
 /vendor/
+/src/Migrations/
 ###< symfony/framework-bundle ###
