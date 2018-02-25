@@ -161,6 +161,9 @@
     "symfony/inflector": {
         "version": "v3.4.4"
     },
+    "symfony/ldap": {
+        "version": "v3.4.4"
+    },
     "symfony/lts": {
         "version": "v3"
     },
@@ -172,6 +175,9 @@
             "version": "1.0",
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
+    },
+    "symfony/options-resolver": {
+        "version": "v3.4.4"
     },
     "symfony/orm-pack": {
         "version": "v1.0.5"

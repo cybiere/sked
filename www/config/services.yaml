@@ -1,6 +1,11 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    ldap_url: ldap.forumsys.com
+    ldap_port: 389
+    ldap_bind_dn: cn=read-only-admin,dc=example,dc=com
+    ldap_bind_pw: password
+    ldap_base_dn: dc=example,dc=com
 
 services:
     # default configuration for services in *this* file

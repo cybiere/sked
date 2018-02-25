@@ -2,6 +2,7 @@
 
 {% block body %}
 <h1>User index</h1>
+<a href="{{ path('user_enrol') }}">enrol_user</a>
 <ul>
 	{% for user in userList %}
 		<li>{{user}}</li>

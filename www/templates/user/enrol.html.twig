@@ -1,0 +1,23 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<h1>User enrol</h1>
+<a href="{{ path('user_index') }}">back to index</a>
+<h2>Existing users</h2>
+<ul>
+	{% for user in userList %}
+		<li>{{user}}</li>
+	{% endfor %}
+</ul>
+<h2>Ldap users</h2>
+<ul>
+	{% for user in userLdap %}
+		<li>{{user}}</li>
+	{% endfor %}
+</ul>
+
+<pre>
+	{{ dump(rawLdap) }}
+</pre>
+
+{% endblock %}
