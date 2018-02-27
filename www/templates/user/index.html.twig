@@ -1,11 +1,18 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
-<h1>User index</h1>
-<a href="{{ path('user_enrol') }}">enrol_user</a>
+<h1>User enrol</h1>
+<h2>Add user</h2>
+
+{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}
+
+<h2>Existing users</h2>
 <ul>
-	{% for user in userList %}
-		<li>{{user}}</li>
+	{% for user in users %}
+	<li>{{user.fullname}} ({{user.username}})</li>
 	{% endfor %}
 </ul>
+
 {% endblock %}
