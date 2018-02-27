@@ -5,10 +5,13 @@ namespace App\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+/**
+ * @Route("/project/status")
+ */
 class ProjectStatusController extends Controller
 {
     /**
-     * @Route("/project/status", name="project_status")
+     * @Route("/", name="projectstatus_index")
      */
     public function index()
     {

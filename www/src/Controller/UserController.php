@@ -10,9 +10,12 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Ldap\Ldap;
 
+/**
+ * @Route("/user")
+ */
 class UserController extends Controller{
 	/**
-	 * @Route("/users/",name="users")
+	 * @Route("/",name="user_index")
 	 */
 	public function index(Request $request){
 
@@ -40,7 +43,7 @@ class UserController extends Controller{
 				$ldap->bind($this->container->getParameter('ldap_bind_dn'), $this->container->getParameter('ldap_bind_pw'));
 
 				$sanitized=array('\\' => '\5c','*' => '\2a','(' => '\28',')' => '\29',"\x00" => '\00');
-			    $username = str_replace(array_keys($sanitized),array_values($sanitized),$user->getUsername());	
+				$username = str_replace(array_keys($sanitized),array_values($sanitized),$user->getUsername());	
 
 				$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(&(objectclass=person)(uid='.$username.'))');
 				$ldapResults = $ldapQuery->execute()->toArray();
@@ -69,7 +72,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	 * @Route("/users/del/{username}",name="user_del")
+	 * @Route("/del/{username}",name="user_del")
 	 */
 	public function delete(Request $request,$username){
 		$em = $this->getDoctrine()->getManager();
@@ -80,6 +83,6 @@ class UserController extends Controller{
 			$em->flush();
 		}else{
 		}
-		return $this->redirectToRoute('users');
+		return $this->redirectToRoute('user_index');
 	}
 }

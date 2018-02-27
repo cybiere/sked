@@ -16,5 +16,34 @@ class ProjectStatus
      */
     private $id;
 
-    // add your own fields
+	/**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $statusname;
+
+	/**
+     * @ORM\Column(type="integer")
+     */
+	private $order;
+
+	public function getId(){         
+		return $this->id;
+	}
+
+	public function getStatusname(){
+		return $this->statusname;
+	}
+
+	public function setStatusname($statusname){
+		$this->statusname=$statusname;
+	}
+
+	public function getOrder(){
+		return $this->order;
+	}
+
+	public function setOrder($order){
+		$this->order=$order;
+	}
+
 }
