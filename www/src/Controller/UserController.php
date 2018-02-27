@@ -17,6 +17,7 @@ class UserController extends Controller{
 	public function index(Request $request){
 
 		$em = $this->getDoctrine()->getManager();
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
 
 		$user = new User();
 		$form = $this->createFormBuilder($user)
@@ -29,7 +30,6 @@ class UserController extends Controller{
 
 		if ($form->isSubmitted() && $form->isValid()) {
 			$user = $form->getData();
-			$userRepository = $this->getDoctrine()->getRepository(User::class);
 
 			//check the user is not already existing
 			if($userRepository->findOneBy(['username' => $user->getUsername()])){
@@ -66,5 +66,20 @@ class UserController extends Controller{
 		$users = $userRepository->findAll();
 
 		return $this->render('user/index.html.twig',array('users'=>$users,'form'=>$form->createView()));
+	}
+
+	/**
+	 * @Route("/users/del/{username}",name="user_del")
+	 */
+	public function delete(Request $request,$username){
+		$em = $this->getDoctrine()->getManager();
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$user = $userRepository->findOneBy(['username' => $username]);
+		if($user){
+			$em->remove($user);
+			$em->flush();
+		}else{
+		}
+		return $this->redirectToRoute('users');
 	}
 }
