@@ -23,10 +23,12 @@ class UserController extends Controller{
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 
 		$user = new User();
-		$form = $this->createFormBuilder($user)
-			->add('username', TextType::class)
-			->add('save', SubmitType::class, array('label' => 'Create User'))
-			->getForm();
+		$formBuilder = $this->createFormBuilder($user)->add('username', TextType::class);
+		if(!$this->container->hasParameter('ldap_url')){
+			$formBuilder->add('fullname', TextType::class)
+				->add('email', TextType::class);
+		}
+		$form = $formBuilder->add('save', SubmitType::class, array('label' => 'Create User'))->getForm();
 
 
 		$form->handleRequest($request);
@@ -38,31 +40,34 @@ class UserController extends Controller{
 			if($userRepository->findOneBy(['username' => $user->getUsername()])){
 				echo "<script>alert('user already enroled')</script>";
 			}else{
-				//check the user is an existing LDAP user
-				$ldap = Ldap::create('ext_ldap', array('connection_string' => 'ldap://'.$this->container->getParameter('ldap_url').':'.$this->container->getParameter('ldap_port')));
-				$ldap->bind($this->container->getParameter('ldap_bind_dn'), $this->container->getParameter('ldap_bind_pw'));
+				if($this->container->hasParameter('ldap_url')){
+					//check the user is an existing LDAP user
+					$ldap = Ldap::create('ext_ldap', array('connection_string' => 'ldap://'.$this->container->getParameter('ldap_url').':'.$this->container->getParameter('ldap_port')));
+					$ldap->bind($this->container->getParameter('ldap_bind_dn'), $this->container->getParameter('ldap_bind_pw'));
 
-				$sanitized=array('\\' => '\5c','*' => '\2a','(' => '\28',')' => '\29',"\x00" => '\00');
-				$username = str_replace(array_keys($sanitized),array_values($sanitized),$user->getUsername());	
+					$sanitized=array('\\' => '\5c','*' => '\2a','(' => '\28',')' => '\29',"\x00" => '\00');
+					$username = str_replace(array_keys($sanitized),array_values($sanitized),$user->getUsername());	
 
-				$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(&(objectclass=person)(uid='.$username.'))');
-				$ldapResults = $ldapQuery->execute()->toArray();
+					$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(&(objectclass=person)(uid='.$username.'))');
+					$ldapResults = $ldapQuery->execute()->toArray();
 
-				if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute('uid')[0] == $user->getUsername()){
-					$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
-					$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
-
-					$em->persist($user);
-					$em->flush();
-					echo "<script>alert('user ".$user->getFullname()." found')</script>";
-					$user = new User();
-					$form = $this->createFormBuilder($user)
-						->add('username', TextType::class)
-						->add('save', SubmitType::class, array('label' => 'Create User'))
-						->getForm();
-				}else{
-					echo "<script>alert('user not found')</script>";
+					if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute('uid')[0] == $user->getUsername()){
+						$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
+						$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
+					}else{
+						echo "<script>alert('user not found')</script>";
+					}
 				}
+				$em->persist($user);
+				$em->flush();
+				echo "<script>alert('user ".$user->getFullname()." found')</script>";
+				$user = new User();
+				$formBuilder = $this->createFormBuilder($user)->add('username', TextType::class);
+				if(!$this->container->hasParameter('ldap_url')){
+					$formBuilder->add('fullname', TextType::class)
+						->add('email', TextType::class);
+				}
+				$form = $formBuilder->add('save', SubmitType::class, array('label' => 'Create User'))->getForm();
 			}
 		}
 
