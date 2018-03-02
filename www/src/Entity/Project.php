@@ -37,12 +37,12 @@ class Project
 	private $status;
 
 	/**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
 	private $nbDays;
 
 	/**
-     * @ORM\Column(type="string", length=1000)
+     * @ORM\Column(type="string", length=1000, nullable=true)
      */
 	private $comments;
 

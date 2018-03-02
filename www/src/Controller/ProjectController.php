@@ -2,6 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Project;
+use App\Form\ProjectType;
+
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -10,10 +14,23 @@ class ProjectController extends Controller
     /**
      * @Route("/project", name="project")
      */
-    public function index()
+    public function index(Request $request)
     {
-        return $this->render('project/index.html.twig', [
-            'controller_name' => 'ProjectController',
-        ]);
+		$em = $this->getDoctrine()->getManager();
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+
+		$project = new Project();
+		$form = $this->createForm(ProjectType::class,$project);
+
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$project = $form->getData();
+			$em->persist($project);
+			$em->flush();
+		}
+
+		$projects = $projectRepository->findAll();
+
+        return $this->render('project/index.html.twig',array('projects'=>$projects,'form'=>$form->createView()));
     }
 }
