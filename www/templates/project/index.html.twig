@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello project!{% endblock %}
+{% block pageTitle %}Planning{% endblock %}
 
 {% block body %}
 <h1>Project index</h1>
@@ -9,9 +9,69 @@
 {{ form_widget(form) }}
 {{ form_end(form) }}
 <h2>Existing projects</h2>
-<ul>
-	{% for project in projects %}
-	<li>{{ project.name }} (SC{{project.reference}})</li>
-	{% endfor %}
-</ul>
+<div class="row">
+<div class="col">
+	<p>Non validé</p>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+</div>
+<div class="col">
+	<p>Lancement</p>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+</div>
+<div class="col">
+	<p>En cours</p>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+</div>
+<div class="col">
+	<p>Rapport</p>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+</div>
+<div class="col">
+	<p>Relecture</p>
+	<div class="kanProject">Static</div>
+</div>
+<div class="col">
+	<p>Restitution</p>
+	<div class="kanProject">Static</div>
+</div>
+<div class="col">
+	<p>Terminé</p>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+	<div class="kanProject">Static</div>
+</div>
+</div>
+{% for project in projects %}
+	<div class="kanProject col-2">
+	<h3>{{ project.name }} ({{project.reference}})</h3>
+	{% if project.status == 0 %}
+		Non validé
+	{% elseif project.status == 1 %}
+		Lancement
+	{% elseif project.status == 2 %}
+		En cours
+	{% elseif project.status == 3 %}
+		Rapport
+	{% elseif project.status == 4 %}
+		Relecture
+	{% elseif project.status == 5 %}
+		Restitution
+	{% else %}
+		Terminé
+	{% endif %}
+	</div>
+{% endfor %}
 {% endblock %}
