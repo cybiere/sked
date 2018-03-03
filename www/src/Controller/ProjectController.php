@@ -9,15 +9,32 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+/**
+ * @Route("/project")
+ */
 class ProjectController extends Controller
 {
     /**
-     * @Route("/project", name="project")
+     * @Route("/{projectId}/{way}", name="project_index", defaults={"projectId"=0,"way"="inc"})
      */
-    public function index(Request $request)
+    public function index(Request $request,$projectId,$way)
     {
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+
+		if($projectId != 0){
+			$project = $projectRepository->find($projectId);
+			if($project){
+				if($way == "inc" && $project->getStatus() < 7){
+					$project->setStatus($project->getStatus()+1);
+				}elseif($way == "dec" && $project->getStatus() > 0){
+					$project->setStatus($project->getStatus()-1);
+				}
+				$em->flush();
+			}else{
+				echo "<script>alert('Project not found')</script>";
+			}
+		}
 
 		$project = new Project();
 		$form = $this->createForm(ProjectType::class,$project);
