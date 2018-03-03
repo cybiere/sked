@@ -19,45 +19,87 @@
 	</div>
 </div>
 <hr />
-<div class="row">
-	<div class="col">
+<div class="row" id="kanban">
+	<div class="col kanCol">
 		<h3>Non validé</h3>
+		<div class='card bg-secondary kanGhost'>
+			<h4 class="card-header"></h4>
+			<div class="card-body"></div>
+			<div class="card-footer"></div>
+		</div>
+
 		{% for project in projects[0] %}
 		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
-	<div class="col">
+	<div class="col kanCol">
 		<h3>Lancement</h3>
+		<div class='card bg-secondary kanGhost'>
+			<h4 class="card-header"></h4>
+			<div class="card-body"></div>
+			<div class="card-footer"></div>
+		</div>
+
 		{% for project in projects[1] %}
 		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
-	<div class="col">
+	<div class="col kanCol">
 		<h3>En cours</h3>
+		<div class='card bg-secondary kanGhost'>
+			<h4 class="card-header"></h4>
+			<div class="card-body"></div>
+			<div class="card-footer"></div>
+		</div>
+
 		{% for project in projects[2] %}
 		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
-	<div class="col">
+	<div class="col kanCol">
 		<h3>Rapport</h3>
+		<div class='card bg-secondary kanGhost'>
+			<h4 class="card-header"></h4>
+			<div class="card-body"></div>
+			<div class="card-footer"></div>
+		</div>
+
 		{% for project in projects[3] %}
 		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
-	<div class="col">
+	<div class="col kanCol">
 		<h3>Relecture</h3>
+		<div class='card bg-secondary kanGhost'>
+			<h4 class="card-header"></h4>
+			<div class="card-body"></div>
+			<div class="card-footer"></div>
+		</div>
+
 		{% for project in projects[4] %}
 		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
-	<div class="col">
+	<div class="col kanCol">
 		<h3>Restitution</h3>
+		<div class='card bg-secondary kanGhost'>
+			<h4 class="card-header"></h4>
+			<div class="card-body"></div>
+			<div class="card-footer"></div>
+		</div>
+
 		{% for project in projects[5] %}
 		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
-	<div class="col">
+	<div class="col kanCol">
 		<h3>Facturation</h3>
+		<div class='card bg-secondary kanGhost'>
+			<h4 class="card-header"></h4>
+			<div class="card-body"></div>
+			<div class="card-footer"></div>
+		</div>
+
 		{% for project in projects[6] %}
 		{{ kanproject(project) }}
 		{% endfor %}
@@ -92,3 +134,7 @@
 	</tbody>
 </table>
 {% endblock %}
+
+{% block extraJs %}
+<script src="/js/kanban.js" />
+	{% endblock %}

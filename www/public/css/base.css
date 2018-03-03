@@ -10,3 +10,11 @@ body {
 .kanProject{
 	margin-bottom: 5px;
 }
+.kanGhost{
+	display:none;
+	margin-bottom: 5px;
+}
+.kanCol{
+	border : 1px #ccc solid;
+	border-width : 0 1px ;
+}
