@@ -1,7 +1,12 @@
 body {
   padding-top: 5rem;
 }
-.kanProject {
-	border : 1px #aaa solid;
-	border-radius : 5px;
+.kanProject ul{
+	margin:0;
+}
+.kanProject .card-body{
+	padding: 5px 15px ;
+}
+.kanProject{
+	margin-bottom: 5px;
 }
