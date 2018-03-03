@@ -10,68 +10,53 @@
 {{ form_end(form) }}
 <h2>Existing projects</h2>
 <div class="row">
-<div class="col">
-	<p>Non validé</p>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-</div>
-<div class="col">
-	<p>Lancement</p>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-</div>
-<div class="col">
-	<p>En cours</p>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-</div>
-<div class="col">
-	<p>Rapport</p>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-</div>
-<div class="col">
-	<p>Relecture</p>
-	<div class="kanProject">Static</div>
-</div>
-<div class="col">
-	<p>Restitution</p>
-	<div class="kanProject">Static</div>
-</div>
-<div class="col">
-	<p>Terminé</p>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-	<div class="kanProject">Static</div>
-</div>
-</div>
-{% for project in projects %}
-	<div class="kanProject col-2">
-	<h3>{{ project.name }} ({{project.reference}})</h3>
-	{% if project.status == 0 %}
-		Non validé
-	{% elseif project.status == 1 %}
-		Lancement
-	{% elseif project.status == 2 %}
-		En cours
-	{% elseif project.status == 3 %}
-		Rapport
-	{% elseif project.status == 4 %}
-		Relecture
-	{% elseif project.status == 5 %}
-		Restitution
-	{% else %}
-		Terminé
-	{% endif %}
+	<div class="col">
+		<h3>Non validé</h3>
+		{% for project in projects[0] %}
+			{{ kanproject(project) }}
+		{% endfor %}
 	</div>
-{% endfor %}
+	<div class="col">
+		<h3>Lancement</h3>
+		{% for project in projects[1] %}
+			{{ kanproject(project) }}
+		{% endfor %}
+	</div>
+	<div class="col">
+		<h3>En cours</h3>
+		{% for project in projects[2] %}
+			{{ kanproject(project) }}
+		{% endfor %}
+	</div>
+	<div class="col">
+		<h3>Rapport</h3>
+		{% for project in projects[3] %}
+			{{ kanproject(project) }}
+		{% endfor %}
+	</div>
+	<div class="col">
+		<h3>Relecture</h3>
+		{% for project in projects[4] %}
+			{{ kanproject(project) }}
+		{% endfor %}
+	</div>
+	<div class="col">
+		<h3>Restitution</h3>
+		{% for project in projects[5] %}
+			{{ kanproject(project) }}
+		{% endfor %}
+	</div>
+	<div class="col">
+		<h3>Facturation</h3>
+		{% for project in projects[6] %}
+			{{ kanproject(project) }}
+		{% endfor %}
+	</div>
+	<div class="col">
+		<h3>Archivé</h3>
+		{% for project in projects[7] %}
+			{{ kanproject(project) }}
+		{% endfor %}
+	</div>
+</div>
 {% endblock %}

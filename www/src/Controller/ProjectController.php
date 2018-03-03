@@ -30,7 +30,20 @@ class ProjectController extends Controller
 		}
 
 		$projects = $projectRepository->findAll();
+		$sortedProjects = array(
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+		);
+		foreach($projects as $project){
+			$sortedProjects[$project->getStatus()][] = $project;
+		}
 
-        return $this->render('project/index.html.twig',array('projects'=>$projects,'form'=>$form->createView()));
+        return $this->render('project/index.html.twig',array('projects'=>$sortedProjects,'form'=>$form->createView()));
     }
 }
