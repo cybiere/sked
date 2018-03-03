@@ -39,7 +39,7 @@ class UserController extends Controller{
 
 			//check the user is not already existing
 			if($userRepository->findOneBy(['username' => $user->getUsername()])){
-				echo "<script>alert('user already enroled')</script>";
+				$this->addFlash('warning',"Attention : l'utilisateur ".$user->getUsername()." existe déjà");
 			}else{
 				if($this->container->hasParameter('ldap_url')){
 					//check the user is an existing LDAP user
@@ -55,13 +55,17 @@ class UserController extends Controller{
 					if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute('uid')[0] == $user->getUsername()){
 						$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
 						$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
+						$em->persist($user);
+						$em->flush();
+						$this->addFlash('success','Utilisateur ajouté');
 					}else{
-						echo "<script>alert('user not found')</script>";
+						$this->addFlash('danger',"Erreur : l'utilisateur ".$username." n'existe pas dans l'annuaire LDAP");
 					}
+				}else{
+					$em->persist($user);
+					$em->flush();
+					$this->addFlash('success','Utilisateur ajouté');
 				}
-				$em->persist($user);
-				$em->flush();
-				echo "<script>alert('user ".$user->getFullname()." found')</script>";
 				$user = new User();
 				$formBuilder = $this->createFormBuilder($user)->add('username', TextType::class);
 				if(!$this->container->hasParameter('ldap_url')){
@@ -85,9 +89,11 @@ class UserController extends Controller{
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$user = $userRepository->findOneBy(['username' => $username]);
 		if($user){
+			$this->addFlash('success','Utilisateur '.$username.' supprimé');
 			$em->remove($user);
 			$em->flush();
 		}else{
+			$this->addFlash('danger',"Erreur : l'utilisateur ".$username." n'existe pas");
 		}
 		return $this->redirectToRoute('user_index');
 	}

@@ -31,10 +31,10 @@ class ProjectController extends Controller
 					$project->setStatus($project->getStatus()-1);
 				}
 				$em->flush();
-				return $this->redirectToRoute('project_index');
 			}else{
-				echo "<script>alert('Project not found')</script>";
+		 		$this->addFlash('danger','Erreur : projet non trouvé');
 			}
+			return $this->redirectToRoute('project_index');
 		}
 
 		$project = new Project();
@@ -45,6 +45,7 @@ class ProjectController extends Controller
 			$project = $form->getData();
 			$em->persist($project);
 			$em->flush();
+		 	$this->addFlash('success','Projet ajouté');
 		}
 
 		$projects = $projectRepository->findAll();
@@ -61,6 +62,7 @@ class ProjectController extends Controller
 		foreach($projects as $project){
 			$sortedProjects[$project->getStatus()][] = $project;
 		}
+
 
         return $this->render('project/index.html.twig',array('projects'=>$sortedProjects,'form'=>$form->createView()));
     }
