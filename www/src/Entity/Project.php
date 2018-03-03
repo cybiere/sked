@@ -79,6 +79,8 @@ class Project
 	}
 
 	public function setStatus($status){
+		if($status>7) $status = 7;
+		if($status<0) $status = 0;
 		$this->status = $status;
 	}
 
@@ -87,6 +89,7 @@ class Project
 	}
 
 	public function setNbDays($nbDays){
+		if($nbDays < 0) $nbDays=0;
 		$this->nbDays = $nbDays;
 	}
 
