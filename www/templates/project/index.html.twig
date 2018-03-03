@@ -3,12 +3,22 @@
 {% block pageTitle %}Planning{% endblock %}
 
 {% block body %}
-<h1>Project index</h1>
-<h2>New project</h2>
+<h1>Projets en cours
+<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addProject" role="button" aria-expanded="false" aria-controls="addButton">
+    Ajouter un project
+</a>
+</h1>
+<div class="collapse" id="addProject">
+	<div class="card bg-light">
+		<h2 class="card-header">Ajouter un projet</h2>
+		<div class="card-body">
 {{ form_start(form) }}
 {{ form_widget(form) }}
 {{ form_end(form) }}
-<h2>Existing projects</h2>
+		</div>
+</div>
+</div>
+<hr />
 <div class="row">
 	<div class="col">
 		<h3>Non validé</h3>
@@ -52,11 +62,31 @@
 			{{ kanproject(project) }}
 		{% endfor %}
 	</div>
-	<div class="col">
-		<h3>Archivé</h3>
+</div>
+<hr />
+<h2>Projets archivés
+<a class="btn btn-outline-secondary float-right" data-toggle="collapse" href="#archivedProjects" role="button" aria-expanded="false" aria-controls="archivedProjects">
+    Afficher les projets archivés
+</a>
+</h2>
+<div class="collapse" id="archivedProjects">
+	<table class="table table-hover table-sm">
+		<thead class="thead-light">
+		<tr>
+			<th>Code projet</th>
+			<th>Nom du projet</th>
+			<th>Client</th>
+		</tr>
+		</thead>
+		<tbody>
 		{% for project in projects[7] %}
-			{{ kanproject(project) }}
+			<tr>
+				<td>{{ project.reference }}</td>
+				<td>{{ project.name }}</td>
+				<td>{{ project.client }}</td>
+			</tr>
 		{% endfor %}
-	</div>
+		</tbody>
+	</table>
 </div>
 {% endblock %}
