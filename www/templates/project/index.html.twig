@@ -4,89 +4,84 @@
 
 {% block body %}
 <h1>Projets en cours
-<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addProject" role="button" aria-expanded="false" aria-controls="addButton">
-    Ajouter un project
-</a>
+	<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addProject" role="button" aria-expanded="false" aria-controls="addButton">
+		Ajouter un project
+	</a>
 </h1>
 <div class="collapse" id="addProject">
 	<div class="card bg-light">
 		<h2 class="card-header">Ajouter un projet</h2>
 		<div class="card-body">
-{{ form_start(form) }}
-{{ form_widget(form) }}
-{{ form_end(form) }}
+			{{ form_start(form) }}
+			{{ form_widget(form) }}
+			{{ form_end(form) }}
 		</div>
-</div>
+	</div>
 </div>
 <hr />
 <div class="row">
 	<div class="col">
 		<h3>Non validé</h3>
 		{% for project in projects[0] %}
-			{{ kanproject(project) }}
+		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
 	<div class="col">
 		<h3>Lancement</h3>
 		{% for project in projects[1] %}
-			{{ kanproject(project) }}
+		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
 	<div class="col">
 		<h3>En cours</h3>
 		{% for project in projects[2] %}
-			{{ kanproject(project) }}
+		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
 	<div class="col">
 		<h3>Rapport</h3>
 		{% for project in projects[3] %}
-			{{ kanproject(project) }}
+		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
 	<div class="col">
 		<h3>Relecture</h3>
 		{% for project in projects[4] %}
-			{{ kanproject(project) }}
+		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
 	<div class="col">
 		<h3>Restitution</h3>
 		{% for project in projects[5] %}
-			{{ kanproject(project) }}
+		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
 	<div class="col">
 		<h3>Facturation</h3>
 		{% for project in projects[6] %}
-			{{ kanproject(project) }}
+		{{ kanproject(project) }}
 		{% endfor %}
 	</div>
 </div>
 <hr />
 <h2>Projets archivés
-<a class="btn btn-outline-secondary float-right" data-toggle="collapse" href="#archivedProjects" role="button" aria-expanded="false" aria-controls="archivedProjects">
-    Afficher les projets archivés
-</a>
 </h2>
-<div class="collapse" id="archivedProjects">
-	<table class="table table-hover table-sm">
-		<thead class="thead-light">
+<table class="table table-hover table-sm">
+	<thead class="thead-light">
 		<tr>
 			<th>Code projet</th>
 			<th>Nom du projet</th>
 			<th>Client</th>
 		</tr>
-		</thead>
-		<tbody>
+	</thead>
+	<tbody>
 		{% for project in projects[7] %}
-			<tr>
-				<td>{{ project.reference }}</td>
-				<td>{{ project.name }}</td>
-				<td>{{ project.client }}</td>
-			</tr>
+		<tr>
+			<td>{{ project.reference }}</td>
+			<td>{{ project.name }}</td>
+			<td>{{ project.client }}</td>
+		</tr>
 		{% endfor %}
-		</tbody>
-	</table>
-</div>
+	</tbody>
+</table>
 {% endblock %}
