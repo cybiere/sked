@@ -64,7 +64,9 @@
 	</div>
 </div>
 <hr />
-<h2>Projets archivés
+<h2>
+	<i class="fas fa-archive"></i>
+	Projets archivés
 </h2>
 <table class="table table-hover table-sm">
 	<thead class="thead-light">
@@ -82,8 +84,8 @@
 			<td>{{ project.name }}</td>
 			<td>{{ project.client }}</td>
 			<td>
-				<a href='{{ path('project_edit',{"projectId":project.id})}}'>Modifier</a>
-				<a href='{{ path('project_archive',{"projectId":project.id})}}'>Désarchiver</a>
+				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
+				<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Désarchiver" class="fas fa-caret-square-up"></i></a>
 			</td>
 		</tr>
 		{% endfor %}
