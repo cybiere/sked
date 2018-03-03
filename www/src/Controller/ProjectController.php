@@ -25,12 +25,13 @@ class ProjectController extends Controller
 		if($projectId != 0){
 			$project = $projectRepository->find($projectId);
 			if($project){
-				if($way == "inc" && $project->getStatus() < 7){
+				if($way == "inc" && $project->getStatus() < 6){
 					$project->setStatus($project->getStatus()+1);
 				}elseif($way == "dec" && $project->getStatus() > 0){
 					$project->setStatus($project->getStatus()-1);
 				}
 				$em->flush();
+				return $this->redirectToRoute('project_index');
 			}else{
 				echo "<script>alert('Project not found')</script>";
 			}

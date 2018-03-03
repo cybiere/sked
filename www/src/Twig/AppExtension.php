@@ -26,10 +26,18 @@ class AppExtension extends AbstractExtension
 	public function kanprojectFunction($project){
 		echo "<div class='kanProject'>\n";
 		echo "<h4>".$project->getName()." (".$project->getReference().")</h4>\n";
+		if($project->getStatus() != 7){
 		echo "<p class='kanMove'>\n";
-		echo "<a href='".$this->router->generate('project_index',array("projectId"=>$project->getId(),"way"=>"dec"))."'>&lt;</a>\n";
-		echo "<a href='".$this->router->generate('project_index',array("projectId"=>$project->getId(),"way"=>"inc"))."'>&gt;</a>\n";
+		if($project->getStatus() == 0)
+			echo "&lt;\n";
+		else
+			echo "<a href='".$this->router->generate('project_index',array("projectId"=>$project->getId(),"way"=>"dec"))."'>&lt;</a>\n";
+		if($project->getStatus() == 6)
+			echo "&gt;\n";
+		else
+			echo "<a href='".$this->router->generate('project_index',array("projectId"=>$project->getId(),"way"=>"inc"))."'>&gt;</a>\n";
 		echo "</p>\n";
+		}
 		echo "</div>\n";
 	}
 }
