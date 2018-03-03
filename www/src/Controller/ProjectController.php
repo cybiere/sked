@@ -82,4 +82,28 @@ class ProjectController extends Controller
 		}
         return $this->render('project/edit.html.twig',array('project'=>$project,'form'=>$form->createView()));
 	}
+
+	/**
+	 * @Route("/archive/{projectId}",name="project_archive")
+	 */
+	public function archive(Request $request,$projectId){
+		$em = $this->getDoctrine()->getManager();
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+
+		if(!($project = $projectRepository->find($projectId))){
+		 	$this->addFlash('danger','Erreur : projet non trouvé');
+			return $this->redirectToRoute('project_index');
+		}
+
+		if($project->getStatus() == 7){
+			$project->setStatus(0);
+			$em->flush();
+			$this->addFlash('success','Projet désarchivé');
+		}else{
+			$project->setStatus(7);
+			$em->flush();
+			$this->addFlash('success','Projet archivé');
+		}
+		return $this->redirectToRoute('project_index');
+	}
 }

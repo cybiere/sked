@@ -83,6 +83,7 @@
 			<td>{{ project.client }}</td>
 			<td>
 				<a href='{{ path('project_edit',{"projectId":project.id})}}'>Modifier</a>
+				<a href='{{ path('project_archive',{"projectId":project.id})}}'>Désarchiver</a>
 			</td>
 		</tr>
 		{% endfor %}

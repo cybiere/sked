@@ -28,6 +28,7 @@ class AppExtension extends AbstractExtension
 		echo "<h4>".$project->getName()." (".$project->getReference().")</h4>\n";
 		echo "<p class='kanActions'>\n";
 			echo "<a href='".$this->router->generate('project_edit',array("projectId"=>$project->getId()))."'>Modifier</a>\n";
+			echo "<a href='".$this->router->generate('project_archive',array("projectId"=>$project->getId()))."'>Archiver</a>\n";
 		echo "</p>\n";
 		if($project->getStatus() != 7){
 		echo "<p class='kanMove'>\n";
