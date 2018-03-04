@@ -18,3 +18,6 @@ body {
 	border : 1px #ccc solid;
 	border-width : 0 1px ;
 }
+.kanFloat{
+    box-shadow: 10px 10px 5px grey;
+}
