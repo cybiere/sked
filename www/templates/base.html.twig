@@ -20,7 +20,7 @@
 	<body>
 
 		<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-			<a class="navbar-brand" href="#">
+			<a class="navbar-brand" href="{{ path('planning_index')}}">
   				<i class="fas fa-user" data-fa-transform="shrink-8.0 down-2.7" data-fa-mask="fas fa-calendar"></i> TeamManager</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
@@ -28,6 +28,9 @@
 
 			<div class="collapse navbar-collapse" id="navbarsExampleDefault">
 				<ul class="navbar-nav mr-auto">
+					<li class="nav-item{% if app.request.attributes.get('_route') == "planning_index" %} active{% endif %}">
+						<a class="nav-link" href="{{ path('planning_index') }}">Planning</a>
+					</li>
 					<li class="nav-item{% if app.request.attributes.get('_route') == "project_index" %} active{% endif %}">
 						<a class="nav-link" href="{{ path('project_index') }}">Projets</a>
 					</li>
@@ -35,10 +38,12 @@
 						<a class="nav-link" href="{{ path('user_index') }}">Utilisateurs</a>
 					</li>
 				</ul>
+				<!--
 				<form class="form-inline my-2 my-lg-0">
 					<input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
 					<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
 				</form>
+				-->
 			</div>
 		</nav>
 
