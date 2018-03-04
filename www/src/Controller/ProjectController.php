@@ -6,6 +6,7 @@ use App\Entity\Project;
 use App\Form\ProjectType;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -106,4 +107,24 @@ class ProjectController extends Controller
 		}
 		return $this->redirectToRoute('project_index');
 	}
+
+	/**
+	 * @Route("/move/{projectId}/{newStatus}",name="project_move")
+	 */
+	public function move(Request $request,$projectId,$newStatus){
+		$em = $this->getDoctrine()->getManager();
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+
+		if(!($project = $projectRepository->find($projectId))){
+			$arrData = ['success' => false, 'errormsg' => 'Projet non trouvé'];
+		}else{
+			if($newStatus < 0) $newStatus = 0;
+			if($newStatus > 7) $newStatus = 7;
+			$project->setStatus($newStatus);
+			$em->flush();
+			$arrData = ['success' => true];
+		}
+        return new JsonResponse($arrData);
+	}
+
 }

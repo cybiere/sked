@@ -122,12 +122,19 @@
 				"ui-droppable-hover":"kanActiveCol",
 			},
 			drop : function(event, ui){
-				/*
-				$.get({{ path('project_index') }}, function(data, status){
-					alert("Data: " + data + "\nStatus: " + status);
+				url=  "{{ path("project_move",{"projectId":"idPlaceHold","newStatus":"statusPlaceHold"}) }}";
+				url = url.replace("idPlaceHold", ui.draggable.data('projectid'));
+				url = url.replace("statusPlaceHold", $(this).data('status'));
+				destCol = this;
+				$.get(url, function(data, status){
+					console.log('ajax\n');
+					if(data.success){
+						ui.draggable.detach().appendTo(destCol);
+					}else{
+						message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+						$('#flashMessages').append(message);
+					}
 				});
-				*/
-				ui.draggable.detach().appendTo(this);
 			}
 		});
 	});

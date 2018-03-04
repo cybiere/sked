@@ -25,7 +25,7 @@ class AppExtension extends AbstractExtension
 
 	public function kanprojectFunction($project){
 ?>
-		<div class='card kanProject'>
+	<div class='card kanProject' data-projectid="<?php echo $project->getId(); ?>">
 		<h4 class="card-header"><?php echo $project->getReference(); ?></h4>
 		<div class="card-body">
 			<ul class="list-unstyled">

@@ -44,7 +44,7 @@
 
 		<main role="main" class="container-fluid">
 
-
+		<div id="flashMessages">
 {% for label, messages in app.flashes %}
     {% for message in messages %}
 		<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
@@ -55,6 +55,7 @@
         </div>
     {% endfor %}
 {% endfor %}
+		</div>
 
 		{% block body %}{% endblock %}
 
