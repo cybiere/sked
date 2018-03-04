@@ -19,5 +19,9 @@ body {
 	border-width : 0 1px ;
 }
 .kanFloat{
+	z-index:10000;
     box-shadow: 10px 10px 5px grey;
+}
+.kanActiveCol{
+	background-color:lightblue;
 }
