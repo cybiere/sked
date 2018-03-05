@@ -4,6 +4,10 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProjectRepository")
  */
@@ -45,6 +49,17 @@ class Project
      * @ORM\Column(type="string", length=1000, nullable=true)
      */
 	private $comments;
+
+	/**
+     * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="project", orphanRemoval=true)
+	 */
+	private $plannings;
+
+
+    public function __construct()
+    {
+        $this->plannings = new ArrayCollection();
+    }
 
 	public function getId(){
 		return $this->id;
@@ -100,4 +115,13 @@ class Project
 	public function setComments($comments){
 		$this->comments = $comments;
 	}
+
+	/**
+     * @return Collection|Planning[]
+     */
+    public function getPlannings()
+    {
+        return $this->plannings;
+    }
+
 }

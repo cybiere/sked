@@ -4,6 +4,9 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
@@ -32,6 +35,16 @@ class User
      */
     private $email;
 
+	/**
+     * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="user", orphanRemoval=true)
+	 */
+	private $plannings;
+
+
+    public function __construct()
+    {
+        $this->plannings = new ArrayCollection();
+    }
 
 	public function getId(){
 		return $this->id;
@@ -61,4 +74,11 @@ class User
 		$this->email=$email;
 	}
 
+	/**
+     * @return Collection|Planning[]
+     */
+    public function getPlannings()
+    {
+        return $this->plannings;
+    }
 }
