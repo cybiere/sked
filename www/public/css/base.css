@@ -28,6 +28,9 @@ body {
 .schedDate{
 	text-align:center;
 }
+.schedUser{
+	text-align:right;
+}
 .schedHour{
 	border: 1px #ccc solid;
 }

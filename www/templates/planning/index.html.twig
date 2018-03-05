@@ -14,12 +14,12 @@
 	</div>
 </div>
 
-	<table class="table table-sm schedule">
+	<table class="table table-sm table-hover schedule">
 		<thead>
 			<tr>
-				{% set startDate = "01-01-2013" %}
-				{% set endDate = "31-01-2013" %}
-				<th>{{ startDate|date('M Y') }}</th>
+				{% set startDate = "01-02-2013" %}
+				{% set endDate = "28-02-2013" %}
+				<th class="schedDate">{{ startDate|date('M Y') }}</th>
 				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
 					<th colspan="2" class="schedDate">{{ x|date('d') }}</th>
 				{% endfor %}
@@ -28,7 +28,7 @@
 		<tbody>
 			{% for user in users %}
 			<tr>
-				<th>{{ user.username }}</th>
+				<th class="schedUser">{{ user.username }}</th>
 				{% set currentPlanning = "" %}
 				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
 					{% set empty = true %}
