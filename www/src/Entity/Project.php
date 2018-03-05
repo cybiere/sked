@@ -61,6 +61,10 @@ class Project
         $this->plannings = new ArrayCollection();
     }
 
+	public function __toString(){
+		return $this->name." (".$this->reference.")";
+	}
+
 	public function getId(){
 		return $this->id;
 	}

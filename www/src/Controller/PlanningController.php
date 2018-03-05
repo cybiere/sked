@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Planning;
+use App\Form\PlanningType;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -17,10 +19,15 @@ class PlanningController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 
+		$planning = new Planning();
+		$form = $this->createForm(PlanningType::class,$planning);
+
+
 		$users = $userRepository->findAll();
 
         return $this->render('planning/index.html.twig', [
-            'users' => $users,
+			'users' => $users,
+			'form' => $form->createView(),
         ]);
     }
 }

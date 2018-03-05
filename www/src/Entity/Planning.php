@@ -35,14 +35,14 @@ class Planning
 	private $endHour;
 
 	/**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="plannings")
-     * @ORM\JoinColumn(nullable=true)
+	 * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="plannings")
+	 * @ORM\JoinColumn(nullable=true)
      */
 	private $project;
 
 	/**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="plannings")
-     * @ORM\JoinColumn(nullable=true)
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="plannings")
+	 * @ORM\JoinColumn(nullable=true)
      */
 	private $user;
 
@@ -51,7 +51,7 @@ class Planning
 	}
 
 	public function getStartDate(){
-		return $this->startDate();
+		return $this->startDate;
 	}
 
 	public function setStartDate($startDate){
@@ -73,7 +73,7 @@ class Planning
 	}
 
 	public function getEndDate(){
-		return $this->endDate();
+		return $this->endDate;
 	}
 
 	public function setEndDate($endDate){
@@ -95,7 +95,7 @@ class Planning
 	}
 
 	public function getProject(){
-		return $this->project();
+		return $this->project;
 	}
 
 	public function setProject($project){
@@ -103,7 +103,7 @@ class Planning
 	}
 
 	public function getUser(){
-		return $this->user();
+		return $this->user;
 	}
 
 	public function setUser($user){

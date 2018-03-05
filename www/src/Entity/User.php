@@ -46,6 +46,10 @@ class User
         $this->plannings = new ArrayCollection();
     }
 
+	public function __toString(){
+		return $this->fullname;
+	}
+
 	public function getId(){
 		return $this->id;
 	}

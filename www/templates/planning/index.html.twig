@@ -5,6 +5,15 @@
 {% block body %}
 <h1>Planning</h1>
 
+	<div class="card bg-light">
+		<h2 class="card-header">Ajouter un projet</h2>
+		<div class="card-body">
+			{{ form_start(form) }}
+			{{ form_widget(form) }}
+			{{ form_end(form) }}
+		</div>
+	</div>
+
 <div class="row">
 	<table class="table schedule">
 		<thead>
