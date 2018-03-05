@@ -14,14 +14,14 @@
 	</div>
 </div>
 
-	<table class="table schedule">
+	<table class="table table-sm schedule">
 		<thead>
 			<tr>
-				<th>Ressources</th>
-				{% set startDate = "01-01-2003" %}
-				{% set endDate = "31-01-2003" %}
+				{% set startDate = "01-01-2013" %}
+				{% set endDate = "31-01-2013" %}
+				<th>{{ startDate|date('M Y') }}</th>
 				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
-					<th colspan="2">{{ x|date('d') }}</th>
+					<th colspan="2" class="schedDate">{{ x|date('d') }}</th>
 				{% endfor %}
 			</tr>
 		</thead>
@@ -29,8 +29,6 @@
 			{% for user in users %}
 			<tr>
 				<th>{{ user.username }}</th>
-				{% set startDate = "01-01-2013" %}
-				{% set endDate = "31-01-2013" %}
 				{% set currentPlanning = "" %}
 				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
 					{% set empty = true %}
@@ -39,26 +37,26 @@
 							{% if planning.startDate|date('U') == x|date('U') %}
 								{% set currentPlanning = planning %}
 								{% if planning.startHour == "am" %}
-									<td class="schedHour schedActive">X</td>
+									<td class="schedHour schedActive"></td>
 								{% else %}
 									<td class="schedHour"></td>
 								{% endif %}
-								<td class="schedHour schedActive">X</td>
+								<td class="schedHour schedActive"></td>
 								{% set empty = false %}
 							{% elseif planning.startDate|date('U') < x|date('U') %}
 								{% if planning.endDate|date('U') == x|date('U') %}
-									<td class="schedHour schedActive">X</td>
+									<td class="schedHour schedActive"></td>
 									{% if planning.endHour == "am" %}
 										<td class="schedHour"></td>
 									{% else %}
-										<td class="schedHour schedActive">X</td>
+										<td class="schedHour schedActive"></td>
 									{% endif %}
 									{% set currentPlanning = "" %}
 									{% set empty = false %}
 								{% elseif planning.endDate|date('U') > x|date('U') %}
 									{% set currentPlanning = planning %}
-									<td class="schedHour schedActive">X</td>
-									<td class="schedHour schedActive">X</td>
+									<td class="schedHour schedActive"></td>
+									<td class="schedHour schedActive"></td>
 									{% set empty = false %}
 								{% endif %}
 							{% endif %}
@@ -67,17 +65,17 @@
 						{% set planning = currentPlanning %}
 						{% if planning.endDate|date('U') == x|date('U') %}
 							{% set currentPlanning = "" %}
-							<td class="schedHour schedActive">X</td>
+							<td class="schedHour schedActive"></td>
 							{% if planning.endHour == "am" %}
 								<td class="schedHour"></td>
 							{% else %}
-								<td class="schedHour schedActive">X</td>
+								<td class="schedHour schedActive"></td>
 							{% endif %}
 							{% set currentPlanning = "" %}
 							{% set empty = false %}
 						{% elseif planning.endDate|date('U') > x|date('U') %}
-							<td class="schedHour schedActive">X</td>
-							<td class="schedHour schedActive">X</td>
+							<td class="schedHour schedActive"></td>
+							<td class="schedHour schedActive"></td>
 							{% set empty = false %}
 						{% endif %}
 					{% endif %}

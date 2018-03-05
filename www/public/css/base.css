@@ -25,3 +25,12 @@ body {
 .kanActiveCol{
 	background-color:lightblue;
 }
+.schedDate{
+	text-align:center;
+}
+.schedHour{
+	border: 1px #ccc solid;
+}
+.schedActive{
+	background : #f88;
+}
