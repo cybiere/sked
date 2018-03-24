@@ -49,7 +49,7 @@
 								{% if planning.endDate|date('U') == endPlanning|date('U') and planning.endHour == "am" %}
 									{% set nbSpan = nbSpan - 1 %}
 								{% endif %}
-									<td class="schedHour schedActive" colspan="{{ nbSpan }}"></td>
+								<td class="schedHour schedActive" colspan="{{ nbSpan }}">{{ planning.project.name }}</td>
 								{% if planning.endDate|date('U') == endPlanning|date('U') and planning.endHour == "am" %}
 									<td class="schedHour"></td>
 								{% endif %}
