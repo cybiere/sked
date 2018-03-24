@@ -15,9 +15,9 @@ class PlanningType extends AbstractType
     {
         $builder
             ->add('startDate',null,array('label'=>'Date de début'))
-			->add('startHour',ChoiceType::class,array('label'=>'Heure de début','choices'=>array('Matin'=>'am','Après-midi'=>'pm')))
+			->add('startHour',ChoiceType::class,array('label'=>'Heure de début','choices'=>array('Matin'=>'am','Midi'=>'pm')))
             ->add('endDate',null,array('label'=>'Date de fin'))
-			->add('endHour',ChoiceType::class,array('label'=>'Heure de fin','choices'=>array('Matin'=>'am','Après-midi'=>'pm')))
+			->add('endHour',ChoiceType::class,array('label'=>'Heure de fin','choices'=>array('Midi'=>'am','Soir'=>'pm')))
             ->add('project',null,array('label'=>'Projet'))
             ->add('user',null,array('label'=>'Ressource'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
