@@ -1,0 +1,215 @@
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<link href="jquery-ui.min.css" rel="stylesheet">
+<style>
+table {
+	border-collapse: collapse;
+	width:100%;
+}
+td {
+	border: 1px #ccc solid;
+	height: 30px;
+	padding:0;
+}
+.projectContainer {
+	position: relative;
+	width:100%;
+	background:#fcc;
+	height:100%;
+}
+.project {
+	border: 1px #668 solid;
+	background: #ccf;
+	border-radius: 5px;
+	margin-top : 4px;
+	margin-left : 1px;
+	height:20px;
+	
+	left:0;
+		right:0;
+
+	position: absolute;
+	z-index: 100000;
+}
+.projectGhost {
+	border: 1px #aac solid;
+	background: #eef;
+	border-radius: 5px;
+	margin-top : 4px;
+	margin-left : 1px;
+	height:20px;
+	left:0;
+	right:0;
+	position: absolute;
+	z-index: 100000;
+}
+.activeDrop {
+	background: #cfc;
+}
+</style>
+	</head>
+	<body>
+		<table id="sched">
+			<tr>
+				<th>x</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+				<th colspan="2">a</th>
+			</tr>
+			<tr class="userline">
+				<th>user</th>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer">
+						<div class="project">Projet du jour</div>
+					</div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+			</tr>
+			<tr class="userline">
+				<th>user</th>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer">
+						<div class="project">Projet du jour</div>
+					</div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+			</tr>
+			<tr class="userline">
+				<th>user</th>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer">
+						<div class="project">Projet du jour</div>
+					</div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+			</tr>
+			<tr class="userline">
+				<th>user</th>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer">
+						<div class="project">Projet du jour</div>
+					</div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+				<td><div class="projectContainer"></div></td><td><div class="projectContainer"></div></td>
+			</tr>
+		</table>
+	
+		<script src="jquery.js"></script>
+		<script src="jquery-ui.min.js"></script>
+		<script>
+			$('.project').outerWidth($('td').outerWidth()*5-3);
+			/*$('.projectContainer').mousedown(function(e){
+				$("<div class='projectGhost'>Hello</div>").appendTo(this);
+			});*/
+
+	    	$(".project").resizable({
+				handles: "e",
+	    		grid: $('td').outerWidth(),
+				containment: "#sched"
+	    	});
+	
+			$('.project').draggable({
+			containment : 'table',
+			revert : true,
+			revertDuration: 0,
+			cursor: "grab",
+			cursorAt: { left:5 }
+		}); // appel du plugin
+	
+		$('.projectContainer').droppable({
+			classes: {
+				"ui-droppable-hover":"activeDrop",
+			},
+			tolerance: 'pointer',
+			drop : function(event, ui){
+				destCell = this;
+				ui.draggable.detach().appendTo(destCell);
+			}
+		});
+
+
+		</script>
+	</body>
+</html>
