@@ -29,59 +29,36 @@
 			{% for user in users %}
 			<tr>
 				<th class="schedUser">{{ user.username }}</th>
-				{% set currentPlanning = "" %}
+				{% set endPlanning = startDate|date_modify("-1 day") %}
 				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
-					{% set empty = true %}
-					{% if currentPlanning == "" %}
-						{% for planning in user.plannings if currentPlanning == "" %}
-							{% if planning.startDate|date('U') == x|date('U') %}
-								{% set currentPlanning = planning %}
-								{% if planning.startHour == "am" %}
-									<td class="schedHour schedActive"></td>
+					{% if x|date('U') > endPlanning|date('U') %}
+						{% set foundPlanning = false %}
+						{% for planning in user.plannings if not foundPlanning %}
+							{% if planning.startDate|date('U') <= x|date('U') and planning.endDate|date('U') >= x|date('U')%}
+								{% set foundPlanning = true %}
+								{% if planning.endDate|date('U') > endDate|date('U') %}
+									{% set endPlanning = endDate %}
 								{% else %}
-									<td class="schedHour"></td>
+									{% set endPlanning = planning.endDate %}
 								{% endif %}
-								<td class="schedHour schedActive"></td>
-								{% set empty = false %}
-							{% elseif planning.startDate|date('U') < x|date('U') %}
-								{% if planning.endDate|date('U') == x|date('U') %}
-									<td class="schedHour schedActive"></td>
-									{% if planning.endHour == "am" %}
-										<td class="schedHour"></td>
-									{% else %}
-										<td class="schedHour schedActive"></td>
-									{% endif %}
-									{% set currentPlanning = "" %}
-									{% set empty = false %}
-								{% elseif planning.endDate|date('U') > x|date('U') %}
-									{% set currentPlanning = planning %}
-									<td class="schedHour schedActive"></td>
-									<td class="schedHour schedActive"></td>
-									{% set empty = false %}
+								{% set nbSpan = (endPlanning|date('d') - x|date('d') + 1) * 2%}
+								{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
+									<td class="schedHour"></td>
+									{% set nbSpan = nbSpan - 1 %}
+								{% endif %}
+								{% if planning.endDate|date('U') == endPlanning|date('U') and planning.endHour == "am" %}
+									{% set nbSpan = nbSpan - 1 %}
+								{% endif %}
+									<td class="schedHour schedActive" colspan="{{ nbSpan }}"></td>
+								{% if planning.endDate|date('U') == endPlanning|date('U') and planning.endHour == "am" %}
+									<td class="schedHour"></td>
 								{% endif %}
 							{% endif %}
 						{% endfor %}
-					{% else %}
-						{% set planning = currentPlanning %}
-						{% if planning.endDate|date('U') == x|date('U') %}
-							{% set currentPlanning = "" %}
-							<td class="schedHour schedActive"></td>
-							{% if planning.endHour == "am" %}
-								<td class="schedHour"></td>
-							{% else %}
-								<td class="schedHour schedActive"></td>
-							{% endif %}
-							{% set currentPlanning = "" %}
-							{% set empty = false %}
-						{% elseif planning.endDate|date('U') > x|date('U') %}
-							<td class="schedHour schedActive"></td>
-							<td class="schedHour schedActive"></td>
-							{% set empty = false %}
+						{% if not foundPlanning %}
+							<td class="schedHour"></td>
+							<td class="schedHour"></td>
 						{% endif %}
-					{% endif %}
-					{% if empty == true %}
-						<td class="schedHour"></td>
-						<td class="schedHour"></td>
 					{% endif %}
 				{% endfor %}
 			</tr>
