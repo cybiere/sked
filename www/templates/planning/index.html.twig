@@ -3,8 +3,13 @@
 {% block title %}Planning{% endblock %}
 
 {% block body %}
-<h1>Planning</h1>
+<h1>Planning
+	<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addPlanning" role="button" aria-expanded="false" aria-controls="addButton">
+		Ajouter une entrée de planning
+	</a>
+</h1>
 
+<div class="collapse" id="addPlanning">
 <div class="card bg-light">
 	<h2 class="card-header">Ajouter une entrée de planning</h2>
 	<div class="card-body">
@@ -13,15 +18,20 @@
 		{{ form_end(form) }}
 	</div>
 </div>
+</div>
 
 <hr />
+	
+	{% set baseDate = "01-01-2013"|date() %}
+	{% set nbMonths = 3 %}
+	{% for i in range(0,nbMonths-1) %}
 
+	{% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
+	{% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
 	<table class="table table-sm table-hover schedule">
 		<thead>
 			<tr>
-				{% set startDate = "01-02-2013" %}
-				{% set endDate = "28-02-2013" %}
-				<th class="schedDate">{{ startDate|date('M Y') }}</th>
+				<th class="schedUser schedDate">{{ startDate|date('M Y') }}</th>
 				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
 					{% if x|date('N') < 6 %}
 						<th colspan="2" class="schedDate">{{ x|date('D d') }}</th>
@@ -75,4 +85,5 @@
 			{% endfor %}
 		</tbody>
 	</table>
+	{% endfor %}
 {% endblock %}

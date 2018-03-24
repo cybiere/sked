@@ -25,11 +25,13 @@ body {
 .kanActiveCol{
 	background-color:lightblue;
 }
-.schedDate{
+th.schedDate{
 	text-align:center;
-	border: 1px #ccc solid;
+	border-top: 0;
+	border-right: 1px #ccc solid;
 }
-.schedUser{
+th.schedUser{
+	width: 120px;
 	text-align:right;
 } 
 .schedHour{
