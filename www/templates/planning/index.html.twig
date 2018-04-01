@@ -10,75 +10,75 @@
 </h1>
 
 <div class="collapse" id="addPlanning">
-<div class="card bg-light">
-	<h2 class="card-header">Ajouter une entrée de planning</h2>
-	<div class="card-body">
-		{{ form_start(form) }}
-		{{ form_widget(form) }}
-		{{ form_end(form) }}
+	<div class="card bg-light">
+		<h2 class="card-header">Ajouter une entrée de planning</h2>
+		<div class="card-body">
+			{{ form_start(form) }}
+			{{ form_widget(form) }}
+			{{ form_end(form) }}
+		</div>
 	</div>
-</div>
 </div>
 
 <hr />
-	
-	{% set baseDate = "now"|date('d-m-Y') %}
-	{% set nbMonths = 3 %}
-	{% for i in range(0,nbMonths-1) %}
 
-	{% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
-	{% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
-	<table class="table table-sm table-hover schedule">
-		<thead>
-			<tr>
-				<th class="schedUser schedDate">{{ startDate|date('M Y') }}</th>
-				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
-					{% if x|date('N') < 6 %}
-					<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}">{{ x|date('D d') }}</th>
-					{% endif %}
-				{% endfor %}
-			</tr>
-		</thead>
-		<tbody>
-			{% for user in users %}
-			<tr>
-				<th class="schedUser">{{ user.username }}</th>
-				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
-					{% if x|date('N') < 6 %}
-					<td class="schedHour">
-						<div class="projectContainer">
-						{% for planning in user.plannings %}
-							{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
-							<div class="project" data-duration="{{ planning.nbSlices }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
-							{% endif %}
-						{% endfor %}
-					</div></td>
-					<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}">
-						<div class="projectContainer">
-						{% for planning in user.plannings %}
-							{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
-							<div class="project" data-duration="{{ planning.nbSlices }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
-							{% endif %}
-						{% endfor %}
-					</div></td>
-					{% endif %}
-				{% endfor %}
-			</tr>
+{% set baseDate = "now"|date('d-m-Y') %}
+{% set nbMonths = 3 %}
+{% for i in range(0,nbMonths-1) %}
+
+{% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
+{% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
+<table class="table table-sm table-hover schedule">
+	<thead>
+		<tr>
+			<th class="schedUser schedDate">{{ startDate|date('M Y') }}</th>
+			{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
+			{% if x|date('N') < 6 %}
+			<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}">{{ x|date('D d') }}</th>
+			{% endif %}
 			{% endfor %}
-		</tbody>
-	</table>
-	{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for user in users %}
+		<tr>
+			<th class="schedUser">{{ user.username }}</th>
+			{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
+			{% if x|date('N') < 6 %}
+			<td class="schedHour">
+				<div class="projectContainer">
+					{% for planning in user.plannings %}
+					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
+					<div class="project" data-duration="{{ planning.nbSlices }}" data-planningId="{{ planning.id }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
+					{% endif %}
+					{% endfor %}
+				</div></td>
+				<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}">
+					<div class="projectContainer">
+						{% for planning in user.plannings %}
+						{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
+						<div class="project" data-duration="{{ planning.nbSlices }}" data-planningId="{{ planning.id }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
+						{% endif %}
+						{% endfor %}
+					</div></td>
+					{% endif %}
+					{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endfor %}
 {% endblock %}
 {% block extraJs %}
-		<script>
-			$('.project').each(function(index){
-				$(this).outerWidth($('.schedHour').outerWidth()*$(this).data("duration")-3);
-			});
+<script>
+	$('.project').each(function(index){
+		$(this).outerWidth($('.schedHour').outerWidth()*$(this).data("duration")-3);
+	});
 
-			baseX=0;
-			mouseDown=false;
-			newGhost=null;
-			/*$('.projectContainer').mousedown(function(e){
+baseX=0;
+mouseDown=false;
+newGhost=null;
+/*$('.projectContainer').mousedown(function(e){
 				e.preventDefault();
 				$("<div class='projectGhost'>Nouveau projet</div>").appendTo(this);
 				newGhost = $(this).find('.projectGhost');
@@ -103,35 +103,56 @@
 				}
 			});*/
 
-	    	$(".project").resizable({
-				handles: "e",
-				containment: ".schedule",
-	    		grid: $('.schedHour').outerWidth(),
-				resize: function(e,ui){
-					newSize = Math.round(((ui.size.width-(ui.size.width%$('.schedHour').outerWidth()))/$('.schedHour').outerWidth())+1);
-					$(this).find('i').text(newSize);
-					$(this).data("duration",newSize);
-				},
-	    	});
-
-			$('.project').draggable({
-				revert : true,
-				revertDuration: 0,
-				cursor: "grab",
-				cursorAt: { left:5 }
-			}); 
-	
-			$('.projectContainer').droppable({
-				classes: {
-					"ui-droppable-hover":"activeDrop",
-				},
-				tolerance: "pointer",
-				drop : function(e, ui){
-					destCell = this;
-					ui.draggable.detach().appendTo(destCell);
+$(".project").resizable({
+	handles: "e",
+	containment: ".schedule",
+	grid: $('.schedHour').outerWidth(),
+	resize: function(e,ui){
+		newSize = Math.round(((ui.size.width-(ui.size.width%$('.schedHour').outerWidth()))/$('.schedHour').outerWidth())+1);
+		$(this).find('i').text(newSize);
+		$(this).data("duration",newSize);
+	},
+	stop : function(event, ui){
+		url=  "{{ path("planning_resize",{"planningId":"idPlaceHold","newSize":"sizePlaceHold"}) }}";
+		url = url.replace("idPlaceHold", ui.element.data('planningid'));
+		url = url.replace("sizePlaceHold", $(this).data('duration'));
+		$.ajax(url,{
+			async:false,
+			error:function(xhr,status,error){
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+				ui.element.width(ui.originalSize.width);
+			},
+			success:function(data, status, xhr){
+				console.log('ajax\n');
+				if(!data.success){
+					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+					$('#flashMessages').append(message);
+					ui.element.width(ui.originalSize.width);
 				}
-			});
+			}
+		});
+	}
+});
 
-		</script>
+$('.project').draggable({
+	revert : true,
+	revertDuration: 0,
+	cursor: "grab",
+	cursorAt: { left:5 }
+}); 
+
+$('.projectContainer').droppable({
+	classes: {
+		"ui-droppable-hover":"activeDrop",
+	},
+	tolerance: "pointer",
+	drop : function(e, ui){
+		destCell = this;
+		ui.draggable.detach().appendTo(destCell);
+	}
+});
+
+</script>
 
 {% endblock %}
