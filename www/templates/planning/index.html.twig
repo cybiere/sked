@@ -46,7 +46,7 @@
 			{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
 			{% if x|date('N') < 6 %}
 			<td class="schedHour">
-				<div class="projectContainer">
+				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
 					<div class="project" data-duration="{{ planning.nbSlices }}" data-planningId="{{ planning.id }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
@@ -54,7 +54,7 @@
 					{% endfor %}
 				</div></td>
 				<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}">
-					<div class="projectContainer">
+					<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}">
 						{% for planning in user.plannings %}
 						{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
 						<div class="project" data-duration="{{ planning.nbSlices }}" data-planningId="{{ planning.id }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
@@ -110,12 +110,12 @@ $(".project").resizable({
 	resize: function(e,ui){
 		newSize = Math.round(((ui.size.width-(ui.size.width%$('.schedHour').outerWidth()))/$('.schedHour').outerWidth())+1);
 		$(this).find('i').text(newSize);
-		$(this).data("duration",newSize);
 	},
 	stop : function(event, ui){
+		newSize = Math.round(((ui.size.width-(ui.size.width%$('.schedHour').outerWidth()))/$('.schedHour').outerWidth())+1);
 		url=  "{{ path("planning_resize",{"planningId":"idPlaceHold","newSize":"sizePlaceHold"}) }}";
 		url = url.replace("idPlaceHold", ui.element.data('planningid'));
-		url = url.replace("sizePlaceHold", $(this).data('duration'));
+		url = url.replace("sizePlaceHold", newSize);
 		$.ajax(url,{
 			async:false,
 			error:function(xhr,status,error){
@@ -125,7 +125,9 @@ $(".project").resizable({
 			},
 			success:function(data, status, xhr){
 				console.log('ajax\n');
-				if(!data.success){
+				if(data.success){
+					$(this).data("duration",newSize);
+				}else{
 					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 					$('#flashMessages').append(message);
 					ui.element.width(ui.originalSize.width);
@@ -149,7 +151,27 @@ $('.projectContainer').droppable({
 	tolerance: "pointer",
 	drop : function(e, ui){
 		destCell = this;
-		ui.draggable.detach().appendTo(destCell);
+		url= "{{ path("planning_move",{"planningId":"idPlaceHold","newStart":"startPlaceHold","newHour":"hourPlaceHold","newUser":"userPlaceHold"}) }}";
+		url = url.replace("idPlaceHold", ui.draggable.data('planningid'));
+		url = url.replace("startPlaceHold", $(this).data('date'));
+		url = url.replace("hourPlaceHold", $(this).data('hour'));
+		url = url.replace("userPlaceHold", $(this).data('user'));
+			$.ajax(url,{
+				async:false,
+				error:function(xhr,status,error){
+					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+					$('#flashMessages').append(message);
+				},
+				success:function(data, status, xhr){
+				console.log('ajax\n');
+				if(data.success){
+					ui.draggable.detach().appendTo(destCell);
+				}else{
+						message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+						$('#flashMessages').append(message);
+				}
+				}
+			});
 	}
 });
 
