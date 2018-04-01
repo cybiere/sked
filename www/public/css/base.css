@@ -25,6 +25,10 @@ body {
 .kanActiveCol{
 	background-color:lightblue;
 }
+.schedule{
+	table-layout: fixed;
+	margin-bottom: 50px;
+}
 th.schedDate{
 	text-align:center;
 	border-top: 0;
@@ -36,10 +40,51 @@ th.schedUser{
 } 
 .schedHour{
 	border: 1px #ccc solid;
+	padding:0 !important;
+	height:40px;
 }
-.schedActive{
-	background : #ccf;
+.friday{
+border-right : #ccc 5px double !important;
 }
-.weekend{
-	background : #ccc;
+.projectContainer {
+	position: relative;
+	width:100%;
+	height:100%;
+}
+.project {
+	border: 1px #668 solid;
+	background: #ccf;
+	border-radius: 5px;
+	margin-top : 5px;
+	margin-left : 1px;
+	padding-left:3px;
+	height:30px;
+	left:0;
+	right:0;
+	position: absolute;
+	z-index: 10;
+	overflow-x: hidden;
+}
+.project i {
+	float:right;
+	padding-right:3px;
+}
+.ui-resizable-e {
+	width: 25px;
+}
+.projectGhost {
+	border: 1px #aac solid;
+	background: #eef;
+	border-radius: 5px;
+	margin-top : 4px;
+	margin-left : 1px;
+	height:20px;
+	left:0;
+	right:0;
+	position: absolute;
+	z-index: 100;
+	overflow-x: hidden;
+}
+.activeDrop {
+	background: #cfc;
 }

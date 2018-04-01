@@ -26,13 +26,9 @@ class Planning
 	private $startHour;
 
 	/**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="integer")
      */
-	private $endDate;
-	/**
-     * @ORM\Column(type="string", length=2)
-     */
-	private $endHour;
+	private $nbSlices;
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="plannings")
@@ -72,26 +68,12 @@ class Planning
 		$this->startHour = $startHour;
 	}
 
-	public function getEndDate(){
-		return $this->endDate;
+	public function getNbSlices(){
+		return $this->nbSlices;
 	}
 
-	public function setEndDate($endDate){
-		if(isset($this->startDate) && $this->startDate > $endDate){
-			$this->endDate = $this->startDate;
-			$this->setStartDate($endDate);
-		}else{
-			$this->endDate = $endDate;
-		}
-	}
-
-	public function getEndHour(){
-		return $this->endHour;
-	}
-
-	public function setEndHour($endHour){
-		if($endHour != "pm") $endHour = "am";
-		$this->endHour = $endHour;
+	public function setNbSlices($nbSlices){
+		$this->nbSlices = $nbSlices > 0?$nbSlices:1;
 	}
 
 	public function getProject(){

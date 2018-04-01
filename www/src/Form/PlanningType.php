@@ -14,10 +14,9 @@ class PlanningType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('startDate',null,array('label'=>'Date de début'))
+            ->add('startDate',null,array('label'=>'Date de début','data' => new \DateTime()))
 			->add('startHour',ChoiceType::class,array('label'=>'Heure de début','choices'=>array('Matin'=>'am','Midi'=>'pm')))
-            ->add('endDate',null,array('label'=>'Date de fin'))
-			->add('endHour',ChoiceType::class,array('label'=>'Heure de fin','choices'=>array('Midi'=>'am','Soir'=>'pm')))
+            ->add('nbSlices',null,array('label'=>'Nombre de tranches (0,5jh)'))
             ->add('project',null,array('label'=>'Projet'))
             ->add('user',null,array('label'=>'Ressource'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))

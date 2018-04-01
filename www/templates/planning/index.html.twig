@@ -22,7 +22,7 @@
 
 <hr />
 	
-	{% set baseDate = "01-01-2013"|date() %}
+	{% set baseDate = "now"|date('d-m-Y') %}
 	{% set nbMonths = 3 %}
 	{% for i in range(0,nbMonths-1) %}
 
@@ -34,9 +34,7 @@
 				<th class="schedUser schedDate">{{ startDate|date('M Y') }}</th>
 				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
 					{% if x|date('N') < 6 %}
-						<th colspan="2" class="schedDate">{{ x|date('D d') }}</th>
-					{% else %}
-						<th colspan="2" class="schedDate weekend">{{ x|date('d') }}</th>
+					<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}">{{ x|date('D d') }}</th>
 					{% endif %}
 				{% endfor %}
 			</tr>
@@ -45,40 +43,24 @@
 			{% for user in users %}
 			<tr>
 				<th class="schedUser">{{ user.username }}</th>
-				{% set endPlanning = startDate|date_modify("-1 day") %}
 				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
-					{% if x|date('U') > endPlanning|date('U') %}
-						{% set foundPlanning = false %}
-						{% for planning in user.plannings if not foundPlanning %}
-							{% if planning.startDate|date('U') <= x|date('U') and planning.endDate|date('U') >= x|date('U')%}
-								{% set foundPlanning = true %}
-								{% if planning.endDate|date('U') > endDate|date('U') %}
-									{% set endPlanning = endDate %}
-								{% else %}
-									{% set endPlanning = planning.endDate %}
-								{% endif %}
-								{% set nbSpan = (endPlanning|date('d') - x|date('d') + 1) * 2%}
-								{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
-								<td class="schedHour {% if x|date('N') > 5 %}weekend{% endif %}"></td>
-									{% set nbSpan = nbSpan - 1 %}
-								{% endif %}
-								{% if planning.endDate|date('U') == endPlanning|date('U') and planning.endHour == "am" %}
-									{% set nbSpan = nbSpan - 1 %}
-								{% endif %}
-								<td class="schedHour schedActive" colspan="{{ nbSpan }}">{{ planning.project.name }}</td>
-								{% if planning.endDate|date('U') == endPlanning|date('U') and planning.endHour == "am" %}
-									<td class="schedHour {% if endPlanning|date('N') > 5 %}weekend{% endif %}"></td>
-								{% endif %}
+					{% if x|date('N') < 6 %}
+					<td class="schedHour">
+						<div class="projectContainer">
+						{% for planning in user.plannings %}
+							{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
+							<div class="project" data-duration="{{ planning.nbSlices }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
 							{% endif %}
 						{% endfor %}
-						{% if not foundPlanning %}
-							{% if x|date('N') < 6 %}
-								<td class="schedHour"></td>
-								<td class="schedHour"></td>
-							{% else %}
-								<td class="schedHour weekend" colspan="2"></td>
+					</div></td>
+					<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}">
+						<div class="projectContainer">
+						{% for planning in user.plannings %}
+							{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
+							<div class="project" data-duration="{{ planning.nbSlices }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
 							{% endif %}
-						{% endif %}
+						{% endfor %}
+					</div></td>
 					{% endif %}
 				{% endfor %}
 			</tr>
@@ -86,4 +68,70 @@
 		</tbody>
 	</table>
 	{% endfor %}
+{% endblock %}
+{% block extraJs %}
+		<script>
+			$('.project').each(function(index){
+				$(this).outerWidth($('.schedHour').outerWidth()*$(this).data("duration")-3);
+			});
+
+			baseX=0;
+			mouseDown=false;
+			newGhost=null;
+			/*$('.projectContainer').mousedown(function(e){
+				e.preventDefault();
+				$("<div class='projectGhost'>Nouveau projet</div>").appendTo(this);
+				newGhost = $(this).find('.projectGhost');
+				console.log(newGhost.offset().left);
+				baseX = newGhost.offset().left;
+				mouseDown=true;
+			});
+			$(document).mousemove(function(e){
+				if(mouseDown){
+					e.preventDefault();
+					console.log('move');
+					newGhost.outerWidth(e.pageX - baseX);
+				}
+			});
+			$(document).mouseup(function(e){
+				if(mouseDown){
+					console.log("> " + baseX + " > " + e.pageX);
+					newGhost.remove();
+					baseX=0;
+					mouseDown=false;
+					newGhost=null;
+				}
+			});*/
+
+	    	$(".project").resizable({
+				handles: "e",
+				containment: ".schedule",
+	    		grid: $('.schedHour').outerWidth(),
+				resize: function(e,ui){
+					newSize = Math.round(((ui.size.width-(ui.size.width%$('.schedHour').outerWidth()))/$('.schedHour').outerWidth())+1);
+					$(this).find('i').text(newSize);
+					$(this).data("duration",newSize);
+				},
+	    	});
+
+			$('.project').draggable({
+				revert : true,
+				revertDuration: 0,
+				cursor: "grab",
+				cursorAt: { left:5 }
+			}); 
+	
+			$('.projectContainer').droppable({
+				classes: {
+					"ui-droppable-hover":"activeDrop",
+				},
+				tolerance: "pointer",
+				drop : function(e, ui){
+					destCell = this;
+					ui.draggable.detach().appendTo(destCell);
+				}
+			});
+
+		</script>
+
 {% endblock %}
