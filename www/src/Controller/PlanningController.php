@@ -60,9 +60,9 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/move/{planningId}/{newStart}/{newHour}/{newUser}",name="planning_move")
+	 * @Route("/move/{planningId}/{newStart}/{newHour}/{newUser}/{newSize}",name="planning_move")
 	 */
-	public function move(Request $request,$planningId,$newStart,$newHour,$newUser){
+	public function move(Request $request,$planningId,$newStart,$newHour,$newUser,$newSize){
 		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
@@ -73,8 +73,10 @@ class PlanningController extends Controller
 			$arrData = ['success' => false, 'errormsg' => 'Utilisateur non trouvé'];
 		}else{
 			if($newHour != "pm") $newHour = "am";
+			if($newSize < 1) $newSize = 1;
 			$planning->setStartDate(new \DateTime($newStart));
 			$planning->setStartHour($newHour);
+			$planning->setNbSlices($newSize);
 			$planning->setUser($user);
 			$em->flush();
 			$arrData = ['success' => true];

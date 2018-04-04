@@ -160,7 +160,7 @@ $('.projectContainer').droppable({
 	tolerance: "pointer",
 	drop : function(e, ui){
 		destCell = this;
-		url= "{{ path("planning_move",{"planningId":"idPlaceHold","newStart":"startPlaceHold","newHour":"hourPlaceHold","newUser":"userPlaceHold"}) }}";
+		url= "{{ path("planning_move",{"planningId":"idPlaceHold","newStart":"startPlaceHold","newHour":"hourPlaceHold","newUser":"userPlaceHold","newSize":"sizePlaceHold"}) }}";
 		url = url.replace("idPlaceHold", ui.draggable.data('planningid'));
 		url = url.replace("startPlaceHold", $(this).data('date'));
 		url = url.replace("hourPlaceHold", $(this).data('hour'));
@@ -170,6 +170,7 @@ $('.projectContainer').droppable({
 			ui.draggable.find('i').text($(this).data("remainingslices")+1);
 			ui.draggable.outerWidth($('.schedHour').outerWidth()*ui.draggable.data("duration")-3);
 		}
+		url = url.replace("sizePlaceHold", ui.draggable.data('duration'));
 			$.ajax(url,{
 				async:false,
 				error:function(xhr,status,error){
