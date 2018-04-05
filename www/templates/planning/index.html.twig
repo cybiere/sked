@@ -135,7 +135,7 @@ $(".project").resizable({
 			success:function(data, status, xhr){
 				console.log('ajax\n');
 				if(data.success){
-					$(this).data("duration",newSize);
+					ui.element.data("duration",newSize);
 				}else{
 					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 					$('#flashMessages').append(message);
