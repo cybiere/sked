@@ -162,11 +162,20 @@ $('.projectContainer').droppable({
 	}
 });
 
+$('.projectContainer').on('mousedown',function(e){
+	e.preventDefault();
+});
 baseX=0;
 mouseDown=false;
 newGhost=null;
+add_startDate=null;
+add_startHour=null;
+add_userId=null;
 $('.projectContainer').mousedown(function(e){
 	$("<div class='projectGhost'>Nouveau projet</div>").appendTo(this);
+	add_startDate=$(this).data('date');
+	add_startHour=$(this).data('hour');
+	add_userId=$(this).data('user');
 	newGhost = $(this).find('.projectGhost');
 	baseX = newGhost.offset().left;
 	mouseDown=true;
@@ -182,14 +191,19 @@ $(document).mouseup(function(e){
 		modulo = ghostSize % $('td').outerWidth();
 		nbSlices = Math.round((ghostSize-modulo)/$('td').outerWidth()+1);
 
-		console.log(nbSlices);
 		newGhost.remove();
 
+		console.log("New projet !\n\tStart : " + add_startDate + add_startHour + "\n\tDuration : " + nbSlices + "\n\tUser id : " + add_userId);
 		//create project 
+		
+
 
 		baseX=0;
 		mouseDown=false;
 		newGhost=null;
+		add_startDate=null;
+		add_startHour=null;
+		add_userId=null;
 	}
 });
 
