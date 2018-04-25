@@ -133,7 +133,6 @@ $(".project").resizable({
 				ui.element.width(ui.originalSize.width);
 			},
 			success:function(data, status, xhr){
-				console.log('ajax\n');
 				if(data.success){
 					ui.element.data("duration",newSize);
 				}else{
@@ -178,7 +177,6 @@ $('.projectContainer').droppable({
 					$('#flashMessages').append(message);
 				},
 				success:function(data, status, xhr){
-				console.log('ajax\n');
 				if(data.success){
 					ui.draggable.detach().appendTo(destCell);
 				}else{
