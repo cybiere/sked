@@ -61,14 +61,14 @@
 			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}">
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
-						{% for planning in user.plannings %}
-						{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
-						<div class="project" data-duration="{{ planning.nbSlices }}" data-planningId="{{ planning.id }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
-						{% endif %}
-						{% endfor %}
-					</div></td>
+					{% for planning in user.plannings %}
+					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
+					<div class="project" data-duration="{{ planning.nbSlices }}" data-planningId="{{ planning.id }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
 					{% endif %}
 					{% endfor %}
+				</div></td>
+				{% endif %}
+				{% endfor %}
 		</tr>
 		{% endfor %}
 	</tbody>
@@ -80,34 +80,6 @@
 	$('.project').each(function(index){
 		$(this).outerWidth($('.schedHour').outerWidth()*$(this).data("duration")-3);
 	});
-
-baseX=0;
-mouseDown=false;
-newGhost=null;
-/*$('.projectContainer').mousedown(function(e){
-				e.preventDefault();
-				$("<div class='projectGhost'>Nouveau projet</div>").appendTo(this);
-				newGhost = $(this).find('.projectGhost');
-				console.log(newGhost.offset().left);
-				baseX = newGhost.offset().left;
-				mouseDown=true;
-			});
-			$(document).mousemove(function(e){
-				if(mouseDown){
-					e.preventDefault();
-					console.log('move');
-					newGhost.outerWidth(e.pageX - baseX);
-				}
-			});
-			$(document).mouseup(function(e){
-				if(mouseDown){
-					console.log("> " + baseX + " > " + e.pageX);
-					newGhost.remove();
-					baseX=0;
-					mouseDown=false;
-					newGhost=null;
-				}
-			});*/
 
 $(".project").resizable({
 	handles: "e",
@@ -144,7 +116,9 @@ $(".project").resizable({
 		});
 	}
 });
-
+$('.project').on('mousedown',function(e){
+	e.stopPropagation();
+});
 $('.project').draggable({
 	revert : true,
 	revertDuration: 0,
@@ -170,23 +144,56 @@ $('.projectContainer').droppable({
 			ui.draggable.outerWidth($('.schedHour').outerWidth()*ui.draggable.data("duration")-3);
 		}
 		url = url.replace("sizePlaceHold", ui.draggable.data('duration'));
-			$.ajax(url,{
-				async:false,
-				error:function(xhr,status,error){
-					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
-					$('#flashMessages').append(message);
-				},
-				success:function(data, status, xhr){
+		$.ajax(url,{
+			async:false,
+			error:function(xhr,status,error){
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			},
+			success:function(data, status, xhr){
 				if(data.success){
 					ui.draggable.detach().appendTo(destCell);
 				}else{
-						message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
-						$('#flashMessages').append(message);
+					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+					$('#flashMessages').append(message);
 				}
-				}
-			});
+			}
+		});
 	}
 });
+
+baseX=0;
+mouseDown=false;
+newGhost=null;
+$('.projectContainer').mousedown(function(e){
+	$("<div class='projectGhost'>Nouveau projet</div>").appendTo(this);
+	newGhost = $(this).find('.projectGhost');
+	baseX = newGhost.offset().left;
+	mouseDown=true;
+});
+$(document).mousemove(function(e){
+	if(mouseDown){
+		newGhost.outerWidth(e.pageX - baseX);
+	}
+});
+$(document).mouseup(function(e){
+	if(mouseDown){
+		ghostSize = e.pageX-baseX
+		modulo = ghostSize % $('td').outerWidth();
+		nbSlices = Math.round((ghostSize-modulo)/$('td').outerWidth()+1);
+
+		console.log(nbSlices);
+		newGhost.remove();
+
+		//create project 
+
+		baseX=0;
+		mouseDown=false;
+		newGhost=null;
+	}
+});
+
+
 
 </script>
 

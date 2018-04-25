@@ -420,21 +420,26 @@ td {
 				e.preventDefault();
 				$("<div class='projectGhost'>Nouveau projet</div>").appendTo(this);
 				newGhost = $(this).find('.projectGhost');
-				console.log(newGhost.offset().left);
 				baseX = newGhost.offset().left;
 				mouseDown=true;
 			});
 			$(document).mousemove(function(e){
 				if(mouseDown){
 					e.preventDefault();
-					console.log('move');
 					newGhost.outerWidth(e.pageX - baseX);
 				}
 			});
 			$(document).mouseup(function(e){
 				if(mouseDown){
-					console.log("> " + baseX + " > " + e.pageX);
+					ghostSize = e.pageX-baseX
+					modulo = ghostSize % $('td').outerWidth();
+					nbSlices = Math.round((ghostSize-modulo)/$('td').outerWidth()+1);
+
+					console.log(nbSlices);
 					newGhost.remove();
+
+					//create project 
+
 					baseX=0;
 					mouseDown=false;
 					newGhost=null;
@@ -443,6 +448,9 @@ td {
 
 	    	$(".project").resizable({
 				handles: "e",
+				start: function(e,ui){
+					e.stopPropagation();
+				},
 				containment: "#sched",
 	    		grid: $('td').outerWidth(),
 				resize: function(e,ui){
@@ -453,6 +461,9 @@ td {
 	    	});
 	
 			$('.project').draggable({
+				start: function(e,ui){
+					e.stopPropagation();
+				},
 				revert : true,
 				revertDuration: 0,
 				cursor: "grab",
