@@ -88,3 +88,7 @@ border-right : #ccc 5px double !important;
 .activeDrop {
 	background: #cfc;
 }
+.tooltip-inner {
+    max-width: 350px;
+    width: 350px;
+}
