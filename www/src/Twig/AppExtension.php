@@ -84,7 +84,7 @@ class AppExtension extends AbstractExtension
 			<tr><th colspan='2'><?php echo $planning->getProject()->getName(); ?></th></tr>
 			<tr><th>Code projet</th><td><?php echo $planning->getProject()->getReference(); ?></td></tr>
 			<tr><th>Client</th><td><?php echo $planning->getProject()->getClient(); ?></td></tr>
-			<tr><th>Jours vendus</th><td><?php echo $planning->getProject()->getNbDays(); ?></td></tr>
+			<tr><th>jh planifiés/vendus</th><td><?php echo $planning->getProject()->getPlannedDays()."/".$planning->getProject()->getNbDays(); ?></td></tr>
 			<tr><th>Commentaires</th><td><?php echo $planning->getProject()->getComments(); ?></td></tr>
 			</table>
 		"

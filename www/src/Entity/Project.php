@@ -126,6 +126,14 @@ class Project
     public function getPlannings()
     {
         return $this->plannings;
-    }
+	}
+
+	public function getPlannedDays(){
+		$slicesPlanned = 0;
+		foreach($this->plannings as $planning){
+			$slicesPlanned += $planning->getNbSlices();
+		}	
+		return $slicesPlanned/2;
+	}
 
 }
