@@ -13,7 +13,7 @@
 	<div class="card bg-light">
 		<h2 class="card-header">Ajouter une entrée de planning</h2>
 		<div class="card-body">
-			{{ form_start(form) }}
+			{{ form_start(form, {'attr': {'id': 'addPlanning_form'}}) }}
 			{{ form_widget(form) }}
 			{{ form_end(form) }}
 		</div>
@@ -21,6 +21,47 @@
 </div>
 
 <hr />
+
+<div class="modal fade" id="addPlanning_Modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="addModal_title">Ajout d'une entrée au planning</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<dl class="row">
+					<dt class="col-sm-5">Ressource :</dt>
+						<dd class="col-sm-7">
+							<span id="addModal_ressource"></span>
+						</dd>
+					<dt class="col-sm-5">Date de démarrage :</dt>
+						<dd class="col-sm-7">
+							<span id="addModal_startDate"></span> (<span id="addModal_startHour"></span>)
+						</dd>
+					<dt class="col-sm-5">Durée :</dt>
+						<dd class="col-sm-7">
+							<span id="addModal_duration"></span>
+						</dd>
+					<dt class="col-sm-5">Projet :</dt>
+						<dd class="col-sm-7">
+							<select id="addForm_projectId">
+								{% for project in projects %}
+									<option value="{{ project.id }}">{{ project.reference }} - {{ project.name }}</option>
+								{% endfor %}
+							</select>
+						</dd>
+				</dl>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+				<button type="button" class="btn btn-primary" onclick="addPlanning()">Ajouter</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 {% set baseDate = "now"|date('d-m-Y') %}
 {% set nbMonths = 3 %}
@@ -165,6 +206,12 @@ $('.projectContainer').droppable({
 $('.projectContainer').on('mousedown',function(e){
 	e.preventDefault();
 });
+
+var users=[];
+{% for user in users %}
+	users[{{ user.id }}] = "{{ user.fullname }}"
+{% endfor %}
+
 baseX=0;
 mouseDown=false;
 newGhost=null;
@@ -194,9 +241,16 @@ $(document).mouseup(function(e){
 		newGhost.remove();
 
 		console.log("New projet !\n\tStart : " + add_startDate + add_startHour + "\n\tDuration : " + nbSlices + "\n\tUser id : " + add_userId);
-		//create project 
-		
+		$('#planning_user').val(add_userId);
+		$('#planning_startDate').val(add_startDate);
+		$('#planning_startHour').val(add_startHour);
+		$('#planning_nbSlices').val(nbSlices);
 
+		$('#addModal_ressource').html(users[add_userId]);
+		$('#addModal_startDate').html(new Date(add_startDate).toLocaleDateString('fr-FR'));
+		$('#addModal_startHour').html(add_startHour == "am" ? "matin" : "midi");
+		$('#addModal_duration').html(nbSlices/2 + 'jh');
+		$('#addPlanning_Modal').modal();
 
 		baseX=0;
 		mouseDown=false;
@@ -207,7 +261,10 @@ $(document).mouseup(function(e){
 	}
 });
 
-
+function addPlanning(){
+	$('#planning_project').val($('#addForm_projectId').val());
+	$('#addPlanning_form').submit();
+}
 
 </script>
 

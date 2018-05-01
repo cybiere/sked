@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Project;
 use App\Entity\Planning;
 use App\Form\PlanningType;
 
@@ -20,6 +21,7 @@ class PlanningController extends Controller
 	{
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
 		$planning = new Planning();
 		$form = $this->createForm(PlanningType::class,$planning);
@@ -34,9 +36,11 @@ class PlanningController extends Controller
 
 
 		$users = $userRepository->findAll();
+		$projects = $projectRepository->findAll();
 
         return $this->render('planning/index.html.twig', [
 			'users' => $users,
+			'projects' => $projects,
 			'form' => $form->createView(),
         ]);
 	}
