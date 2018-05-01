@@ -5,6 +5,8 @@ namespace App\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use App\Entity\Project;
+use App\Entity\Planning;
+use App\Entity\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AppExtension extends AbstractExtension
@@ -20,6 +22,7 @@ class AppExtension extends AbstractExtension
 	{
 		return array(
 			new TwigFunction('kanproject',array($this,'kanprojectFunction')),
+			new TwigFunction('printPlanning',array($this,'printPlanningFunction')),
 		);
 	}
 
@@ -64,4 +67,27 @@ class AppExtension extends AbstractExtension
 	</div>
 <?php
 	}
+
+
+	public function printPlanningFunction($planning){
+?>
+
+	<div 
+		class="project" 
+		tabindex="0" 
+		data-duration="<?php echo $planning->getNbSlices(); ?>" 
+		data-planningId="<?php echo $planning->getId(); ?>"
+		data-toggle="tooltip"
+		data-html="true"
+		title="<em>Tooltip</em> <u>with</u> <b>HTML</b>"
+	>
+		<?php echo $planning->getProject()->getName(); ?>
+		<i class="duration">
+			<?php echo $planning->getNbSlices(); ?>
+		</i>
+	</div>
+
+<?php
+	}
+
 }

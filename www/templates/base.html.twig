@@ -9,10 +9,10 @@
 
 		<title>TeamManager - {% block pageTitle %}Accueil{% endblock %}</title>
 
-		<link href="/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/css/jquery-ui.min.css" rel="stylesheet">
 		<link href="/css/jquery-ui.theme.min.css" rel="stylesheet">
 		<link href="/css/fa-svg-with-js.css" rel="stylesheet">
+		<link href="/css/bootstrap.min.css" rel="stylesheet">
 		<link href="/css/base.css" rel="stylesheet">
 		{% block extraCss %}{% endblock %}
 	</head>
@@ -21,7 +21,7 @@
 
 		<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
 			<a class="navbar-brand" href="{{ path('planning_index')}}">
-  				<i class="fas fa-user" data-fa-transform="shrink-8.0 down-2.7" data-fa-mask="fas fa-calendar"></i> TeamManager</a>
+				<i class="fas fa-user" data-fa-transform="shrink-8.0 down-2.7" data-fa-mask="fas fa-calendar"></i> TeamManager</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
 			</button>
@@ -39,41 +39,41 @@
 					</li>
 				</ul>
 				<!--
-				<form class="form-inline my-2 my-lg-0">
-					<input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-					<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-				</form>
+		<form class="form-inline my-2 my-lg-0">
+		<input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+		<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+		</form>
 				-->
 			</div>
 		</nav>
 
 		<main role="main" class="container-fluid">
 
-		<div id="flashMessages">
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-		<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
-            {{ message }}
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			</button>
-        </div>
-    {% endfor %}
-{% endfor %}
-		</div>
+			<div id="flashMessages">
+				{% for label, messages in app.flashes %}
+				{% for message in messages %}
+				<div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+					{{ message }}
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				{% endfor %}
+				{% endfor %}
+			</div>
 
-		{% block body %}{% endblock %}
+			{% block body %}{% endblock %}
 
 		</main><!-- /.container -->
 
 		<!-- Bootstrap core JavaScript
 	  ================================================== -->
 	  <!-- Placed at the end of the document so the pages load faster -->
-	  <script src="/js/popper.min.js"></script>
 	  <script src="/js/jquery.js"></script>
+	  <script src="/js/jquery-ui.min.js"></script>
+	  <script src="/js/popper.min.js"></script>
 	  <script src="/js/bootstrap.min.js"></script>
 	  <script src="/js/fontawesome-all.min.js"></script>
-	  <script src="/js/jquery-ui.min.js"></script>
 	  {% block extraJs %}{% endblock %}
 	</body>
 </html>

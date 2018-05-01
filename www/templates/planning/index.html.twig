@@ -94,7 +94,7 @@
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
-					<div class="project" data-duration="{{ planning.nbSlices }}" data-planningId="{{ planning.id }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
+					{{ printPlanning(planning) }}
 					{% endif %}
 					{% endfor %}
 				</div>
@@ -104,7 +104,7 @@
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
-					<div class="project" data-duration="{{ planning.nbSlices }}" data-planningId="{{ planning.id }}">{{planning.project.name}} <i class="duration">{{ planning.nbSlices }}</i></div>
+					{{ printPlanning(planning) }}
 					{% endif %}
 					{% endfor %}
 				</div></td>
@@ -266,6 +266,15 @@ function addPlanning(){
 	$('#addPlanning_form').submit();
 }
 
+$(function () {
+	$('[data-toggle="tooltip"]').tooltip(
+		{
+			html:true,
+			container: 'body'
+		}
+	)
+})
+	  </script>
 </script>
 
 {% endblock %}
