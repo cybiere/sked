@@ -77,11 +77,11 @@ class AppExtension extends AbstractExtension
 		tabindex="0" 
 		data-duration="<?php echo $planning->getNbSlices(); ?>" 
 		data-planningId="<?php echo $planning->getId(); ?>"
-		data-toggle="tooltip"
+		data-toggle="popover"
 		data-html="true"
-		title="
+		title="<?php echo $planning->getProject()->getName(); ?>"
+		data-content="
 			<table class='table table-sm'>
-			<tr><th colspan='2'><?php echo $planning->getProject()->getName(); ?></th></tr>
 			<tr><th>Code projet</th><td><?php echo $planning->getProject()->getReference(); ?></td></tr>
 			<tr><th>Client</th><td><?php echo $planning->getProject()->getClient(); ?></td></tr>
 			<tr><th>jh planifiés/vendus</th><td><?php echo $planning->getProject()->getPlannedDays()."/".$planning->getProject()->getNbDays(); ?></td></tr>

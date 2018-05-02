@@ -266,13 +266,16 @@ function addPlanning(){
 	$('#addPlanning_form').submit();
 }
 
+$( ".project" ).contextmenu(function() {
+	$(this).popover('show')
+	return false;
+});
+$( ".project" ).on('blur',function() {
+	$(this).popover('hide')
+});
 $(function () {
-	$('[data-toggle="tooltip"]').tooltip(
-		{
-			html:true,
-			container: 'body'
-		}
-	)
+	$('[data-toggle="tooltip"]').tooltip()
+	$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
 })
 	  </script>
 </script>
