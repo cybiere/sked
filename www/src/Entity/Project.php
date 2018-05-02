@@ -51,6 +51,11 @@ class Project
 	private $comments;
 
 	/**
+     * @ORM\Column(type="string")
+     */
+	private $color;
+
+	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="project", orphanRemoval=true)
 	 */
 	private $plannings;
@@ -118,6 +123,26 @@ class Project
 
 	public function setComments($comments){
 		$this->comments = $comments;
+	}
+
+	public function getColor(){
+		return $this->color;
+	}
+
+	public function setColor($color){
+		switch($color){
+			case "primary":
+			case "secondary":
+			case "success":
+			case "danger":
+			case "warning":
+			case "info":
+			case "dark":
+				$this->color = $color;
+				break;
+			default:
+				$this->color = "info";
+		}
 	}
 
 	/**

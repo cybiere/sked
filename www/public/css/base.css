@@ -52,8 +52,7 @@ border-right : #ccc 5px double !important;
 	height:100%;
 }
 .project {
-	border: 1px #668 solid;
-	background: #ccf;
+	border: 1px #ccc solid;
 	border-radius: 5px;
 	margin-top : 5px;
 	margin-left : 1px;
