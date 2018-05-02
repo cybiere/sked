@@ -14,10 +14,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class PlanningController extends Controller
 {
-    /**
-     * @Route("/", name="planning_index")
-     */
-    public function index(Request $request)
+	/**
+	 * @Route("/", name="planning_index")
+	 */
+	public function index(Request $request)
 	{
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
@@ -31,18 +31,18 @@ class PlanningController extends Controller
 			$planning = $form->getData();
 			$em->persist($planning);
 			$em->flush();
-		 	$this->addFlash('success','Planning ajouté');
+			$this->addFlash('success','Planning ajouté');
 		}
 
 
 		$users = $userRepository->findAll();
 		$projects = $projectRepository->findAll();
 
-        return $this->render('planning/index.html.twig', [
+		return $this->render('planning/index.html.twig', [
 			'users' => $users,
 			'projects' => $projects,
 			'form' => $form->createView(),
-        ]);
+		]);
 	}
 
 	/**
@@ -60,7 +60,7 @@ class PlanningController extends Controller
 			$em->flush();
 			$arrData = ['success' => true];
 		}
-        return new JsonResponse($arrData);
+		return new JsonResponse($arrData);
 	}
 
 	/**
@@ -85,6 +85,23 @@ class PlanningController extends Controller
 			$em->flush();
 			$arrData = ['success' => true];
 		}
-        return new JsonResponse($arrData);
+		return new JsonResponse($arrData);
+	}
+
+	/**
+	 * @Route("/del/{planningId}",name="planning_del")
+	 */
+	public function del(Request $request,$planningId){
+		$em = $this->getDoctrine()->getManager();
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+
+		if(!($planning = $planningRepository->find($planningId))){
+			$this->addFlash('danger','Erreur : élément de planning non trouvé');
+			return $this->redirectToRoute('planning_index');
+		}
+
+		$em->remove($planning);
+		$em->flush();
+		return $this->redirectToRoute('planning_index');
 	}
 }

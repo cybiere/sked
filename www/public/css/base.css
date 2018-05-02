@@ -92,3 +92,6 @@ border-right : #ccc 5px double !important;
     max-width: 350px;
     width: 350px;
 }
+.action {
+	text-align:center;
+}

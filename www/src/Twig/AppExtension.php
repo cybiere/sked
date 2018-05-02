@@ -81,12 +81,14 @@ class AppExtension extends AbstractExtension
 		data-html="true"
 		title="<?php echo $planning->getProject()->getName(); ?>"
 		data-content="
-			<table class='table table-sm'>
-			<tr><th>Code projet</th><td><?php echo $planning->getProject()->getReference(); ?></td></tr>
-			<tr><th>Client</th><td><?php echo $planning->getProject()->getClient(); ?></td></tr>
-			<tr><th>jh planifiés/vendus</th><td><?php echo $planning->getProject()->getPlannedDays()."/".$planning->getProject()->getNbDays(); ?></td></tr>
-			<tr><th>Commentaires</th><td><?php echo $planning->getProject()->getComments(); ?></td></tr>
-			</table>
+			<div class='row'>
+			<dt class='col-md-6'>Code projet</dt><dd class='col-md-6'><?php echo $planning->getProject()->getReference(); ?></dd>
+			<dt class='col-md-6'>Client</dt><dd class='col-md-6'><?php echo $planning->getProject()->getClient(); ?></dd>
+			<dt class='col-md-6'>jh planif/vendus</dt><dd class='col-md-6'><?php echo $planning->getProject()->getPlannedDays()."/".$planning->getProject()->getNbDays(); ?></dd>
+			<dt class='col-md-6'>Commentaires</dt><dd class='col-md-6'><?php echo $planning->getProject()->getComments(); ?></dd>
+			<div class='action col-md-6'><a class='btn btn-outline-warning' href='<?php echo $this->router->generate('project_edit',array("projectId"=>$planning->getProject()->getId())); ?>'><i class='fas fa-edit'></i></a></div>
+			<div class='action col-md-6'><a class='btn btn-outline-danger' href='<?php echo $this->router->generate('planning_del',array("planningId"=>$planning->getId())); ?>'><i class='fas fa-trash'></i></a></div>
+			</div>
 		"
 	>
 		<?php echo $planning->getProject()->getName(); ?>
