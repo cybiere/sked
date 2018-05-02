@@ -219,6 +219,7 @@ add_startDate=null;
 add_startHour=null;
 add_userId=null;
 $('.projectContainer').mousedown(function(e){
+	if(e.which != 1) return;
 	$("<div class='projectGhost'>Nouveau projet</div>").appendTo(this);
 	add_startDate=$(this).data('date');
 	add_startHour=$(this).data('hour');
@@ -274,7 +275,6 @@ $( ".project" ).on('blur',function() {
 	$(this).popover('hide')
 });
 $(function () {
-	$('[data-toggle="tooltip"]').tooltip()
 	$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
 })
 	  </script>
