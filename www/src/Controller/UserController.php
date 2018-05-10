@@ -124,30 +124,32 @@ class UserController extends Controller{
 		$sanitized=array('\\' => '\5c','*' => '\2a','(' => '\28',')' => '\29',"\x00" => '\00');
 		$username = str_replace(array_keys($sanitized),array_values($sanitized),$this->get('security.token_storage')->getToken()->getUser()->getUsername());	
 
-		if($userRepository->findOneBy(['username' => $username]))
-			return $this->redirectToRoute('planning_index');
+		if(!($user = $userRepository->findOneBy(['username' => $username]))){
 
-		$ldap = Ldap::create('ext_ldap', array('connection_string' => 'ldap://'.$this->container->getParameter('ldap_url').':'.$this->container->getParameter('ldap_port')));
-		$ldap->bind($this->container->getParameter('ldap_bind_dn'), $this->container->getParameter('ldap_bind_pw'));
-		$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(&(objectclass=person)(uid='.$username.'))');
-		$ldapResults = $ldapQuery->execute()->toArray();
+			$ldap = Ldap::create('ext_ldap', array('connection_string' => 'ldap://'.$this->container->getParameter('ldap_url').':'.$this->container->getParameter('ldap_port')));
+			$ldap->bind($this->container->getParameter('ldap_bind_dn'), $this->container->getParameter('ldap_bind_pw'));
+			$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(&(objectclass=person)(uid='.$username.'))');
+			$ldapResults = $ldapQuery->execute()->toArray();
 
-		if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute('uid')[0] == $username){
-			$user = new User();
-			$user->setUsername($username);
-			$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
-			$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
-			if($userRepository->findOneBy(['isAdmin' => true])){
-				$user->setIsResource(true);
+			if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute('uid')[0] == $username){
+				$user = new User();
+				$user->setUsername($username);
+				$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
+				$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
+				if($userRepository->findOneBy(['isAdmin' => true])){
+					$user->setIsResource(true);
+				}else{
+					$user->setIsAdmin(true);
+				}
+				$em->persist($user);
+				$em->flush();
+				$this->addFlash('success','Bienvenue sur TeamManager '.$user->getFullname());
 			}else{
-				$user->setIsAdmin(true);
+				return $this->redirectToRoute('logout');
 			}
-			$em->persist($user);
-			$em->flush();
-			$this->addFlash('success','Bienvenue sur TeamManager '.$user->getFullname());
-		}else{
-			return $this->redirectToRoute('logout');
 		}
+
+		$this->get('session')->set('user',$user);
 		return $this->redirectToRoute('planning_index');
 	}
 }
