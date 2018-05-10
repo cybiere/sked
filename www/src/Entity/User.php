@@ -38,7 +38,7 @@ class User
 	/**
      * @ORM\Column(type="boolean")
      */
-	private $isResource=false;
+	private $isResource=true;
 
 	/**
      * @ORM\Column(type="boolean")

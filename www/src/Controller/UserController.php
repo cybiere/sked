@@ -136,9 +136,8 @@ class UserController extends Controller{
 				$user->setUsername($username);
 				$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
 				$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
-				if($userRepository->findOneBy(['isAdmin' => true])){
-					$user->setIsResource(true);
-				}else{
+				if(!$userRepository->findOneBy(['isAdmin' => true])){
+					$user->setIsResource(false);
 					$user->setIsAdmin(true);
 				}
 				$em->persist($user);
