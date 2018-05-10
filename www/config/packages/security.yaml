@@ -20,7 +20,8 @@ security:
             form_login_ldap:
                 login_path: login
                 check_path: login
-                default_target_path: /
+                always_use_default_target_path: true
+                default_target_path: /user/enrol
                 service: Symfony\Component\Ldap\Ldap
                 dn_string: 'dc=example,dc=com'
                 query_string: '(uid={username})'
