@@ -128,7 +128,7 @@ $(".project").resizable({
 	grid: $('.schedHour').outerWidth(),
 	resize: function(e,ui){
 		newSize = Math.round(((ui.size.width-(ui.size.width%$('.schedHour').outerWidth()))/$('.schedHour').outerWidth())+1);
-		$(this).find('i').text(newSize);
+		$(this).find('i').text(newSize/2);
 	},
 	stop : function(event, ui){
 		newSize = Math.round(((ui.size.width-(ui.size.width%$('.schedHour').outerWidth()))/$('.schedHour').outerWidth())+1);
