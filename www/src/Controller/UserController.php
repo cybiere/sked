@@ -24,12 +24,12 @@ class UserController extends Controller{
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 
 		$user = new User();
-		$formBuilder = $this->createFormBuilder($user)->add('username', TextType::class);
+		$formBuilder = $this->createFormBuilder($user)->add('username', TextType::class,array('label'=>"Nom d'utilisateur"));
 		if(!$this->container->hasParameter('ldap_url')){
 			$formBuilder->add('fullname', TextType::class)
 				->add('email', TextType::class);
 		}
-		$form = $formBuilder->add('save', SubmitType::class, array('label' => 'Create User'))->getForm();
+		$form = $formBuilder->add('save', SubmitType::class, array('label' => "Ajouter l'utilisateur"))->getForm();
 
 
 		$form->handleRequest($request);
@@ -89,9 +89,15 @@ class UserController extends Controller{
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$user = $userRepository->findOneBy(['username' => $username]);
 		if($user){
+			if($user->isAdmin()){
+				$this->addFlash('warning',"Vous ne pouvez pas supprimer un administrateur. Retirez lui les droits d'administrateur avant de le supprimer.");
+			}elseif($user->getId() == $this->get('session')->get('user')->getId()){
+				$this->addFlash('warning',"Vous ne pouvez pas supprimer votre propre compte.");
+			}else{
 			$this->addFlash('success','Utilisateur '.$username.' supprimé');
 			$em->remove($user);
 			$em->flush();
+			}
 		}else{
 			$this->addFlash('danger',"Erreur : l'utilisateur ".$username." n'existe pas");
 		}
@@ -107,6 +113,26 @@ class UserController extends Controller{
 		$user = $userRepository->find($userid);
 		if($user){
 			$user->setIsResource($user->isResource()?false:true);
+			$em->flush();
+		}else{
+			$this->addFlash('danger',"Erreur : l'utilisateur demandé n'existe pas");
+		}
+		return $this->redirectToRoute('user_index');
+	}
+
+	/**
+	/**
+	 * @Route("/toggleAdmin/{userid}",name="user_toggleAdmin")
+	 */
+	public function toggleAdmin(Request $request,$userid){
+		$em = $this->getDoctrine()->getManager();
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$user = $userRepository->find($userid);
+		if($user){
+			if($user->getId() == $this->get('session')->get('user')->getId() && $user->isAdmin())
+				$this->addFlash('warning',"Vous ne pouvez pas retirer vos droits d'administrateur");
+			else
+				$user->setIsAdmin($user->isAdmin()?false:true);
 			$em->flush();
 		}else{
 			$this->addFlash('danger',"Erreur : l'utilisateur demandé n'existe pas");
