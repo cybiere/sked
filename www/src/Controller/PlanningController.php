@@ -28,6 +28,9 @@ class PlanningController extends Controller
 
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
+			if(!$this->get('session')->get('user')->isAdmin()){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
 			$planning = $form->getData();
 			$em->persist($planning);
 			$em->flush();
@@ -49,6 +52,9 @@ class PlanningController extends Controller
 	 * @Route("/resize/{planningId}/{newSize}",name="planning_resize")
 	 */
 	public function resize(Request $request,$planningId,$newSize){
+			if(!$this->get('session')->get('user')->isAdmin()){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
 		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
 
@@ -67,6 +73,9 @@ class PlanningController extends Controller
 	 * @Route("/move/{planningId}/{newStart}/{newHour}/{newUser}/{newSize}",name="planning_move")
 	 */
 	public function move(Request $request,$planningId,$newStart,$newHour,$newUser,$newSize){
+			if(!$this->get('session')->get('user')->isAdmin()){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
 		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
@@ -92,6 +101,9 @@ class PlanningController extends Controller
 	 * @Route("/del/{planningId}",name="planning_del")
 	 */
 	public function del(Request $request,$planningId){
+			if(!$this->get('session')->get('user')->isAdmin()){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
 		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
 

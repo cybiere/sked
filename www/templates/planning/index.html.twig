@@ -4,11 +4,14 @@
 
 {% block body %}
 <h1>Planning
+					{% if app.session.get('user').admin %}
 	<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addPlanning" role="button" aria-expanded="false" aria-controls="addButton">
 		Ajouter une entrée de planning
 	</a>
+					{% endif %}
 </h1>
 
+					{% if app.session.get('user').admin %}
 <div class="collapse" id="addPlanning">
 	<div class="card bg-light">
 		<h2 class="card-header">Ajouter une entrée de planning</h2>
@@ -19,7 +22,7 @@
 		</div>
 	</div>
 </div>
-
+					{% endif %}
 <hr />
 
 <div class="modal fade" id="addPlanning_Modal" tabindex="-1" role="dialog">
@@ -94,7 +97,7 @@
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
-					{{ printPlanning(planning) }}
+					{{ printPlanning(planning,app.session.get('user').admin) }}
 					{% endif %}
 					{% endfor %}
 				</div>
@@ -104,7 +107,7 @@
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
-					{{ printPlanning(planning) }}
+					{{ printPlanning(planning,app.session.get('user').admin) }}
 					{% endif %}
 					{% endfor %}
 				</div></td>
@@ -122,6 +125,17 @@
 		$(this).outerWidth($('.schedHour').outerWidth()*$(this).data("duration")-3);
 	});
 
+$( ".project" ).contextmenu(function() {
+	$(this).popover('show')
+	return false;
+});
+$( ".project" ).on('blur',function() {
+	$(this).popover('hide')
+});
+$(function () {
+	$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
+})
+					{% if app.session.get('user').admin %}
 $(".project").resizable({
 	handles: "e",
 	containment: ".schedule",
@@ -267,17 +281,7 @@ function addPlanning(){
 	$('#addPlanning_form').submit();
 }
 
-$( ".project" ).contextmenu(function() {
-	$(this).popover('show')
-	return false;
-});
-$( ".project" ).on('blur',function() {
-	$(this).popover('hide')
-});
-$(function () {
-	$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
-})
-	  </script>
+					{% endif %}
 </script>
 
 {% endblock %}

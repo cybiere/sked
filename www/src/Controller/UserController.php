@@ -19,6 +19,9 @@ class UserController extends Controller{
 	 * @Route("/",name="user_index")
 	 */
 	public function index(Request $request){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
@@ -75,9 +78,7 @@ class UserController extends Controller{
 				$form = $formBuilder->add('save', SubmitType::class, array('label' => 'Create User'))->getForm();
 			}
 		}
-
 		$users = $userRepository->findAll();
-
 		return $this->render('user/index.html.twig',array('users'=>$users,'form'=>$form->createView()));
 	}
 
@@ -85,6 +86,10 @@ class UserController extends Controller{
 	 * @Route("/del/{username}",name="user_del")
 	 */
 	public function delete(Request $request,$username){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$user = $userRepository->findOneBy(['username' => $username]);
@@ -94,9 +99,9 @@ class UserController extends Controller{
 			}elseif($user->getId() == $this->get('session')->get('user')->getId()){
 				$this->addFlash('warning',"Vous ne pouvez pas supprimer votre propre compte.");
 			}else{
-			$this->addFlash('success','Utilisateur '.$username.' supprimé');
-			$em->remove($user);
-			$em->flush();
+				$this->addFlash('success','Utilisateur '.$username.' supprimé');
+				$em->remove($user);
+				$em->flush();
 			}
 		}else{
 			$this->addFlash('danger',"Erreur : l'utilisateur ".$username." n'existe pas");
@@ -108,6 +113,10 @@ class UserController extends Controller{
 	 * @Route("/toggleResource/{userid}",name="user_toggleResource")
 	 */
 	public function toggleResource(Request $request,$userid){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$user = $userRepository->find($userid);
@@ -125,6 +134,10 @@ class UserController extends Controller{
 	 * @Route("/toggleAdmin/{userid}",name="user_toggleAdmin")
 	 */
 	public function toggleAdmin(Request $request,$userid){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$user = $userRepository->find($userid);

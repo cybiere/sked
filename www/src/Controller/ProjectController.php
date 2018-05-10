@@ -15,15 +15,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  */
 class ProjectController extends Controller
 {
-    /**
-     * @Route("/{projectId}/{way}", name="project_index", defaults={"projectId"=0,"way"="inc"},requirements={"projectId"="\d+"})
-     */
-    public function index(Request $request,$projectId,$way)
-    {
+	/**
+	 * @Route("/{projectId}/{way}", name="project_index", defaults={"projectId"=0,"way"="inc"},requirements={"projectId"="\d+"})
+	 */
+	public function index(Request $request,$projectId,$way)
+	{
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
 		if($projectId != 0){
+			if(!$this->get('session')->get('user')->isAdmin()){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
 			$project = $projectRepository->find($projectId);
 			if($project){
 				if($way == "inc" && $project->getStatus() < 6){
@@ -33,7 +36,7 @@ class ProjectController extends Controller
 				}
 				$em->flush();
 			}else{
-		 		$this->addFlash('danger','Erreur : projet non trouvé');
+				$this->addFlash('danger','Erreur : projet non trouvé');
 			}
 			return $this->redirectToRoute('project_index');
 		}
@@ -43,10 +46,13 @@ class ProjectController extends Controller
 
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
+			if(!$this->get('session')->get('user')->isAdmin()){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
 			$project = $form->getData();
 			$em->persist($project);
 			$em->flush();
-		 	$this->addFlash('success','Projet ajouté');
+			$this->addFlash('success','Projet ajouté');
 		}
 
 		$projects = $projectRepository->findAll();
@@ -55,19 +61,22 @@ class ProjectController extends Controller
 			$sortedProjects[$project->getStatus()][] = $project;
 		}
 
-
-        return $this->render('project/index.html.twig',array('projects'=>$sortedProjects,'form'=>$form->createView()));
+		return $this->render('project/index.html.twig',array('projects'=>$sortedProjects,'form'=>$form->createView()));
 	}
 
 	/**
 	 * @Route("/edit/{projectId}",name="project_edit")
 	 */
 	public function edit(Request $request,$projectId){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
 		if(!($project = $projectRepository->find($projectId))){
-		 	$this->addFlash('danger','Erreur : projet non trouvé');
+			$this->addFlash('danger','Erreur : projet non trouvé');
 			return $this->redirectToRoute('project_index');
 		}
 
@@ -78,21 +87,25 @@ class ProjectController extends Controller
 			$project = $form->getData();
 			$em->persist($project);
 			$em->flush();
-		 	$this->addFlash('success','Projet mis à jour');
+			$this->addFlash('success','Projet mis à jour');
 			return $this->redirectToRoute('project_index');
 		}
-        return $this->render('project/edit.html.twig',array('project'=>$project,'form'=>$form->createView()));
+		return $this->render('project/edit.html.twig',array('project'=>$project,'form'=>$form->createView()));
 	}
 
 	/**
 	 * @Route("/archive/{projectId}",name="project_archive")
 	 */
 	public function archive(Request $request,$projectId){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
 		if(!($project = $projectRepository->find($projectId))){
-		 	$this->addFlash('danger','Erreur : projet non trouvé');
+			$this->addFlash('danger','Erreur : projet non trouvé');
 			return $this->redirectToRoute('project_index');
 		}
 
@@ -112,6 +125,10 @@ class ProjectController extends Controller
 	 * @Route("/move/{projectId}/{newStatus}",name="project_move")
 	 */
 	public function move(Request $request,$projectId,$newStatus){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
@@ -124,7 +141,7 @@ class ProjectController extends Controller
 			$em->flush();
 			$arrData = ['success' => true];
 		}
-        return new JsonResponse($arrData);
+		return new JsonResponse($arrData);
 	}
 
 }

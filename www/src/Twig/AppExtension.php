@@ -26,7 +26,7 @@ class AppExtension extends AbstractExtension
 		);
 	}
 
-	public function kanprojectFunction($project){
+	public function kanprojectFunction($project,$isAdmin){
 ?>
 	<div class='card kanProject border-<?php echo $project->getColor(); ?>' data-projectid="<?php echo $project->getId(); ?>">
 		<h4 class="card-header">
@@ -43,6 +43,7 @@ class AppExtension extends AbstractExtension
 					<li> Jours : <?php echo $project->getNbDays(); ?></li>
 				</ul>
 			</div>
+			<?php if($isAdmin){ ?>
 			<div class="card-footer">
 				<div class="row">
 					<div class="col">
@@ -63,13 +64,14 @@ class AppExtension extends AbstractExtension
 					</div>
 				</div>
 			</div>
+			<?php } ?>
 		</div>
 	</div>
 <?php
 	}
 
 
-	public function printPlanningFunction($planning){
+	public function printPlanningFunction($planning,$isAdmin){
 ?>
 
 	<div 
@@ -86,8 +88,10 @@ class AppExtension extends AbstractExtension
 			<dt class='col-md-6'>Client</dt><dd class='col-md-6'><?php echo $planning->getProject()->getClient(); ?></dd>
 			<dt class='col-md-6'>jh planif/vendus</dt><dd class='col-md-6'><?php echo $planning->getProject()->getPlannedDays()."/".$planning->getProject()->getNbDays(); ?></dd>
 			<dt class='col-md-6'>Commentaires</dt><dd class='col-md-6'><?php echo $planning->getProject()->getComments(); ?></dd>
+<?php if($isAdmin){ ?>
 			<div class='action col-md-6'><a class='btn btn-outline-warning' href='<?php echo $this->router->generate('project_edit',array("projectId"=>$planning->getProject()->getId())); ?>'><i class='fas fa-edit'></i></a></div>
 			<div class='action col-md-6'><a class='btn btn-outline-danger' href='<?php echo $this->router->generate('planning_del',array("planningId"=>$planning->getId())); ?>'><i class='fas fa-trash'></i></a></div>
+<?php } ?>
 			</div>
 		"
 	>
