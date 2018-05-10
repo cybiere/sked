@@ -11,10 +11,23 @@
 {{ form_end(form) }}
 
 <h2>Existing users</h2>
-<ul>
+<table class="table table-sm table-hover">
+	<tr><th>id</th><th>Nom complet</th><th>Nom d'utilisateur</th><th>Ressource</th><th>Actions</th></tr>
 	{% for user in users %}
-	<li>{{user.fullname}} ({{user.username}}) <a href="{{ path("user_del",{'username':user.username}) }}">X</a></li>
+	<tr>
+		<td>{{user.id}}</td>
+		<td>{{user.fullname}}</td>
+		<td>{{user.username}}</td>
+		<td>
+			{% if user.resource %}
+				<i class='fas fa-check-circle'></i>
+			{% endif %}
+		</td>
+		<td>
+			<a href="{{ path("user_toggleResource",{'userid':user.id}) }}"><i class='fas fa-user-circle'></i></a>
+			<a href="{{ path("user_del",{'username':user.username}) }}"><i class='fas fa-trash'</a>
+		</td>
 	{% endfor %}
-</ul>
+</table>
 
 {% endblock %}

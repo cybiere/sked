@@ -35,7 +35,7 @@ class PlanningController extends Controller
 		}
 
 
-		$users = $userRepository->findAll();
+		$users = $userRepository->findBy(array("isResource"=>true));
 		$projects = $projectRepository->findAll();
 
 		return $this->render('planning/index.html.twig', [

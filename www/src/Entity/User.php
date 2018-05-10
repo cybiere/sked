@@ -36,6 +36,11 @@ class User
     private $email;
 
 	/**
+     * @ORM\Column(type="boolean")
+     */
+	private $isResource=false;
+
+	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="user", orphanRemoval=true)
 	 */
 	private $plannings;
@@ -76,6 +81,14 @@ class User
 
 	public function setEmail($email){
 		$this->email=$email;
+	}
+
+	public function isResource(){
+		return $this->isResource;
+	}
+
+	public function setIsResource($resource){
+		$this->isResource = $resource?true:false;
 	}
 
 	/**

@@ -97,4 +97,20 @@ class UserController extends Controller{
 		}
 		return $this->redirectToRoute('user_index');
 	}
+
+	/**
+	 * @Route("/toggleResource/{userid}",name="user_toggleResource")
+	 */
+	public function toggleResource(Request $request,$userid){
+		$em = $this->getDoctrine()->getManager();
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$user = $userRepository->find($userid);
+		if($user){
+			$user->setIsResource($user->isResource()?false:true);
+			$em->flush();
+		}else{
+			$this->addFlash('danger',"Erreur : l'utilisateur demandé n'existe pas");
+		}
+		return $this->redirectToRoute('user_index');
+	}
 }
