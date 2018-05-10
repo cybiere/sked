@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link rel="icon" href="../../../../favicon.ico">
+
+		<title>TeamManager - Authentification</title>
+
+		<link href="/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/css/fa-svg-with-js.css" rel="stylesheet">
+		<link href="/css/signin.css" rel="stylesheet">
+	</head>
+
+	<body class="text-center">
+		<form class="form-signin" action="{{ path('login') }}" method="post">
+			<i class="fas fa-user" data-fa-transform="shrink-8.0 down-2.7" data-fa-mask="fas fa-calendar" style="font-size:6em;margin-bottom:5px;"></i>
+			<h1 class="h3 mb-3 font-weight-normal">TeamManager</h1>
+
+			{% if error %}
+			<div class='alert alert-danger'>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+			{% endif %}
+
+			<label for="inputEmail" class="sr-only">Utilisateur</label>
+			<input type="text" id="username" name="_username" class="form-control" placeholder="Utilisateur" value="{{ last_username }}" required autofocus>
+			<label for="inputPassword" class="sr-only">Mot de passe</label>
+			<input type="password" id="password" name="_password" class="form-control" placeholder="Password" required>
+	{#
+	<input type="hidden" name="_target_path" value="/account" />
+	#}
+			<button class="btn btn-lg btn-outline-primary btn-block" type="submit">Sign in</button>
+		</form>
+	  <script src="/js/fontawesome-all.min.js"></script>
+	</body>
+</html>
