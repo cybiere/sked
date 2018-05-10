@@ -137,7 +137,11 @@ class UserController extends Controller{
 			$user->setUsername($username);
 			$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
 			$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
-			$user->setIsResource(true);
+			if($userRepository->findOneBy(['isAdmin' => true])){
+				$user->setIsResource(true);
+			}else{
+				$user->setIsAdmin(true);
+			}
 			$em->persist($user);
 			$em->flush();
 			$this->addFlash('success','Bienvenue sur TeamManager '.$user->getFullname());

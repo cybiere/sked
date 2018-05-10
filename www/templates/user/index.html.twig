@@ -12,7 +12,7 @@
 
 <h2>Existing users</h2>
 <table class="table table-sm table-hover">
-	<tr><th>id</th><th>Nom complet</th><th>Nom d'utilisateur</th><th>Ressource</th><th>Actions</th></tr>
+	<tr><th>id</th><th>Nom complet</th><th>Nom d'utilisateur</th><th>Ressource</th><th>Admin</th><th>Actions</th></tr>
 	{% for user in users %}
 	<tr>
 		<td>{{user.id}}</td>
@@ -21,6 +21,11 @@
 		<td>
 			{% if user.resource %}
 				<i class='fas fa-check-circle'></i>
+			{% endif %}
+		</td>
+		<td>
+			{% if user.admin %}
+				<span class="badge badge-warning">Admin</span>
 			{% endif %}
 		</td>
 		<td>

@@ -41,6 +41,11 @@ class User
 	private $isResource=false;
 
 	/**
+     * @ORM\Column(type="boolean")
+     */
+	private $isAdmin=false;
+
+	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="user", orphanRemoval=true)
 	 */
 	private $plannings;
@@ -89,6 +94,14 @@ class User
 
 	public function setIsResource($resource){
 		$this->isResource = $resource?true:false;
+	}
+
+	public function isAdmin(){
+		return $this->isAdmin;
+	}
+
+	public function setIsAdmin($admin){
+		$this->isAdmin = $admin?true:false;
 	}
 
 	/**
