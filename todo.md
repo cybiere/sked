@@ -1,7 +1,7 @@
 #TODO
 
   * ~~Différencier les projets internes/non facturables~~
-  * Ne proposer que les projets en cours sur le select de création des plannings
+  * ~~Ne proposer que les projets en cours sur le select de création des plannings~~
   * Différencier les éléments de planning pour des réunions
   * Absences
   * Jours fériés ?
