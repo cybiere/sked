@@ -73,29 +73,32 @@ class AppExtension extends AbstractExtension
 
 	public function printPlanningFunction($planning,$isAdmin){
 ?>
-
 	<div 
-		class="project <?php if($planning->getProject()->isBillable()) echo $planning->isMeeting()?"meeting":"billable"; else echo "non-billable"; ?>"
+		class="project <?php if($planning->getProject() == NULL) echo "absence"; elseif($planning->getProject()->isBillable()) echo $planning->isMeeting()?"meeting":"billable"; else echo "non-billable"; ?>"
 		tabindex="0" 
 		data-duration="<?php echo $planning->getNbSlices(); ?>" 
 		data-planningId="<?php echo $planning->getId(); ?>"
 		data-toggle="popover"
 		data-html="true"
-		title="<?php echo $planning->getProject()->getName(); ?>"
+		title="<?php echo $planning->getProject() == NULL?"Absence":$planning->getProject()->getName(); ?>"
 		data-content="
 			<div class='row'>
+<?php if($planning->getProject() != NULL){ ?>
 			<dt class='col-md-6'>Code projet</dt><dd class='col-md-6'><?php echo $planning->getProject()->getReference(); ?></dd>
 			<dt class='col-md-6'>Client</dt><dd class='col-md-6'><?php echo $planning->getProject()->getClient(); ?></dd>
 			<dt class='col-md-6'>jh planif/vendus</dt><dd class='col-md-6'><?php echo $planning->getProject()->getPlannedDays()."/".$planning->getProject()->getNbDays(); ?></dd>
 			<dt class='col-md-6'>Commentaires</dt><dd class='col-md-6'><?php echo $planning->getProject()->getComments(); ?></dd>
 <?php if($isAdmin){ ?>
 			<div class='action col-md-6'><a class='btn btn-outline-warning' href='<?php echo $this->router->generate('project_edit',array("projectId"=>$planning->getProject()->getId())); ?>'><i class='fas fa-edit'></i></a></div>
+<?php } ?>
+<?php } ?>
+<?php if($isAdmin){ ?>
 			<div class='action col-md-6'><a class='btn btn-outline-danger' href='<?php echo $this->router->generate('planning_del',array("planningId"=>$planning->getId())); ?>'><i class='fas fa-trash'></i></a></div>
 <?php } ?>
 			</div>
 		"
 	>
-		<?php echo $planning->getProject()->getName(); ?>
+		<?php echo $planning->getProject() == NULL?"Absence":$planning->getProject()->getName(); ?>
 		<i class="duration">
 			<?php echo $planning->getNbSlices()/2; ?>
 		</i>

@@ -63,6 +63,7 @@
 					<dt class="col-sm-5">Projet :</dt>
 						<dd class="col-sm-7">
 							<select id="addForm_projectId">
+								<option value="0">Absence</option>
 								{% for project in projects %}
 									{% if project.status != 7 %}
 										<option value="{{ project.id }}">{{ project.reference }} - {{ project.name }}</option>
