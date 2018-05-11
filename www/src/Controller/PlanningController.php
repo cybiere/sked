@@ -41,20 +41,48 @@ class PlanningController extends Controller
 		$users = $userRepository->findBy(array("isResource"=>true));
 		$projects = $projectRepository->findAll();
 
+		$baseYear = intval(date('Y'));
+		$holidays = array();
+		for($i=-1;$i<=1;$i++){
+			$year=$baseYear+$i;
+			$easterDate  = \easter_date($year);
+			$easterDay   = date('j', $easterDate);
+			$easterMonth = date('n', $easterDate);
+			$easterYear  = date('Y', $easterDate);
+
+				// Dates fixes
+			$holidays[] = mktime(0, 0, 0, 1,  1,  $year);  // 1er janvier
+			$holidays[] = mktime(0, 0, 0, 5,  1,  $year);  // Fête du travail
+			$holidays[] = mktime(0, 0, 0, 5,  8,  $year);  // Victoire des alliés
+			$holidays[] = mktime(0, 0, 0, 7,  14, $year);  // Fête nationale
+			$holidays[] = mktime(0, 0, 0, 8,  15, $year);  // Assomption
+			$holidays[] = mktime(0, 0, 0, 11, 1,  $year);  // Toussaint
+			$holidays[] = mktime(0, 0, 0, 11, 11, $year);  // Armistice
+			$holidays[] = mktime(0, 0, 0, 12, 25, $year);  // Noel
+
+				// Dates variables
+			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 1,  $easterYear);
+			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 39, $easterYear);
+			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 50, $easterYear);
+		}
+		sort($holidays);
+
 		return $this->render('planning/index.html.twig', [
+			'holidays' => $holidays,
 			'users' => $users,
 			'projects' => $projects,
 			'form' => $form->createView(),
 		]);
+
 	}
 
 	/**
 	 * @Route("/resize/{planningId}/{newSize}",name="planning_resize")
 	 */
 	public function resize(Request $request,$planningId,$newSize){
-			if(!$this->get('session')->get('user')->isAdmin()){
-				throw $this->createNotFoundException("Cette page n'existe pas");
-			}
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
 		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
 
@@ -73,9 +101,9 @@ class PlanningController extends Controller
 	 * @Route("/move/{planningId}/{newStart}/{newHour}/{newUser}/{newSize}",name="planning_move")
 	 */
 	public function move(Request $request,$planningId,$newStart,$newHour,$newUser,$newSize){
-			if(!$this->get('session')->get('user')->isAdmin()){
-				throw $this->createNotFoundException("Cette page n'existe pas");
-			}
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
 		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
@@ -101,9 +129,9 @@ class PlanningController extends Controller
 	 * @Route("/del/{planningId}",name="planning_del")
 	 */
 	public function del(Request $request,$planningId){
-			if(!$this->get('session')->get('user')->isAdmin()){
-				throw $this->createNotFoundException("Cette page n'existe pas");
-			}
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
 		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
 

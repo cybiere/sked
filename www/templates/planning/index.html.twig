@@ -82,7 +82,7 @@
 			{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
 			{% if x|date('N') < 6 %}
 			{% set nbSlices = nbSlices+2 %}
-			<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}">{{ x|date('D d') }}</th>
+			<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}{% if x in holidays%} holiday{% endif %}">{{ x|date('D d') }}</th>
 			{% endif %}
 			{% endfor %}
 		</tr>
@@ -94,7 +94,7 @@
 			<th class="schedUser">{{ user.username }}</th>
 			{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
 			{% if x|date('N') < 6 %}
-			<td class="schedHour">
+			<td class="schedHour{% if x in holidays%} holiday{% endif %}">
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
@@ -104,7 +104,7 @@
 					{% endfor %}
 				</div>
 			</td>
-			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}">
+			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x in holidays%} holiday{% endif %}">
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}

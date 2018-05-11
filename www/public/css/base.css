@@ -44,7 +44,10 @@ th.schedUser{
 	height:40px;
 }
 .friday{
-border-right : #ccc 5px double !important;
+	border-right : #ccc 5px double !important;
+}
+.holiday{
+	background: #eee;
 }
 .projectContainer {
 	position: relative;
