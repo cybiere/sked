@@ -56,6 +56,10 @@
 						<dd class="col-sm-7">
 							<span id="addModal_duration"></span>
 						</dd>
+					<dt class="col-sm-5">Réunion :</dt>
+						<dd class="col-sm-7">
+							<input id="addForm_meeting" type="checkbox">
+						</dd>
 					<dt class="col-sm-5">Projet :</dt>
 						<dd class="col-sm-7">
 							<select id="addForm_projectId">
@@ -288,6 +292,7 @@ $(document).mouseup(function(e){
 });
 
 function addPlanning(){
+	$('#planning_meeting').prop('checked',$('#addForm_meeting').prop('checked'));
 	$('#planning_project').val($('#addForm_projectId').val());
 	$('#addPlanning_form').submit();
 }

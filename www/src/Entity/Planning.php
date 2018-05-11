@@ -20,6 +20,7 @@ class Planning
      * @ORM\Column(type="date")
      */
 	private $startDate;
+
 	/**
      * @ORM\Column(type="string", length=2)
      */
@@ -35,6 +36,11 @@ class Planning
 	 * @ORM\JoinColumn(nullable=true)
      */
 	private $project;
+
+	/**
+     * @ORM\Column(type="boolean")
+     */
+	private $meeting=false;
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="plannings")
@@ -74,6 +80,14 @@ class Planning
 
 	public function setNbSlices($nbSlices){
 		$this->nbSlices = $nbSlices > 0?$nbSlices:1;
+	}
+
+	public function isMeeting(){
+		return $this->meeting;
+	}
+
+	public function setMeeting($isMeeting){
+		$this->meeting = $isMeeting?true:false;
 	}
 
 	public function getProject(){

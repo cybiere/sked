@@ -75,7 +75,7 @@ class AppExtension extends AbstractExtension
 ?>
 
 	<div 
-		class="project <?php if($planning->getProject()->isBillable()) echo "billable"; else echo "non-billable"; ?>"
+		class="project <?php if($planning->getProject()->isBillable()) echo $planning->isMeeting()?"meeting":"billable"; else echo "non-billable"; ?>"
 		tabindex="0" 
 		data-duration="<?php echo $planning->getNbSlices(); ?>" 
 		data-planningId="<?php echo $planning->getId(); ?>"

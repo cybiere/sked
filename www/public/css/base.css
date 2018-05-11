@@ -105,6 +105,11 @@ th.schedUser{
 	border-color:#150;
 	color:#F6F6F6;
 }
+.meeting {
+	background:#b76;
+	border-color:#510;
+	color:#F6F6F6;
+}
 .non-billable {
 	background:#67b;
 	border-color:#015;
