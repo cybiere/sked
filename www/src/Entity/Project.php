@@ -56,6 +56,11 @@ class Project
 	private $color;
 
 	/**
+	 * @ORM\Column(type="boolean")
+	 */
+	private $billable=true;
+
+	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="project", orphanRemoval=true)
 	 */
 	private $plannings;
@@ -123,6 +128,14 @@ class Project
 
 	public function setComments($comments){
 		$this->comments = $comments;
+	}
+
+	public function isBillable(){
+		return $this->billable;
+	}
+
+	public function setBillable($billable){
+		$this->billable = $billable?true:false;
 	}
 
 	public function getColor(){

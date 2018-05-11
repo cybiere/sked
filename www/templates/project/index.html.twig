@@ -76,6 +76,35 @@
 </div>
 <hr />
 <h2>
+	Projets non facturables
+</h2>
+<table class="table table-hover table-sm">
+	<thead class="thead-light">
+		<tr>
+			<th>Nom du projet</th>
+			<th>Jours définis</th>
+			<th>Jours planifiés</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for project in internalProjects %}
+		<tr>
+			<td>{{ project.name }}</td>
+			<td>{{ project.nbDays }}</td>
+			<td>{{ project.plannedDays }}</td>
+			<td>
+				{% if app.session.get('user').admin %}
+				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
+				<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-down"></i></a>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<hr />
+<h2>
 	<i class="fas fa-archive"></i>
 	Projets archivés
 </h2>

@@ -57,11 +57,16 @@ class ProjectController extends Controller
 
 		$projects = $projectRepository->findAll();
 		$sortedProjects = array(array(),array(),array(),array(),array(),array(),array(),array());
+		$internalProjects = array();
 		foreach($projects as $project){
-			$sortedProjects[$project->getStatus()][] = $project;
+			if(!$project->isBillable()){
+				$internalProjects[] = $project;
+			}else{
+				$sortedProjects[$project->getStatus()][] = $project;
+			}
 		}
 
-		return $this->render('project/index.html.twig',array('projects'=>$sortedProjects,'form'=>$form->createView()));
+		return $this->render('project/index.html.twig',array('projects'=>$sortedProjects,'internalProjects'=>$internalProjects,'form'=>$form->createView()));
 	}
 
 	/**
