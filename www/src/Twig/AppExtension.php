@@ -28,10 +28,10 @@ class AppExtension extends AbstractExtension
 
 	public function kanprojectFunction($project,$isAdmin){
 ?>
-	<div class='card kanProject border-<?php echo $project->getColor(); ?>' data-projectid="<?php echo $project->getId(); ?>">
+	<div class='card kanProject' data-projectid="<?php echo $project->getId(); ?>">
 		<h4 class="card-header">
 			<?php echo $project->getReference(); ?>
-<a class="btn bnt-xs btn-outline-<?php echo $project->getColor(); ?> float-right" data-toggle="collapse" href="#kanDetails-<?php echo $project->getId(); ?>" role="button" aria-expanded="false" aria-controls="addButton">
+<a class="btn bnt-xs btn-outline-secondary float-right" data-toggle="collapse" href="#kanDetails-<?php echo $project->getId(); ?>" role="button" aria-expanded="false" aria-controls="addButton">
 				<i title='Détails' class='fas fa-angle-double-down'></i>
 			</a>
 		</h4>
@@ -75,7 +75,7 @@ class AppExtension extends AbstractExtension
 ?>
 
 	<div 
-		class="project bg-<?php echo $planning->getProject()->getColor(); ?> border-<?php echo $planning->getProject()->getColor(); if(in_array($planning->getProject()->getColor(),array("dark","secondary","danger"))) echo " text-white"; ?>"
+		class="project <?php if($planning->getProject()->isBillable()) echo "billable"; else echo "non-billable"; ?>"
 		tabindex="0" 
 		data-duration="<?php echo $planning->getNbSlices(); ?>" 
 		data-planningId="<?php echo $planning->getId(); ?>"

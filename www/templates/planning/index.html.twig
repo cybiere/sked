@@ -24,6 +24,14 @@
 </div>
 					{% endif %}
 <hr />
+{% set planningStart = startDate|date_modify('first day of this month') %}
+<div class="d-flex justify-content-center">
+<a href="{{ path('planning_index_shift',{"startDate":planningStart|date_modify('-1 month')|date('d-m-Y')})}}" class="btn btn-outline-secondary mx-1"><i class="fas fa-angle-left"></i> Mois précédent</a>
+<a href="{{ path('planning_index')}}" class="btn btn-outline-secondary"><i class="far fa-calendar"></i> Mois courant</a>
+<a href="{{ path('planning_index_shift',{"startDate":planningStart|date_modify('+1 month')|date('d-m-Y')})}}" class="btn btn-outline-secondary mx-1">Mois suivant <i class="fas fa-angle-right"></i></a>
+</div>
+
+<hr />
 
 <div class="modal fade" id="addPlanning_Modal" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
@@ -68,7 +76,8 @@
 	</div>
 </div>
 
-{% set baseDate = "now"|date('d-m-Y') %}
+{% set baseDate = planningStart|date('d-m-Y') %}
+{% set today = "now"|date('d-m-Y') %}
 {% set nbMonths = 3 %}
 {% for i in range(0,nbMonths-1) %}
 
@@ -82,7 +91,7 @@
 			{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
 			{% if x|date('N') < 6 %}
 			{% set nbSlices = nbSlices+2 %}
-			<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}{% if x in holidays%} holiday{% endif %}">{{ x|date('D d') }}</th>
+			<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}{% if x in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">{{ x|date('D d') }}</th>
 			{% endif %}
 			{% endfor %}
 		</tr>
@@ -94,7 +103,7 @@
 			<th class="schedUser">{{ user.username }}</th>
 			{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
 			{% if x|date('N') < 6 %}
-			<td class="schedHour{% if x in holidays%} holiday{% endif %}">
+			<td class="schedHour{% if x in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
@@ -104,7 +113,7 @@
 					{% endfor %}
 				</div>
 			</td>
-			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x in holidays%} holiday{% endif %}">
+			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}

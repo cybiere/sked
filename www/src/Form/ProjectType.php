@@ -19,16 +19,6 @@ class ProjectType extends AbstractType
             ->add('reference',null,array('label'=>'Code projet','attr' => array('maxlength' => 10)))
             ->add('name',null,array('label'=>'Nom du projet'))
             ->add('client',null,array('label'=>'Client'))
-			->add('color',ChoiceType::class,array('label'=>'Couleur',
-												   'choices'=>array(
-													   'Défaut'=>'info',
-													   'Bleu'=>'primary',
-													   'Gris'=>'secondary',
-													   'Vert'=>'success',
-													   'Rouge'=>'danger',
-													   'Jaune'=>'warning',
-													   'Noir'=>'dark'
-			)))
 			->add('status',ChoiceType::class,array('label'=>'Statut',
 												   'choices'=>array(
 														'Non validé'=>0,

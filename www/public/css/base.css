@@ -49,6 +49,9 @@ th.schedUser{
 .holiday{
 	background: #eee;
 }
+.today{
+	background: #dfd !important;
+}
 .projectContainer {
 	position: relative;
 	width:100%;
@@ -96,4 +99,14 @@ th.schedUser{
 }
 .action {
 	text-align:center;
+}
+.billable {
+	background:#7b6;
+	border-color:#150;
+	color:#F6F6F6;
+}
+.non-billable {
+	background:#67b;
+	border-color:#015;
+	color:#F6F6F6;
 }

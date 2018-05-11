@@ -16,8 +16,9 @@ class PlanningController extends Controller
 {
 	/**
 	 * @Route("/", name="planning_index")
+	 * @Route("/planning/{startDate}", name="planning_index_shift", defaults={"startDate"="now"})
 	 */
-	public function index(Request $request)
+	public function index(Request $request, $startDate="now")
 	{
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
@@ -41,7 +42,13 @@ class PlanningController extends Controller
 		$users = $userRepository->findBy(array("isResource"=>true));
 		$projects = $projectRepository->findAll();
 
-		$baseYear = intval(date('Y'));
+		try {
+			$startDateObj = new \DateTime($startDate);
+		} catch (\Exception $e) {
+			$startDate = "now";
+			$startDateObj = new \DateTime("now");
+	    }
+		$baseYear = intval($startDateObj->format('Y'));
 		$holidays = array();
 		for($i=-1;$i<=1;$i++){
 			$year=$baseYear+$i;
@@ -69,6 +76,7 @@ class PlanningController extends Controller
 
 		return $this->render('planning/index.html.twig', [
 			'holidays' => $holidays,
+			'startDate' => $startDate,
 			'users' => $users,
 			'projects' => $projects,
 			'form' => $form->createView(),

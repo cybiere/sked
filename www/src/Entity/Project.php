@@ -51,11 +51,6 @@ class Project
 	private $comments;
 
 	/**
-     * @ORM\Column(type="string")
-     */
-	private $color;
-
-	/**
 	 * @ORM\Column(type="boolean")
 	 */
 	private $billable=true;
@@ -136,26 +131,6 @@ class Project
 
 	public function setBillable($billable){
 		$this->billable = $billable?true:false;
-	}
-
-	public function getColor(){
-		return $this->color;
-	}
-
-	public function setColor($color){
-		switch($color){
-			case "primary":
-			case "secondary":
-			case "success":
-			case "danger":
-			case "warning":
-			case "info":
-			case "dark":
-				$this->color = $color;
-				break;
-			default:
-				$this->color = "info";
-		}
 	}
 
 	/**
