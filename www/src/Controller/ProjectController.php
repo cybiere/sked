@@ -59,7 +59,7 @@ class ProjectController extends Controller
 		$sortedProjects = array(array(),array(),array(),array(),array(),array(),array(),array());
 		$internalProjects = array();
 		foreach($projects as $project){
-			if(!$project->isBillable()){
+			if(!$project->isBillable() && $project->getStatus() != 7){
 				$internalProjects[] = $project;
 			}else{
 				$sortedProjects[$project->getStatus()][] = $project;
