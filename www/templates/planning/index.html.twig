@@ -138,7 +138,7 @@
 {% block extraJs %}
 <script>
 	$('.project').each(function(index){
-		$(this).outerWidth($('.schedHour').outerWidth()*$(this).data("duration")-3);
+		$(this).outerWidth($(this).parent().parent().outerWidth()*$(this).data("duration")-3);
 	});
 
 $( ".project" ).contextmenu(function() {
@@ -155,13 +155,13 @@ $(function () {
 $(".project").resizable({
 	handles: "e",
 	containment: ".schedule",
-	grid: $('.schedHour').outerWidth(),
 	resize: function(e,ui){
-		newSize = Math.round(((ui.size.width-(ui.size.width%$('.schedHour').outerWidth()))/$('.schedHour').outerWidth())+1);
+		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1);
 		$(this).find('i').text(newSize/2);
+		$(this).outerHeight(30);
 	},
 	stop : function(event, ui){
-		newSize = Math.round(((ui.size.width-(ui.size.width%$('.schedHour').outerWidth()))/$('.schedHour').outerWidth())+1);
+		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1);
 		if(newSize > $(this).parent().data("remainingslices")+1){
 			newSize = $(this).parent().data("remainingslices")+1;
 		}
@@ -178,6 +178,7 @@ $(".project").resizable({
 			success:function(data, status, xhr){
 				if(data.success){
 					ui.element.data("duration",newSize);
+					$(ui.element).outerWidth($(ui.element).parent().parent().outerWidth()*newSize-3);
 				}else{
 					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 					$('#flashMessages').append(message);
@@ -212,7 +213,7 @@ $('.projectContainer').droppable({
 		if(ui.draggable.data("duration") > $(this).data("remainingslices")+1){
 			ui.draggable.data("duration",$(this).data("remainingslices")+1);
 			ui.draggable.find('i').text($(this).data("remainingslices")+1);
-			ui.draggable.outerWidth($('.schedHour').outerWidth()*ui.draggable.data("duration")-3);
+			ui.draggable.outerWidth($(this).parent().outerWidth()*ui.draggable.data("duration")-3);
 		}
 		url = url.replace("sizePlaceHold", ui.draggable.data('duration'));
 		$.ajax(url,{
@@ -224,6 +225,7 @@ $('.projectContainer').droppable({
 			success:function(data, status, xhr){
 				if(data.success){
 					ui.draggable.detach().appendTo(destCell);
+					ui.draggable.outerWidth($(destCell).parent().outerWidth()*ui.draggable.data("duration")-3);
 				}else{
 					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 					$('#flashMessages').append(message);
@@ -248,11 +250,13 @@ newGhost=null;
 add_startDate=null;
 add_startHour=null;
 add_userId=null;
+gridWidth=0;
 $('.projectContainer').mousedown(function(e){
 	if(e.which != 1) return;
 	$("<div class='projectGhost'>Nouveau projet</div>").appendTo(this);
 	add_startDate=$(this).data('date');
 	add_startHour=$(this).data('hour');
+	gridWidth=$(this).parent().outerWidth();
 	add_userId=$(this).data('user');
 	newGhost = $(this).find('.projectGhost');
 	baseX = newGhost.offset().left;
@@ -266,8 +270,8 @@ $(document).mousemove(function(e){
 $(document).mouseup(function(e){
 	if(mouseDown){
 		ghostSize = e.pageX-baseX
-		modulo = ghostSize % $('td').outerWidth();
-		nbSlices = Math.round((ghostSize-modulo)/$('td').outerWidth()+1);
+		modulo = ghostSize % gridWidth;
+		nbSlices = Math.round((ghostSize-modulo)/gridWidth+1);
 
 		newGhost.remove();
 
@@ -289,6 +293,7 @@ $(document).mouseup(function(e){
 		add_startDate=null;
 		add_startHour=null;
 		add_userId=null;
+		gridWidth=0;
 	}
 });
 
