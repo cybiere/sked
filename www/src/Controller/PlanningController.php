@@ -33,7 +33,7 @@ class PlanningController extends Controller
 				throw $this->createNotFoundException("Cette page n'existe pas");
 			}
 			$planning = $form->getData();
-			if($planning->getProject() == 0) $planning->setProject(NULL);
+			if(!is_object($planning) && $planning->getProject() == 0) $planning->setProject(NULL);
 			$em->persist($planning);
 			$em->flush();
 			$this->addFlash('success','Planning ajouté');
