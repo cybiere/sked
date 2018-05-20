@@ -29,15 +29,15 @@ class AppExtension extends AbstractExtension
 	public function kanprojectFunction($project,$isAdmin){
 ?>
 	<div class='card kanProject' data-projectid="<?php echo $project->getId(); ?>">
-		<h4 class="card-header">
-			<?php echo $project->getReference(); ?>
-<a class="btn bnt-xs btn-outline-secondary float-right" data-toggle="collapse" href="#kanDetails-<?php echo $project->getId(); ?>" role="button" aria-expanded="false" aria-controls="addButton">
-				<i title='Détails' class='fas fa-angle-double-down'></i>
+		<h4 class="card-header text-center">
+			<a class="text-dark" data-toggle="collapse" href="#kanDetails-<?php echo $project->getId(); ?>" aria-expanded="false">
+				<?php echo $project->getClient(); ?> <?php echo $project->getName(); ?>
 			</a>
 		</h4>
 		<div id="kanDetails-<?php echo $project->getId(); ?>" class="collapse">
 			<div class="card-body">
 				<ul class="list-unstyled">
+					<li> Code projet : <?php echo $project->getReference(); ?></li>
 					<li> Nom : <?php echo $project->getName(); ?></li>
 					<li> Client : <?php echo $project->getClient(); ?></li>
 					<li> Jours : <?php echo $project->getNbDays(); ?></li>
