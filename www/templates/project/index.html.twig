@@ -127,6 +127,7 @@
 				{% if app.session.get('user').admin %}
 				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
 				<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Désarchiver" class="fas fa-caret-square-up"></i></a>
+				<a class="text-danger" href='{{ path('project_del',{"projectId":project.id})}}'><i title="Supprimer" class="fas fa-trash"></i></a>
 				{% endif %}
 			</td>
 		</tr>

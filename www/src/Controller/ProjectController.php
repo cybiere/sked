@@ -149,4 +149,29 @@ class ProjectController extends Controller
 		return new JsonResponse($arrData);
 	}
 
+	/**
+	 * @Route("/del/{projectId}",name="project_del")
+	 */
+	public function del(Request $request,$projectId){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+
+		if(!($project = $projectRepository->find($projectId))){
+			$this->addFlash('danger','Projet inexistant');
+		}else{
+			if($project->getStatus() == 7){
+				$em->remove($project);
+				$em->flush();
+				$this->addFlash('success','Projet supprimé');
+			}else{
+				$this->addFlash('warning','Vous devez archiver un projet avant de le supprimer');
+			}
+		}
+		return $this->redirectToRoute('project_index');
+	}
+
 }
