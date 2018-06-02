@@ -119,3 +119,6 @@ th.schedUser{
 	background:#bb7;
 	border-color:#551;
 }
+.modal-dialog {
+	max-width:1000px !important;
+}
