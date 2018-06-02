@@ -13,8 +13,8 @@
 
   * Rajouter des commentaires pour les éléments de planning
   * Retours utilisateurs ?
+  * Planning réalisé par utilisateur
 
 ## V1.2
 
-  * Planning réalisé par utilisateur
-
+  * Gestion dynamique du status projet
