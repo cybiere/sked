@@ -122,3 +122,9 @@ th.schedUser{
 .modal-dialog {
 	max-width:1000px !important;
 }
+.planningHead {
+	min-width:33%;
+}
+.schedule:last-child {
+	margin-bottom:0;
+}
