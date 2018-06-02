@@ -98,7 +98,7 @@ class AppExtension extends AbstractExtension
 			</div>
 		"
 	>
-		<?php echo $planning->getProject() == NULL?"Absence":$planning->getProject()->getName(); ?>
+		<?php echo $planning->getProject() == NULL?"Absence":$planning->getProject()->getClient()." ".$planning->getProject()->getName(); ?>
 		<i class="duration">
 			<?php echo $planning->getNbSlices()/2; ?>
 		</i>
