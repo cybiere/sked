@@ -128,3 +128,6 @@ th.schedUser{
 .schedule:last-child {
 	margin-bottom:0;
 }
+#addExample{
+	display:none;
+}

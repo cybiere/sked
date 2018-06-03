@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Entity\WorkInput;
 use App\Form\WorkInputType;
 
+use App\Entity\User;
+use App\Entity\Project;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -22,8 +25,10 @@ class WorkInputController extends Controller
     {
 		$em = $this->getDoctrine()->getManager();
 		$inputRepository = $this->getDoctrine()->getRepository(WorkInput::class);
-
 		$myInputs = $inputRepository->findByUser($this->get('session')->get('user')->getId());
+
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+		$projects = $projectRepository->findAll();
 
 		try {
 			$startDateObj = new \DateTime($startDate);
@@ -61,6 +66,7 @@ class WorkInputController extends Controller
 		return $this->render('work_input/index.html.twig', [
 			'holidays' => $holidays,
 			'inputs'=>$myInputs,
+			'projects'=>$projects,
 			'startDate'=>$startDate,
 		]);
 	}
