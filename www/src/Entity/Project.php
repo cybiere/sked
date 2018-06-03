@@ -59,11 +59,16 @@ class Project
      * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="project", orphanRemoval=true)
 	 */
 	private $plannings;
+ /**
+  * @ORM\OneToMany(targetEntity="App\Entity\WorkInput", mappedBy="project", orphanRemoval=true)
+  */
+ private $workInputs;
 
 
     public function __construct()
     {
         $this->plannings = new ArrayCollection();
+        $this->workInputs = new ArrayCollection();
     }
 
 	public function __toString(){
@@ -148,5 +153,31 @@ class Project
 		}	
 		return $slicesPlanned/2;
 	}
+ /**
+  * @return Collection|WorkInput[]
+  */
+ public function getWorkInputs(): Collection
+ {
+     return $this->workInputs;
+ }
+ public function addWorkInput(WorkInput $workInput): self
+ {
+     if (!$this->workInputs->contains($workInput)) {
+         $this->workInputs[] = $workInput;
+         $workInput->setProject($this);
+     }
+     return $this;
+ }
+ public function removeWorkInput(WorkInput $workInput): self
+ {
+     if ($this->workInputs->contains($workInput)) {
+         $this->workInputs->removeElement($workInput);
+         // set the owning side to null (unless already changed)
+         if ($workInput->getProject() === $this) {
+             $workInput->setProject(null);
+         }
+     }
+     return $this;
+ }
 
 }

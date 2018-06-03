@@ -49,11 +49,16 @@ class User
      * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="user", orphanRemoval=true)
 	 */
 	private $plannings;
+ /**
+  * @ORM\OneToMany(targetEntity="App\Entity\WorkInput", mappedBy="user", orphanRemoval=true)
+  */
+ private $workInputs;
 
 
     public function __construct()
     {
         $this->plannings = new ArrayCollection();
+        $this->workInputs = new ArrayCollection();
     }
 
 	public function __toString(){
@@ -110,5 +115,36 @@ class User
     public function getPlannings()
     {
         return $this->plannings;
+    }
+
+    /**
+     * @return Collection|WorkInput[]
+     */
+    public function getWorkInputs(): Collection
+    {
+        return $this->workInputs;
+    }
+
+    public function addWorkInput(WorkInput $workInput): self
+    {
+        if (!$this->workInputs->contains($workInput)) {
+            $this->workInputs[] = $workInput;
+            $workInput->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWorkInput(WorkInput $workInput): self
+    {
+        if ($this->workInputs->contains($workInput)) {
+            $this->workInputs->removeElement($workInput);
+            // set the owning side to null (unless already changed)
+            if ($workInput->getUser() === $this) {
+                $workInput->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
