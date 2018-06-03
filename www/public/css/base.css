@@ -128,6 +128,16 @@ th.schedUser{
 .schedule:last-child {
 	margin-bottom:0;
 }
-#addExample{
+#addExample, #dispExample{
+	display:none;
+}
+#emptyNotice{
+	text-align:center;
+}
+.addInput_btn button{
+	width:100%;
+	margin:0 auto;
+}
+#dateIso{
 	display:none;
 }

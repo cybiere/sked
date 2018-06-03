@@ -6,24 +6,20 @@
 <div class="d-flex justify-content-between">
 	<h1 class="planningHead">Compte rendu d'activité</h1>
 
-	{% if startDate|date('w') == 0 %}
-	{% set day = 7 %}
-	{% else %}
-	{% set day = startDate|date('w') %}
-	{% endif %}
-	{% set reportStart = startDate|date_modify("-#{day} days")|date_modify('+1 day')|date('d-m-Y') %}
+	{% set reportStart = startDate %}
 
 	<div class="planningHead">
 		<div class="d-flex justify-content-center">
-			<a href="{{ path('report_index_shift',{"startDate":reportStart|date_modify('-1 week')|date('d-m-Y')})}}" class="btn btn-outline-secondary mx-1"><i class="fas fa-angle-left"></i> Semaine précédente</a>
+			<a href="{{ path('report_index_shift',{"startDate":reportStart|date_modify('-1 week')|date('Y-m-d')})}}" class="btn btn-outline-secondary mx-1"><i class="fas fa-angle-left"></i> Semaine précédente</a>
 			<a href="{{ path('report_index')}}" class="btn btn-outline-secondary"><i class="far fa-calendar"></i> Semaine courante</a>
-			<a href="{{ path('report_index_shift',{"startDate":reportStart|date_modify('+1 week')|date('d-m-Y')})}}" class="btn btn-outline-secondary mx-1">Semaine suivante <i class="fas fa-angle-right"></i></a>
+			<a href="{{ path('report_index_shift',{"startDate":reportStart|date_modify('+1 week')|date('Y-m-d')})}}" class="btn btn-outline-secondary mx-1">Semaine suivante <i class="fas fa-angle-right"></i></a>
 		</div>
 	</div>
 	<div class="planningHead">
 	</div>
 </div>
 <p>Semaine du {{reportStart|date('d/m/Y')}}</p>
+<span id="dateIso">{{reportStart|date('Y/m/d')}}</span>
 <table id="report" class="table table-sm table-hover">
 	<thead>
 		<tr>
@@ -40,7 +36,7 @@
 	<tbody id="reportBody">
 		<tr id="addExample">
 			<td>
-				<select name="project">
+				<select id="project">
 					<option value="0">Absence</option>
 					{% for project in projects %}
 					{% if project.status != 7 %}
@@ -49,28 +45,41 @@
 					{% endfor %}
 				</select>
 			</td>
-			<td><input type="number" min="0" max="1" step="0.25" name="mon"/></td>
-			<td><input type="number" min="0" max="1" step="0.25" name="tue"/></td>
-			<td><input type="number" min="0" max="1" step="0.25" name="wed"/></td>
-			<td><input type="number" min="0" max="1" step="0.25" name="thu"/></td>
-			<td><input type="number" min="0" max="1" step="0.25" name="fri"/></td>
+			<td><input type="number" min="0" max="1" step="0.25" id="mon"/></td>
+			<td><input type="number" min="0" max="1" step="0.25" id="tue"/></td>
+			<td><input type="number" min="0" max="1" step="0.25" id="wed"/></td>
+			<td><input type="number" min="0" max="1" step="0.25" id="thu"/></td>
+			<td><input type="number" min="0" max="1" step="0.25" id="fri"/></td>
 			<td><input type="text" name="comments"/></td>
 			<td>
-			<a class="text-success" href=""><i class="far fa-save"></i></a>
+				<a class="text-success saveReport" href="#"><i class="far fa-save"></i></a>
+			</td>
+		</tr>
+		<tr id="dispExample">
+			<th class='projectName'></th>
+			<td class='weekday mon'></td>
+			<td class='weekday tue'></td>
+			<td class='weekday wed'></td>
+			<td class='weekday thu'></td>
+			<td class='weekday fri'></td>
+			<td class='comments'></td>
+			<td>
+				<a class="" href="#"><i class="far fa-edit"></i></a>
+				<a class="" href="#"><i class="fas fa-trash-alt"></i></a>
 			</td>
 		</tr>
 		{% if inputs is empty %}
 		<tr><td id="emptyNotice" colspan="8">Aucune saisie effectuée pour cette semaine</td></tr>
 		{% else %}
 		{% for input in inputs %}
-		<tr>
-			<th>{{input.project.name}}</th>
-			<td>{{input.project.mon}}</td>
-			<td>{{input.project.tue}}</td>
-			<td>{{input.project.wed}}</td>
-			<td>{{input.project.thu}}</td>
-			<td>{{input.project.fri}}</td>
-			<td></td>
+		<tr data-inputid='{{ input.id }}'>
+			<th class="projectName">{{input.project.client}} {{input.project.name}}</th>
+			<td class='weekday mon'>{{input.mon}}</td>
+			<td class='weekday tue'>{{input.tue}}</td>
+			<td class='weekday wed'>{{input.wed}}</td>
+			<td class='weekday thu'>{{input.thu}}</td>
+			<td class='weekday fri'>{{input.fri}}</td>
+			<td class='comments'></td>
 			<td>
 				<a class="" href="#"><i class="far fa-edit"></i></a>
 				<a class="" href="#"><i class="fas fa-trash-alt"></i></a>
@@ -80,7 +89,7 @@
 		{% endif %}
 	</tbody>
 	<tfoot>
-		<tr><td class="addInput_Btn" colspan="8"><button id="addReport" class="btn btn-xs btn-outline-primary">Ajouter un projet</button></td></tr>
+		<tr><td class="addInput_btn" colspan="8"><button id="addReport" class="btn btn-xs btn-outline-primary"><i class="fas fa-plus-circle "></i> Ajouter un projet</button></td></tr>
 	</tfoot>
 </table>
 {% endblock %}
@@ -89,6 +98,55 @@
 	$('#addReport').on('click',function(){
 		$('#emptyNotice').hide();
 		$('#reportBody tr:last').after($("#addExample").clone().prop('id', '' ));
-		});
+	});
+
+$('body').on('click','.saveReport',function(){
+	row = $(this).parents('tr');
+	project=row.find('#project').val();
+	projectName=row.find('#project option:selected').text();
+	mon=row.find('#mon').val();
+	tue=row.find('#tue').val();
+	wed=row.find('#wed').val();
+	thu=row.find('#thu').val();
+	fri=row.find('#fri').val();
+	mon=mon==""?0:mon;
+	tue=tue==""?0:tue;
+	wed=wed==""?0:wed;
+	thu=thu==""?0:thu;
+	fri=fri==""?0:fri;
+	comments=row.find('#comments').val();
+
+	$.post("{{ path("report_add") }}",
+		{
+			projectId: project,
+			weekstart:$('#dateIso').text(),
+			mon:mon,
+			tue:tue,
+			wed:wed,
+			thu:thu,
+			fri:fri,
+			comments:comments
+		},
+		function(data,status,xhr){
+			if(data.success){
+				dispRow = $("#dispExample").clone().prop('id','');
+				dispRow.data('inputid',data.newId);
+				dispRow.find('.projectName').text(projectName);
+				dispRow.find('.mon').text(mon);
+				dispRow.find('.tue').text(tue);
+				dispRow.find('.wed').text(wed);
+				dispRow.find('.thu').text(thu);
+				dispRow.find('.fri').text(fri);
+				dispRow.find('.comments').text(comments);
+				$(row).after(dispRow);
+				$(row).remove();
+			}else{
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			}
+		}
+	);
+	return false;	
+});
 </script>
 {% endblock %}

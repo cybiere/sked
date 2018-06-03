@@ -29,9 +29,9 @@ class WorkInput
     private $project;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="date")
      */
-    private $weeknum;
+    private $weekStart;
 
     /**
      * @ORM\Column(type="decimal", precision=3, scale=2, nullable=true)
@@ -68,6 +68,11 @@ class WorkInput
      */
     private $locked;
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
     public function getUser(): ?User
     {
         return $this->user;
@@ -92,14 +97,14 @@ class WorkInput
         return $this;
     }
 
-    public function getWeeknum(): ?int
+    public function getWeekStart(): ?int
     {
-        return $this->weeknum;
+        return $this->weekStart;
     }
 
-    public function setWeeknum(int $weeknum): self
+    public function setWeekStart(\DateTime $weekStart): self
     {
-        $this->weeknum = $weeknum;
+        $this->weekStart = $weekStart;
 
         return $this;
     }
