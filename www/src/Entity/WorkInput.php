@@ -58,6 +58,16 @@ class WorkInput
      */
     private $fri;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $comment;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $locked;
+
     public function getUser(): ?User
     {
         return $this->user;
@@ -150,6 +160,30 @@ class WorkInput
     public function setFri($fri): self
     {
         $this->fri = $fri;
+
+        return $this;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
+
+        return $this;
+    }
+
+    public function getLocked(): ?bool
+    {
+        return $this->locked;
+    }
+
+    public function setLocked(?bool $locked): self
+    {
+        $this->locked = $locked;
 
         return $this;
     }

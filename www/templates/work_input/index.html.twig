@@ -3,6 +3,57 @@
 {% block pageTitle %}CRA{% endblock %}
 
 {% block body %}
-<h1>Compte rendu d'activité</h1>
-<hr />
+<div class="d-flex justify-content-between">
+	<h1 class="planningHead">Compte rendu d'activité</h1>
+
+	{% if startDate|date('w') == 0 %}
+		{% set day = 7 %}
+	{% else %}
+		{% set day = startDate|date('w') %}
+	{% endif %}
+	{% set reportStart = startDate|date_modify("-#{day} days")|date_modify('+1 day')|date('d-m-Y') %}
+
+	<div class="planningHead">
+		<div class="d-flex justify-content-center">
+	<a href="{{ path('report_index_shift',{"startDate":reportStart|date_modify('-1 week')|date('d-m-Y')})}}" class="btn btn-outline-secondary mx-1"><i class="fas fa-angle-left"></i> Semaine précédente</a>
+	<a href="{{ path('report_index')}}" class="btn btn-outline-secondary"><i class="far fa-calendar"></i> Semaine courante</a>
+	<a href="{{ path('report_index_shift',{"startDate":reportStart|date_modify('+1 week')|date('d-m-Y')})}}" class="btn btn-outline-secondary mx-1">Semaine suivante <i class="fas fa-angle-right"></i></a>
+	</div>
+	</div>
+	<div class="planningHead">
+	</div>
+</div>
+<p>Semaine du {{reportStart|date('d/m/Y')}}</p>
+<table class="table table-sm table-hover report">
+	<tr>
+		<th>Projet</th>
+		<th class="weekDay {% if reportStart|date('U') in holidays%} holiday{% endif %}">Lundi {{ reportStart|date('d/m')}}</th>
+		<th class="weekDay {% if reportStart|date_modify('+1 days')|date('U') in holidays%} holiday{% endif %}">Mardi {{ reportStart|date_modify('+1 days')|date('d/m')}}</th>
+		<th class="weekDay {% if reportStart|date_modify('+2 days')|date('U') in holidays%} holiday{% endif %}">Mercredi {{ reportStart|date_modify('+2 days')|date('d/m')}}</th>
+		<th class="weekDay {% if reportStart|date_modify('+3 days')|date('U') in holidays%} holiday{% endif %}">Jeudi {{ reportStart|date_modify('+3 days')|date('d/m')}}</th>
+		<th class="weekDay {% if reportStart|date_modify('+4 days')|date('U') in holidays%} holiday{% endif %}">Vendredi {{ reportStart|date_modify('+4 days')|date('d/m')}}</th>
+		<th>Commentaire</th>
+		<th></th>
+	</tr>
+	{% if inputs is empty %}
+	<tr><td class="emptyNotice" colspan="8">Aucune saisie effectuée pour cette semaine</td></tr>
+	{% else %}
+	{% for input in inputs %}
+	<tr>
+		<th>{{input.project.name}}</th>
+		<td>{{input.project.mon}}</td>
+		<td>{{input.project.tue}}</td>
+		<td>{{input.project.wed}}</td>
+		<td>{{input.project.thu}}</td>
+		<td>{{input.project.fri}}</td>
+		<td></td>
+		<td>
+			<a class="" href="#"></a>
+			<a class="" href="#"></a>
+		</td>
+	</tr>
+	{% endfor %}
+	{% endif %}
+	<tr><td class="addInput_Btn" colspan="8"><button class="btn btn-xs btn-outline-primary">Ajouter un projet</button></td></tr>
+</table>
 {% endblock %}
