@@ -212,7 +212,7 @@ $('.projectContainer').droppable({
 		url = url.replace("userPlaceHold", $(this).data('user'));
 		if(ui.draggable.data("duration") > $(this).data("remainingslices")+1){
 			ui.draggable.data("duration",$(this).data("remainingslices")+1);
-			ui.draggable.find('i').text($(this).data("remainingslices")+1);
+			ui.draggable.find('i').text(($(this).data("remainingslices")+1)/2);
 			ui.draggable.outerWidth($(this).parent().outerWidth()*ui.draggable.data("duration")-3);
 		}
 		url = url.replace("sizePlaceHold", ui.draggable.data('duration'));
