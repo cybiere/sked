@@ -66,7 +66,7 @@
 								<option value="0">Absence</option>
 								{% for project in projects %}
 									{% if project.status != 7 %}
-										<option value="{{ project.id }}">{{ project.client }} - {{ project.name }}</option>
+									<option value="{{ project.id }}">{{ project.client }} - {{ project.name }} ({{ project.nbDays - project.plannedDays }}jh rest.)</option>
 									{% endif %}
 								{% endfor %}
 							</select>

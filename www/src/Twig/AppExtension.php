@@ -40,7 +40,8 @@ class AppExtension extends AbstractExtension
 					<li> Code projet : <?php echo $project->getReference(); ?></li>
 					<li> Nom : <?php echo $project->getName(); ?></li>
 					<li> Client : <?php echo $project->getClient(); ?></li>
-					<li> Jours : <?php echo $project->getNbDays(); ?></li>
+					<li> Jours vendus : <?php echo $project->getNbDays()?$project->getNbDays():"?"; ?>jh</li>
+					<li> Jours planifiés : <?php echo $project->getPlannedDays(); ?>jh</li>
 				</ul>
 			</div>
 			<?php if($isAdmin){ ?>
