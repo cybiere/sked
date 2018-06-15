@@ -3,15 +3,27 @@
 {% block title %}Planning{% endblock %}
 
 {% block body %}
-<h1>Planning
-					{% if app.session.get('user').admin %}
+<div class="d-flex justify-content-between">
+	<h1 class="planningHead">Planning</h1>
+
+	{% set planningStart = startDate|date_modify('first day of this month') %}
+	<div class="planningHead">
+		<div class="d-flex justify-content-center">
+	<a href="{{ path('planning_index_shift',{"startDate":planningStart|date_modify('-1 month')|date('d-m-Y')})}}" class="btn btn-outline-secondary mx-1"><i class="fas fa-angle-left"></i> Mois précédent</a>
+	<a href="{{ path('planning_index')}}" class="btn btn-outline-secondary"><i class="far fa-calendar"></i> Mois courant</a>
+	<a href="{{ path('planning_index_shift',{"startDate":planningStart|date_modify('+1 month')|date('d-m-Y')})}}" class="btn btn-outline-secondary mx-1">Mois suivant <i class="fas fa-angle-right"></i></a>
+	</div>
+	</div>
+	<div class="planningHead">
+	{% if app.session.get('user').admin %}
 	<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addPlanning" role="button" aria-expanded="false" aria-controls="addButton">
 		Ajouter une entrée de planning
 	</a>
-					{% endif %}
-</h1>
+	{% endif %}
+	</div>
+</div>
 
-					{% if app.session.get('user').admin %}
+{% if app.session.get('user').admin %}
 <div class="collapse" id="addPlanning">
 	<div class="card bg-light">
 		<h2 class="card-header">Ajouter une entrée de planning</h2>
@@ -22,14 +34,7 @@
 		</div>
 	</div>
 </div>
-					{% endif %}
-<hr />
-{% set planningStart = startDate|date_modify('first day of this month') %}
-<div class="d-flex justify-content-center">
-<a href="{{ path('planning_index_shift',{"startDate":planningStart|date_modify('-1 month')|date('d-m-Y')})}}" class="btn btn-outline-secondary mx-1"><i class="fas fa-angle-left"></i> Mois précédent</a>
-<a href="{{ path('planning_index')}}" class="btn btn-outline-secondary"><i class="far fa-calendar"></i> Mois courant</a>
-<a href="{{ path('planning_index_shift',{"startDate":planningStart|date_modify('+1 month')|date('d-m-Y')})}}" class="btn btn-outline-secondary mx-1">Mois suivant <i class="fas fa-angle-right"></i></a>
-</div>
+{% endif %}
 
 <hr />
 
@@ -66,13 +71,13 @@
 			<div class="modal-body">
 				<dl class="row">
 					<dt class="col-sm-5">Ressource :</dt>
-						<dd class="col-sm-7">
-							<span id="addModal_ressource"></span>
-						</dd>
+					<dd class="col-sm-7">
+					<span id="addModal_ressource"></span>
+					</dd>
 					<dt class="col-sm-5">Date de démarrage :</dt>
-						<dd class="col-sm-7">
-							<span id="addModal_startDate"></span> (<span id="addModal_startHour"></span>)
-						</dd>
+					<dd class="col-sm-7">
+					<span id="addModal_startDate"></span> (<span id="addModal_startHour"></span>)
+					</dd>
 					<dt class="col-sm-5">Durée :</dt>
 						<dd class="col-sm-7">
 							<span id="addModal_duration"></span>
@@ -82,9 +87,9 @@
 							<input id="addForm_confirmed" type="checkbox" checked>
 						</dd>
 					<dt class="col-sm-5">Réunion :</dt>
-						<dd class="col-sm-7">
-							<input id="addForm_meeting" type="checkbox">
-						</dd>
+					<dd class="col-sm-7">
+					<input id="addForm_meeting" type="checkbox">
+					</dd>
 					<dt class="col-sm-5">Projet :</dt>
 						<dd class="col-sm-7">
 							<select id="addForm_projectId">
@@ -109,6 +114,7 @@
 {% set baseDate = planningStart|date('d-m-Y') %}
 {% set today = "now"|date('d-m-Y') %}
 {% set nbMonths = 3 %}
+<div class="planningTables">
 {% for i in range(0,nbMonths-1) %}
 
 {% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
@@ -159,6 +165,7 @@
 	</tbody>
 </table>
 {% endfor %}
+</div>
 {% endblock %}
 {% block extraJs %}
 <script>
@@ -176,7 +183,7 @@ $( ".project" ).on('blur',function() {
 $(function () {
 	$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
 })
-					{% if app.session.get('user').admin %}
+{% if app.session.get('user').admin %}
 $(".project").resizable({
 	handles: "e",
 	containment: ".schedule",
@@ -266,7 +273,7 @@ $('.projectContainer').on('mousedown',function(e){
 
 var users=[];
 {% for user in users %}
-	users[{{ user.id }}] = "{{ user.fullname }}"
+users[{{ user.id }}] = "{{ user.fullname }}"
 {% endfor %}
 var projectsRemaining=[];
 {% for project in projects %}
@@ -337,7 +344,7 @@ function addPlanning(){
 	$('#addPlanning_form').submit();
 }
 
-					{% endif %}
+{% endif %}
 </script>
 
 {% endblock %}
