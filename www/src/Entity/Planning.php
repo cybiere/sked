@@ -43,6 +43,11 @@ class Planning
 	private $meeting=false;
 
 	/**
+     * @ORM\Column(type="boolean")
+     */
+	private $confirmed=false;
+
+	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="plannings")
 	 * @ORM\JoinColumn(nullable=true)
      */
@@ -88,6 +93,14 @@ class Planning
 
 	public function setMeeting($isMeeting){
 		$this->meeting = $isMeeting?true:false;
+	}
+
+	public function isConfirmed(){
+		return $this->confirmed;
+	}
+
+	public function setConfirmed($isConfirmed){
+		$this->confirmed = $isConfirmed?true:false;
 	}
 
 	public function getProject(){

@@ -153,4 +153,26 @@ class PlanningController extends Controller
 		$em->flush();
 		return $this->redirectToRoute('planning_index');
 	}
+
+	/**
+	 * @Route("/confirm/{planningId}",name="planning_confirm")
+	 */
+	public function confirm(Request $request,$planningId){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		$em = $this->getDoctrine()->getManager();
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+
+		if(!($planning = $planningRepository->find($planningId))){
+			$this->addFlash('danger','Erreur : élément de planning non trouvé');
+			return $this->redirectToRoute('planning_index');
+		}
+
+		$planning->setConfirmed($planning->isConfirmed()?false:true);
+		$em->flush();
+		return $this->redirectToRoute('planning_index');
+	}
+
+
 }
