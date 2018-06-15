@@ -58,6 +58,7 @@ th.schedUser{
 	height:100%;
 }
 .project {
+	color:#F6F6F6;
 	border: 1px #ccc solid;
 	border-radius: 5px;
 	margin-top : 5px;
@@ -103,21 +104,39 @@ th.schedUser{
 .billable {
 	background:#7b6;
 	border-color:#150;
-	color:#F6F6F6;
 }
 .meeting {
 	background:#b76;
 	border-color:#510;
-	color:#F6F6F6;
+}
+.billable-unconfirmed {
+	border-color:#150;
+	background: repeating-linear-gradient(
+		45deg,
+		#7b6,
+		#7b6 5px,
+		#8c7 5px,
+		#8c7 10px
+	);
+}
+.meeting-unconfirmed {
+	border-color:#510;
+	background: repeating-linear-gradient(
+		45deg,
+		#b76,
+		#b76 5px,
+		#c87 5px,
+		#c87 10px
+	);
 }
 .non-billable {
 	background:#67b;
 	border-color:#015;
-	color:#F6F6F6;
 }
 .absence {
 	background:#bb7;
 	border-color:#551;
+	color:inherit;
 }
 .modal-dialog {
 	max-width:1000px !important;

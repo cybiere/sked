@@ -18,6 +18,7 @@ class PlanningType extends AbstractType
 			->add('startHour',ChoiceType::class,array('label'=>'Heure de début','choices'=>array('Matin'=>'am','Midi'=>'pm')))
             ->add('nbSlices',null,array('label'=>'Nombre de tranches (0,5jh)'))
             ->add('meeting',null,array('label'=>'Réunion'))
+            ->add('confirmed',null,array('label'=>'Confirmé'))
             ->add('project',null,array('label'=>'Projet'))
             ->add('user',null,array('label'=>'Ressource'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))

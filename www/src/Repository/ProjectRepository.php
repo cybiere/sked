@@ -19,6 +19,11 @@ class ProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Project::class);
     }
 
+
+	public function findAll()
+    {
+        return $this->findBy(array(), array('billable' => 'ASC','client' => 'ASC', 'name' => 'ASC'));
+    }
     /*
     public function findBySomething($value)
     {
