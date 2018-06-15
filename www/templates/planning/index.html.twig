@@ -33,6 +33,27 @@
 
 <hr />
 
+<div class="modal fade" id="overrun_Modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+		  <h5 class="modal-title" id="exampleModalLabel">Dépassement</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Ajouter ce planning va entraîner un dépassement sur le projet. Continuer quand même ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" onclick="$('#addPlanning_form').submit();">Continuer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal fade" id="addPlanning_Modal" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -243,6 +264,10 @@ var users=[];
 {% for user in users %}
 	users[{{ user.id }}] = "{{ user.fullname }}"
 {% endfor %}
+var projectsRemaining=[];
+{% for project in projects %}
+	projectsRemaining[{{project.id}}] = {{ (project.nbDays - project.plannedDays) * 2 }};
+{% endfor %}
 
 baseX=0;
 mouseDown=false;
@@ -275,7 +300,6 @@ $(document).mouseup(function(e){
 
 		newGhost.remove();
 
-		console.log("New projet !\n\tStart : " + add_startDate + add_startHour + "\n\tDuration : " + nbSlices + "\n\tUser id : " + add_userId);
 		$('#planning_user').val(add_userId);
 		$('#planning_startDate').val(add_startDate);
 		$('#planning_startHour').val(add_startHour);
@@ -300,6 +324,11 @@ $(document).mouseup(function(e){
 function addPlanning(){
 	$('#planning_meeting').prop('checked',$('#addForm_meeting').prop('checked'));
 	$('#planning_project').val($('#addForm_projectId').val());
+	if($('#planning_nbSlices').val() > projectsRemaining[$('#addForm_projectId').val()]){
+		$('#addPlanning_Modal').modal('hide');
+		$('#overrun_Modal').modal();
+		return false;
+	}
 	$('#addPlanning_form').submit();
 }
 
