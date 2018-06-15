@@ -111,5 +111,26 @@ class WorkInputController extends Controller
      */
     public function overview()    {
         return $this->redirect('planning_index');
-    }
+	}
+
+	/**
+	 * @Route("/add/{reportId}", name="report_del")
+	 */
+	public function del(Request $request,$reportId){
+		$em = $this->getDoctrine()->getManager();
+		$inputRepository = $this->getDoctrine()->getRepository(WorkInput::class);
+
+		if(!($input = $inputRepository->find($reportId))){
+			$arrData = ['success' => false, 'errormsg' => 'Impossible de trouver la saisie demandée'];
+		}elseif($input->getUser()->getId() != $this->get('session')->get('user')->getId()){
+			$arrData = ['success' => false, 'errormsg' => 'Impossible de trouver la saisie demandée'];
+		}else{
+			$em->remove($input);
+			$em->flush();
+			$arrData = ['success' => true];
+		}
+		return new JsonResponse($arrData);
+
+
+	}
 }

@@ -64,8 +64,8 @@
 			<td class='weekday fri'></td>
 			<td class='comments'></td>
 			<td>
-				<a class="" href="#"><i class="far fa-edit"></i></a>
-				<a class="" href="#"><i class="fas fa-trash-alt"></i></a>
+				<a class="editReport" href="#"><i class="far fa-edit"></i></a>
+				<a class="delReport" href="#"><i class="fas fa-trash-alt"></i></a>
 			</td>
 		</tr>
 		{% if inputs is empty %}
@@ -87,8 +87,8 @@
 			<td class='weekday fri'>{{input.fri}}</td>
 			<td class='comments'></td>
 			<td>
-				<a class="" href="#"><i class="far fa-edit"></i></a>
-				<a class="" href="#"><i class="fas fa-trash-alt"></i></a>
+				<a class="editReport" href="#"><i class="far fa-edit"></i></a>
+				<a class="delReport" href="#"><i class="fas fa-trash-alt"></i></a>
 			</td>
 		</tr>
 		{% endfor %}
@@ -152,6 +152,29 @@ $('body').on('click','.saveReport',function(){
 			}
 		}
 	);
+	return false;	
+});
+$('body').on('click','.editReport',function(){
+	return false;	
+});
+$('body').on('click','.delReport',function(){
+	url= "{{ path("report_del",{"reportId":"idPlaceHold"}) }}";
+	row = $(this).parents('tr');
+	url = url.replace("idPlaceHold", row.data('inputid'));
+	$.ajax(url,{
+		error:function(xhr,status,error){
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			},
+		success:function(data,status,xhr){
+			if(data.success){
+				row.remove();
+			}else{
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			}
+		}
+	});
 	return false;	
 });
 </script>
