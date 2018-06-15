@@ -74,8 +74,20 @@ class AppExtension extends AbstractExtension
 
 	public function printPlanningFunction($planning,$isAdmin){
 ?>
-	<div 
-		class="project <?php if($planning->getProject() == NULL) echo "absence"; elseif($planning->getProject()->isBillable()) echo $planning->isMeeting()?"meeting":"billable"; else echo "non-billable"; ?>"
+	<div
+		class="project <?php 
+			if($planning->getProject() == NULL){
+				echo "absence"; 
+			}elseif($planning->getProject()->isBillable()){
+				if($planning->isConfirmed()){
+					echo $planning->isMeeting()?"meeting":"billable"; 
+				}else{
+					echo $planning->isMeeting()?"meeting-unconfirmed":"billable-unconfirmed"; 
+				}
+			}else{
+				echo "non-billable"; 
+			}
+		?> "
 		tabindex="0" 
 		data-duration="<?php echo $planning->getNbSlices(); ?>" 
 		data-planningId="<?php echo $planning->getId(); ?>"
@@ -90,11 +102,12 @@ class AppExtension extends AbstractExtension
 			<dt class='col-md-6'>jh planif/vendus</dt><dd class='col-md-6'><?php echo $planning->getProject()->getPlannedDays()."/".$planning->getProject()->getNbDays(); ?></dd>
 			<dt class='col-md-6'>Commentaires</dt><dd class='col-md-6'><?php echo $planning->getProject()->getComments(); ?></dd>
 <?php if($isAdmin){ ?>
-			<div class='action col-md-6'><a class='btn btn-outline-warning' href='<?php echo $this->router->generate('project_edit',array("projectId"=>$planning->getProject()->getId())); ?>'><i class='fas fa-edit'></i></a></div>
+			<div class='action col-md-4'><a class='btn btn-outline-success' href='<?php echo $this->router->generate('planning_confirm',array("planningId"=>$planning->getId())); ?>'><i class='far fa-check-circle'></i></a></div>
+			<div class='action col-md-4'><a class='btn btn-outline-warning' href='<?php echo $this->router->generate('project_edit',array("projectId"=>$planning->getProject()->getId())); ?>'><i class='fas fa-edit'></i></a></div>
 <?php } ?>
 <?php } ?>
 <?php if($isAdmin){ ?>
-			<div class='action col-md-6'><a class='btn btn-outline-danger' href='<?php echo $this->router->generate('planning_del',array("planningId"=>$planning->getId())); ?>'><i class='fas fa-trash'></i></a></div>
+			<div class='action col-md-4'><a class='btn btn-outline-danger' href='<?php echo $this->router->generate('planning_del',array("planningId"=>$planning->getId())); ?>'><i class='fas fa-trash'></i></a></div>
 <?php } ?>
 			</div>
 		"

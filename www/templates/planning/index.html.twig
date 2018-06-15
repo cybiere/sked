@@ -77,6 +77,10 @@
 						<dd class="col-sm-7">
 							<span id="addModal_duration"></span>
 						</dd>
+					<dt class="col-sm-5">Confirmé :</dt>
+						<dd class="col-sm-7">
+							<input id="addForm_confirmed" type="checkbox" checked>
+						</dd>
 					<dt class="col-sm-5">Réunion :</dt>
 						<dd class="col-sm-7">
 							<input id="addForm_meeting" type="checkbox">
@@ -323,6 +327,7 @@ $(document).mouseup(function(e){
 
 function addPlanning(){
 	$('#planning_meeting').prop('checked',$('#addForm_meeting').prop('checked'));
+	$('#planning_confirmed').prop('checked',$('#addForm_confirmed').prop('checked'));
 	$('#planning_project').val($('#addForm_projectId').val());
 	if($('#planning_nbSlices').val() > projectsRemaining[$('#addForm_projectId').val()]){
 		$('#addPlanning_Modal').modal('hide');
