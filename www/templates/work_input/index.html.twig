@@ -73,7 +73,13 @@
 		{% else %}
 		{% for input in inputs %}
 		<tr data-inputid='{{ input.id }}'>
-			<th class="projectName">{{input.project.client}} {{input.project.name}}</th>
+			<th class="projectName">
+				{% if input.project %}
+				{{input.project.client}} {{input.project.name}}
+				{% else %}
+				Absence
+				{% endif %}
+			</th>
 			<td class='weekday mon'>{{input.mon}}</td>
 			<td class='weekday tue'>{{input.tue}}</td>
 			<td class='weekday wed'>{{input.wed}}</td>

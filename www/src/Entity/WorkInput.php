@@ -24,7 +24,7 @@ class WorkInput
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="workInputs")
-     * @ORM\JoinColumn(nullable=false)
+	 * @ORM\JoinColumn(nullable=true)
      */
     private $project;
 
