@@ -95,6 +95,7 @@ class WorkInputController extends Controller
 		$newInput->setWed($request->get('wed'));
 		$newInput->setThu($request->get('thu'));
 		$newInput->setFri($request->get('fri'));
+		$newInput->setComment($request->get('comments'));
 
 		try{
 			$em->persist($newInput);
@@ -106,6 +107,7 @@ class WorkInputController extends Controller
 
 		return new JsonResponse($arrData);
 	}
+
     /**
      * @Route("/overview", name="report_overview")
      */
@@ -130,7 +132,34 @@ class WorkInputController extends Controller
 			$arrData = ['success' => true];
 		}
 		return new JsonResponse($arrData);
-
-
 	}
+
+	/**
+	 * @Route("/edit", name="report_edit")
+	 */
+	public function edit(Request $request){
+		$em = $this->getDoctrine()->getManager();
+		$inputRepository = $this->getDoctrine()->getRepository(WorkInput::class);
+
+		$inputId = $request->get('inputid');
+		if($inputId == null){
+			$arrData = ['success' => false, 'errormsg' => 'Aucune saisie demandée'];
+		}elseif(!($input = $inputRepository->find($inputId))){
+			$arrData = ['success' => false, 'errormsg' => 'Impossible de trouver la saisie demandée'];
+		}elseif($input->getUser()->getId() != $this->get('session')->get('user')->getId()){
+			$arrData = ['success' => false, 'errormsg' => 'Impossible de trouver la saisie demandée'];
+		}else{
+			$input->setMon($request->get('mon'));
+			$input->setTue($request->get('tue'));
+			$input->setWed($request->get('wed'));
+			$input->setThu($request->get('thu'));
+			$input->setFri($request->get('fri'));
+			$input->setComment($request->get('comments'));
+			$em->flush();
+			$arrData = ['success' => true];
+		}
+
+		return new JsonResponse($arrData);
+	}
+
 }

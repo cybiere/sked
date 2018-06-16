@@ -35,7 +35,7 @@
 	</thead>
 	<tbody id="reportBody">
 		<tr id="addExample">
-			<td>
+			<th class="projectName">
 				<select id="project">
 					<option value="0">Absence</option>
 					{% for project in projects %}
@@ -44,13 +44,13 @@
 					{% endif %}
 					{% endfor %}
 				</select>
-			</td>
+			</th>
 			<td><input type="number" min="0" max="1" step="0.25" id="mon"/></td>
 			<td><input type="number" min="0" max="1" step="0.25" id="tue"/></td>
 			<td><input type="number" min="0" max="1" step="0.25" id="wed"/></td>
 			<td><input type="number" min="0" max="1" step="0.25" id="thu"/></td>
 			<td><input type="number" min="0" max="1" step="0.25" id="fri"/></td>
-			<td><input type="text" name="comments"/></td>
+			<td><input type="text" id="comments"/></td>
 			<td>
 				<a class="text-success saveReport" href="#"><i class="far fa-save"></i></a>
 			</td>
@@ -85,7 +85,7 @@
 			<td class='weekday wed'>{{input.wed}}</td>
 			<td class='weekday thu'>{{input.thu}}</td>
 			<td class='weekday fri'>{{input.fri}}</td>
-			<td class='comments'></td>
+			<td class='comments'>{{input.comment}}</td>
 			<td>
 				<a class="editReport" href="#"><i class="far fa-edit"></i></a>
 				<a class="delReport" href="#"><i class="fas fa-trash-alt"></i></a>
@@ -138,11 +138,11 @@ $('body').on('click','.saveReport',function(){
 				dispRow = $("#dispExample").clone().prop('id','');
 				dispRow.data('inputid',data.newId);
 				dispRow.find('.projectName').text(projectName);
-				dispRow.find('.mon').text(mon);
-				dispRow.find('.tue').text(tue);
-				dispRow.find('.wed').text(wed);
-				dispRow.find('.thu').text(thu);
-				dispRow.find('.fri').text(fri);
+				dispRow.find('.mon').text(parseFloat(mon).toFixed(2));
+				dispRow.find('.tue').text(parseFloat(tue).toFixed(2));
+				dispRow.find('.wed').text(parseFloat(wed).toFixed(2));
+				dispRow.find('.thu').text(parseFloat(thu).toFixed(2));
+				dispRow.find('.fri').text(parseFloat(fri).toFixed(2));
 				dispRow.find('.comments').text(comments);
 				$(row).after(dispRow);
 				$(row).remove();
@@ -155,6 +155,22 @@ $('body').on('click','.saveReport',function(){
 	return false;	
 });
 $('body').on('click','.editReport',function(){
+	datarow = $(this).parents('tr');
+	editrow = $("#addExample").clone().prop('id', '' );
+
+	editrow.find('#project').before(datarow.find('.projectName').text());
+	editrow.find('#project').before('<input type="hidden" id="inputid" value="'+datarow.data('inputid')+'" />');
+	editrow.find('#project').remove();
+	editrow.find('#mon').val(datarow.find('.mon').text());
+	editrow.find('#tue').val(datarow.find('.tue').text());
+	editrow.find('#wed').val(datarow.find('.wed').text());
+	editrow.find('#thu').val(datarow.find('.thu').text());
+	editrow.find('#fri').val(datarow.find('.fri').text());
+	editrow.find('#comments').val(datarow.find('.comments').text());
+	editrow.find('.saveReport').addClass('saveEditReport').removeClass('saveReport');
+
+	datarow.after(editrow);
+	datarow.remove();
 	return false;	
 });
 $('body').on('click','.delReport',function(){
@@ -176,6 +192,41 @@ $('body').on('click','.delReport',function(){
 		}
 	});
 	return false;	
+});
+
+$('body').on('click','.saveEditReport',function(){
+	row = $(this).parents('tr');
+	inputid = row.find('#inputid').val();
+	$.post("{{ path("report_edit") }}",
+	{
+		inputid:inputid,
+		mon:row.find('#mon').val(),
+		tue:row.find('#tue').val(),
+		wed:row.find('#wed').val(),
+		thu:row.find('#thu').val(),
+		fri:row.find('#fri').val(),
+		comments:row.find('#comments').val(),
+	},
+	function(data,status,xhr){
+		if(data.success){
+			dispRow = $("#dispExample").clone().prop('id','');
+			dispRow.data('inputid',inputid);
+			dispRow.find('.projectName').text(row.find('.projectName').text());
+			dispRow.find('.mon').text(parseFloat(row.find('#mon').val()).toFixed(2));
+			dispRow.find('.tue').text(parseFloat(row.find('#tue').val()).toFixed(2));
+			dispRow.find('.wed').text(parseFloat(row.find('#wed').val()).toFixed(2));
+			dispRow.find('.thu').text(parseFloat(row.find('#thu').val()).toFixed(2));
+			dispRow.find('.fri').text(parseFloat(row.find('#fri').val()).toFixed(2));
+			dispRow.find('.comments').text(row.find('#comments').val());
+			$(row).after(dispRow);
+			$(row).remove();
+		}else{
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		}
+	});
+
+	return false;
 });
 </script>
 {% endblock %}
