@@ -69,11 +69,20 @@ class WorkInputController extends Controller
 			'weekStart'=>$startDateObj
 		]);
 
+		$dailySum = array();
+		for($i=0;$i<5;$i++){
+			$dailySum[$i] = 0;
+			foreach($myInputs as $input){
+				$dailySum[$i] += $input->getDay($i);
+			}
+		}
+
 		return $this->render('work_input/index.html.twig', [
 			'holidays' => $holidays,
 			'inputs'=>$myInputs,
 			'projects'=>$projects,
 			'startDate'=>$startDate,
+			'dailySum'=>$dailySum
 		]);
 	}
 

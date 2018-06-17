@@ -49,6 +49,9 @@ th.schedUser{
 .holiday{
 	background: #eee;
 }
+.overrun{
+	background: #fcc;
+}
 .today{
 	background: #dfd !important;
 }

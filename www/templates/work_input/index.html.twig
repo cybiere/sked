@@ -6,6 +6,8 @@
 <div class="d-flex justify-content-between">
 	<h1 class="planningHead">Compte rendu d'activité</h1>
 
+	{% set daysClasses=['mon','tue','wed','thu','fri'] %}
+	{% set daysNames=['Lundi','Mardi','Mercredi','Jeudi','Vendredi'] %}
 	{% set reportStart = startDate %}
 
 	<div class="planningHead">
@@ -24,11 +26,9 @@
 	<thead>
 		<tr>
 			<th>Projet</th>
-			<th class="weekDay {% if reportStart|date('U') in holidays%} holiday{% endif %}">Lundi {{ reportStart|date('d/m')}}</th>
-			<th class="weekDay {% if reportStart|date_modify('+1 days')|date('U') in holidays%} holiday{% endif %}">Mardi {{ reportStart|date_modify('+1 days')|date('d/m')}}</th>
-			<th class="weekDay {% if reportStart|date_modify('+2 days')|date('U') in holidays%} holiday{% endif %}">Mercredi {{ reportStart|date_modify('+2 days')|date('d/m')}}</th>
-			<th class="weekDay {% if reportStart|date_modify('+3 days')|date('U') in holidays%} holiday{% endif %}">Jeudi {{ reportStart|date_modify('+3 days')|date('d/m')}}</th>
-			<th class="weekDay {% if reportStart|date_modify('+4 days')|date('U') in holidays%} holiday{% endif %}">Vendredi {{ reportStart|date_modify('+4 days')|date('d/m')}}</th>
+			{% for i in 0..4 %}
+			<th class="weekHead {{ daysClasses[i] }}{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] > 1%} overrun{% endif %}" data-dailysum="{{dailySum[i]}}">{{ daysNames[i] }} {{ reportStart|date_modify('+'~ i ~ ' days')|date('d/m')}}</th>
+			{% endfor %}
 			<th>Commentaire</th>
 			<th></th>
 		</tr>
@@ -45,11 +45,9 @@
 					{% endfor %}
 				</select>
 			</th>
-			<td><input type="number" min="0" max="1" step="0.25" id="mon"/></td>
-			<td><input type="number" min="0" max="1" step="0.25" id="tue"/></td>
-			<td><input type="number" min="0" max="1" step="0.25" id="wed"/></td>
-			<td><input type="number" min="0" max="1" step="0.25" id="thu"/></td>
-			<td><input type="number" min="0" max="1" step="0.25" id="fri"/></td>
+			{% for i in 0..4 %}
+			<td class="{{ daysClasses[i] }} weekDay{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] > 1%} overrun{% endif %}"><input type="number" min="0" max="1" step="0.25" id="{{ daysClasses[i] }}" /></td>
+			{% endfor %}
 			<td><input type="text" id="comments"/></td>
 			<td>
 				<a class="text-success saveReport" href="#"><i class="far fa-save"></i></a>
@@ -57,11 +55,9 @@
 		</tr>
 		<tr id="dispExample">
 			<th class='projectName'></th>
-			<td class='weekday mon'></td>
-			<td class='weekday tue'></td>
-			<td class='weekday wed'></td>
-			<td class='weekday thu'></td>
-			<td class='weekday fri'></td>
+			{% for i in 0..4 %}
+			<td class="{{ daysClasses[i] }} weekDay{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] > 1%} overrun{% endif %}"></td>
+			{% endfor %}
 			<td class='comments'></td>
 			<td>
 				<a class="editReport" href="#"><i class="far fa-edit"></i></a>
@@ -80,11 +76,9 @@
 				Absence
 				{% endif %}
 			</th>
-			<td class='weekday mon'>{{input.mon}}</td>
-			<td class='weekday tue'>{{input.tue}}</td>
-			<td class='weekday wed'>{{input.wed}}</td>
-			<td class='weekday thu'>{{input.thu}}</td>
-			<td class='weekday fri'>{{input.fri}}</td>
+			{% for i in 0..4 %}
+			<td class="{{ daysClasses[i] }} weekDay{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] > 1%} overrun{% endif %}">{{input.day(i)}}</td>
+			{% endfor %}
 			<td class='comments'>{{input.comment}}</td>
 			<td>
 				<a class="editReport" href="#"><i class="far fa-edit"></i></a>
@@ -146,6 +140,7 @@ $('body').on('click','.saveReport',function(){
 				dispRow.find('.comments').text(comments);
 				$(row).after(dispRow);
 				$(row).remove();
+				refreshOverrun();
 			}else{
 				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 				$('#flashMessages').append(message);
@@ -185,6 +180,7 @@ $('body').on('click','.delReport',function(){
 		success:function(data,status,xhr){
 			if(data.success){
 				row.remove();
+				refreshOverrun();
 			}else{
 				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 				$('#flashMessages').append(message);
@@ -220,6 +216,7 @@ $('body').on('click','.saveEditReport',function(){
 			dispRow.find('.comments').text(row.find('#comments').val());
 			$(row).after(dispRow);
 			$(row).remove();
+			refreshOverrun();
 		}else{
 			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 			$('#flashMessages').append(message);
@@ -228,5 +225,22 @@ $('body').on('click','.saveEditReport',function(){
 
 	return false;
 });
+
+function refreshOverrun(){
+	$('.weekDay').removeClass('overrun');
+	$('.weekHead').removeClass('overrun');
+	days=['mon','tue','wed','thu','fri'];
+	for(i=0;i<5;i++){
+		sum = 0.0;
+		$('.'+days[i]+'.weekDay').each(function(){
+			value = parseFloat($(this).text());
+			sum += isNaN(value)?0:value;
+		});
+		$('.'+days[i]+'.weekHead').data('dailysum',sum);
+		if(sum > 1){
+			$('.'+days[i]).addClass('overrun');
+		}
+	}
+}
 </script>
 {% endblock %}

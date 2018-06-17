@@ -107,7 +107,24 @@ class WorkInput
         $this->weekStart = $weekStart;
 
         return $this;
-    }
+	}
+
+	public function getDay($day){
+		switch($day){
+			case 0:
+				return $this->mon;
+			case 1:
+				return $this->tue;
+			case 2:
+				return $this->wed;
+			case 3:
+				return $this->thu;
+			case 4:
+				return $this->fri;
+			default:
+				return 0;
+		}
+	}
 
     public function getMon()
     {
