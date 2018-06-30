@@ -1,9 +1,10 @@
 FROM php:7.0-apache
  
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends git zip zlib1g-dev libldap2-dev && \
+    apt-get install -y --no-install-recommends git zip zlib1g-dev libicu-dev libldap2-dev g++ && \
+	docker-php-ext-configure intl && \
 	docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && \
-	docker-php-ext-install pdo_mysql mysqli zip ldap calendar
+	docker-php-ext-install pdo_mysql mysqli zip ldap calendar intl opcache
  
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
