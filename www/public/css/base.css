@@ -1,6 +1,11 @@
 body {
   padding-top: 5rem;
 }
+nav img{
+	height:1.5em;
+	width:auto;
+	vertical-align:top;
+}
 .kanProject ul{
 	margin:0;
 }
