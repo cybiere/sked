@@ -6,6 +6,7 @@ site:
    - /home/ncnd/info/teamManager/www:/var/www/html/
   links:
    - database
+   - ldap
 database:
   image: mariadb
   ports:
@@ -15,3 +16,8 @@ database:
      - MYSQL_DATABASE=symfony
      - MYSQL_USER=symfony
      - MYSQL_PASSWORD=symfony
+ldap:
+  image: rroemhild/test-openldap
+  ports:
+    - "389:389"
+    - "636:636"

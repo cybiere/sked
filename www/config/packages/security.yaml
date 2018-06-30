@@ -5,9 +5,9 @@ security:
         my_ldap:
             ldap:
                 service: Symfony\Component\Ldap\Ldap
-                base_dn: dc=example,dc=com
-                search_dn: "cn=read-only-admin,dc=example,dc=com"
-                search_password: "password"
+                base_dn: dc=planetexpress,dc=com
+                search_dn: "cn=admin,dc=planetexpress,dc=com"
+                search_password: "GoodNewsEveryone"
                 default_roles: ROLE_USER
                 uid_key: uid
     firewalls:
@@ -23,7 +23,7 @@ security:
                 always_use_default_target_path: true
                 default_target_path: /user/enrol
                 service: Symfony\Component\Ldap\Ldap
-                dn_string: 'dc=example,dc=com'
+                dn_string: 'ou=people,dc=planetexpress,dc=com'
                 query_string: '(uid={username})'
             logout: 
                 path: /logout

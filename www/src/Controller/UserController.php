@@ -52,7 +52,7 @@ class UserController extends Controller{
 					$sanitized=array('\\' => '\5c','*' => '\2a','(' => '\28',')' => '\29',"\x00" => '\00');
 					$username = str_replace(array_keys($sanitized),array_values($sanitized),$user->getUsername());	
 
-					$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(&(objectclass=person)(uid='.$username.'))');
+					$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(uid='.$username.')');
 					$ldapResults = $ldapQuery->execute()->toArray();
 
 					if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute('uid')[0] == $user->getUsername()){
@@ -167,7 +167,7 @@ class UserController extends Controller{
 
 			$ldap = Ldap::create('ext_ldap', array('connection_string' => 'ldap://'.$this->container->getParameter('ldap_url').':'.$this->container->getParameter('ldap_port')));
 			$ldap->bind($this->container->getParameter('ldap_bind_dn'), $this->container->getParameter('ldap_bind_pw'));
-			$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(&(objectclass=person)(uid='.$username.'))');
+			$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(uid='.$username.')');
 			$ldapResults = $ldapQuery->execute()->toArray();
 
 			if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute('uid')[0] == $username){
