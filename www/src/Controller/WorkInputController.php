@@ -7,6 +7,7 @@ use App\Form\WorkInputType;
 
 use App\Entity\User;
 use App\Entity\Project;
+use App\Entity\Planning;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -77,8 +78,23 @@ class WorkInputController extends Controller
 			}
 		}
 
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+		$userId = $this->get('session')->get('user')->getId();
+
+		$plannings = array();
+		$plannings['mon'] = $planningRepository->findActiveByDay($startDateObj,$userId);
+		$startDateObj->add(new \DateInterval('P1D'));
+		$plannings['tue'] = $planningRepository->findActiveByDay($startDateObj,$userId);
+		$startDateObj->add(new \DateInterval('P1D'));
+		$plannings['wed'] = $planningRepository->findActiveByDay($startDateObj,$userId);
+		$startDateObj->add(new \DateInterval('P1D'));
+		$plannings['thu'] = $planningRepository->findActiveByDay($startDateObj,$userId);
+		$startDateObj->add(new \DateInterval('P1D'));
+		$plannings['fri'] = $planningRepository->findActiveByDay($startDateObj,$userId);
+
 		return $this->render('work_input/index.html.twig', [
 			'holidays' => $holidays,
+			'plannings' => $plannings,
 			'inputs'=>$myInputs,
 			'projects'=>$projects,
 			'startDate'=>$startDate,

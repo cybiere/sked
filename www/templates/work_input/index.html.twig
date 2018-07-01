@@ -32,6 +32,21 @@
 			<th>Commentaire</th>
 			<th></th>
 		</tr>
+		<tr>
+			<th>Planifié</th>
+			{% for i in 0..4 %}
+			<td class="weekHead {{ daysClasses[i] }}{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] > 1%} overrun{% endif %}" data-dailysum="{{dailySum[i]}}">
+				<ul>
+				{% for planning in plannings[daysClasses[i]]["plannings"] %}
+					<li>
+						{% if planning.project==null %}	Absence	{% else %} {{ planning.project.client }} {{ planning.project.name }} {% endif %}
+					{{ plannings[daysClasses[i]]["planned"][planning.id] }}jh
+					</li>
+					{% endfor %}
+				</ul>
+			</td>
+			{% endfor %}
+			<td></td>
 	</thead>
 	<tbody id="reportBody">
 		<tr id="addExample">
