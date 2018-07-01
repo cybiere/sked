@@ -27,7 +27,7 @@
 		<tr>
 			<th>Projet</th>
 			{% for i in 0..4 %}
-			<th class="weekHead {{ daysClasses[i] }}{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] > 1%} overrun{% endif %}" data-dailysum="{{dailySum[i]}}">{{ daysNames[i] }} {{ reportStart|date_modify('+'~ i ~ ' days')|date('d/m')}}</th>
+			<th class="weekHead {{ daysClasses[i] }}{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] == 1%} filled{% elseif dailySum[i] > 1%} overrun{% endif %}" data-dailysum="{{dailySum[i]}}">{{ daysNames[i] }} {{ reportStart|date_modify('+'~ i ~ ' days')|date('d/m')}}</th>
 			{% endfor %}
 			<th>Commentaire</th>
 			<th></th>
@@ -35,7 +35,7 @@
 		<tr>
 			<th>Planifié</th>
 			{% for i in 0..4 %}
-			<td class="weekHead {{ daysClasses[i] }}{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] > 1%} overrun{% endif %}" data-dailysum="{{dailySum[i]}}">
+			<td class="weekHead {{ daysClasses[i] }}{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] == 1%} filled{% elseif dailySum[i] > 1%} overrun{% endif %}" data-dailysum="{{dailySum[i]}}">
 				<ul>
 				{% for planning in plannings[daysClasses[i]]["plannings"] %}
 					<li>
@@ -61,7 +61,7 @@
 				</select>
 			</th>
 			{% for i in 0..4 %}
-			<td class="{{ daysClasses[i] }} weekDay{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] > 1%} overrun{% endif %}"><input type="number" min="0" max="1" step="0.25" id="{{ daysClasses[i] }}" /></td>
+			<td class="{{ daysClasses[i] }} weekDay{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] == 1%} filled{% elseif dailySum[i] > 1%} overrun{% endif %}"><input type="number" min="0" max="1" step="0.25" id="{{ daysClasses[i] }}" /></td>
 			{% endfor %}
 			<td><input type="text" id="comments"/></td>
 			<td>
@@ -71,7 +71,7 @@
 		<tr id="dispExample">
 			<th class='projectName'></th>
 			{% for i in 0..4 %}
-			<td class="{{ daysClasses[i] }} weekDay{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] > 1%} overrun{% endif %}"></td>
+			<td class="{{ daysClasses[i] }} weekDay{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] == 1%} filled{% elseif dailySum[i] > 1%} overrun{% endif %}"></td>
 			{% endfor %}
 			<td class='comments'></td>
 			<td>
@@ -92,7 +92,7 @@
 				{% endif %}
 			</th>
 			{% for i in 0..4 %}
-			<td class="{{ daysClasses[i] }} weekDay{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] > 1%} overrun{% endif %}">{{input.day(i)}}</td>
+			<td class="{{ daysClasses[i] }} weekDay{% if reportStart|date_modify('+'~ i ~ ' days')|date('U') in holidays%} holiday{% endif %}{% if dailySum[i] == 1%} filled{% elseif dailySum[i] > 1%} overrun{% endif %}">{{input.day(i)}}</td>
 			{% endfor %}
 			<td class='comments'>{{input.comment}}</td>
 			<td>
@@ -243,6 +243,8 @@ $('body').on('click','.saveEditReport',function(){
 
 function refreshOverrun(){
 	$('.weekDay').removeClass('overrun');
+	$('.weekDay').removeClass('filled');
+	$('.weekHead').removeClass('filled');
 	$('.weekHead').removeClass('overrun');
 	days=['mon','tue','wed','thu','fri'];
 	for(i=0;i<5;i++){
@@ -252,7 +254,9 @@ function refreshOverrun(){
 			sum += isNaN(value)?0:value;
 		});
 		$('.'+days[i]+'.weekHead').data('dailysum',sum);
-		if(sum > 1){
+		if(sum == 1){
+			$('.'+days[i]).addClass('filled');
+		}else if(sum > 1){
 			$('.'+days[i]).addClass('overrun');
 		}
 	}

@@ -57,6 +57,9 @@ th.schedUser{
 .overrun{
 	background: #fcc;
 }
+.filled{
+	background: #cfc;
+}
 .today{
 	background: #dfd !important;
 }
