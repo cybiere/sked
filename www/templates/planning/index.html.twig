@@ -162,9 +162,9 @@
 {% endblock %}
 {% block extraJs %}
 <script>
-	$('.project').each(function(index){
-		$(this).outerWidth($(this).parent().parent().outerWidth()*$(this).data("duration")-3);
-	});
+$('.project').each(function(index){
+	$(this).outerWidth($(this).parents('td').outerWidth()*$(this).data("duration")-3);
+});
 
 $( ".project" ).contextmenu(function() {
 	$(this).popover('show')
