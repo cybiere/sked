@@ -181,7 +181,7 @@ class UserController extends Controller{
 				}
 				$em->persist($user);
 				$em->flush();
-				$this->addFlash('success','Bienvenue sur TeamManager '.$user->getFullname());
+				$this->addFlash('success','Bienvenue sur Sked '.$user->getFullname());
 			}else{
 				return $this->redirectToRoute('logout');
 			}

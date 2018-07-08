@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -31,7 +32,7 @@ class ProjectType extends AbstractType
 														'Archivé'=>7
 			)))
             ->add('billable',null,array('required'=>false,'label'=>'Facturable'))
-            ->add('nbDays',null,array('required'=>false,'label'=>'Jours vendus'))
+            ->add('nbDays',NumberType::class,array('required'=>false,'label'=>'Jours vendus'))
             ->add('comments',TextareaType::class,array('required'=>false,'label'=>'Commentaires'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
         ;
