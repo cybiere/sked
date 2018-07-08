@@ -96,7 +96,7 @@
 								<option value="0">Absence</option>
 								{% for project in projects %}
 									{% if project.status != 7 %}
-									<option value="{{ project.id }}">{{ project.client }} - {{ project.name }} ({{ project.nbDays - project.plannedDays }}jh rest.)</option>
+									<option value="{{ project.id }}">{{ project.client }} - {{ project.name }}{% if project.nbDays is not null and project.nbDays != 0%} ({{ project.nbDays - project.plannedDays }}jh rest.){% endif %}</option>
 									{% endif %}
 								{% endfor %}
 							</select>
@@ -277,7 +277,11 @@ users[{{ user.id }}] = "{{ user.fullname }}"
 {% endfor %}
 var projectsRemaining=[];
 {% for project in projects %}
-	projectsRemaining[{{project.id}}] = {{ (project.nbDays - project.plannedDays) * 2 }};
+	{% if project.nbDays is not null and project.nbDays != 0 %}
+		projectsRemaining[{{project.id}}] = {{ (project.nbDays - project.plannedDays) * 2 }};
+	{% else %}
+		projectsRemaining[{{project.id}}] = null;
+	{% endif %}
 {% endfor %}
 
 baseX=0;
@@ -336,7 +340,7 @@ function addPlanning(){
 	$('#planning_meeting').prop('checked',$('#addForm_meeting').prop('checked'));
 	$('#planning_confirmed').prop('checked',$('#addForm_confirmed').prop('checked'));
 	$('#planning_project').val($('#addForm_projectId').val());
-	if($('#planning_nbSlices').val() > projectsRemaining[$('#addForm_projectId').val()]){
+	if(projectsRemaining[$('#addForm_projectId').val()] != null && $('#planning_nbSlices').val() > projectsRemaining[$('#addForm_projectId').val()]){
 		$('#addPlanning_Modal').modal('hide');
 		$('#overrun_Modal').modal();
 		return false;
