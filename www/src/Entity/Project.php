@@ -41,7 +41,7 @@ class Project
 	private $status;
 
 	/**
-     * @ORM\Column(type="decimal", precision=3, scale=2, nullable=true)
+     * @ORM\Column(type="decimal", precision=7, scale=2, nullable=true)
      */
 	private $nbDays;
 
