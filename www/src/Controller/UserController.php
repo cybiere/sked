@@ -44,37 +44,26 @@ class UserController extends Controller{
 			if($userRepository->findOneBy(['username' => $user->getUsername()])){
 				$this->addFlash('warning',"Attention : l'utilisateur ".$user->getUsername()." existe déjà");
 			}else{
-				if($this->container->hasParameter('ldap_url')){
-					//check the user is an existing LDAP user
-					$ldap = Ldap::create('ext_ldap', array('connection_string' => 'ldap://'.$this->container->getParameter('ldap_url').':'.$this->container->getParameter('ldap_port')));
-					$ldap->bind($this->container->getParameter('ldap_bind_dn'), $this->container->getParameter('ldap_bind_pw'));
+				$ldap = Ldap::create('ext_ldap', array('connection_string' => 'ldap://'.$this->container->getParameter('ldap_url').':'.$this->container->getParameter('ldap_port')));
+				$ldap->bind($this->container->getParameter('ldap_bind_dn'), $this->container->getParameter('ldap_bind_pw'));
 
-					$sanitized=array('\\' => '\5c','*' => '\2a','(' => '\28',')' => '\29',"\x00" => '\00');
-					$username = str_replace(array_keys($sanitized),array_values($sanitized),$user->getUsername());	
+				$sanitized=array('\\' => '\5c','*' => '\2a','(' => '\28',')' => '\29',"\x00" => '\00');
+				$username = str_replace(array_keys($sanitized),array_values($sanitized),$user->getUsername());	
 
-					$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(&(objectclass=person)(uid='.$username.'))');
-					$ldapResults = $ldapQuery->execute()->toArray();
+				$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '('.$this->container->getParameter('ldap_uid_key').'='.$username.')');
+				$ldapResults = $ldapQuery->execute()->toArray();
 
-					if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute('uid')[0] == $user->getUsername()){
-						$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
-						$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
-						$em->persist($user);
-						$em->flush();
-						$this->addFlash('success','Utilisateur ajouté');
-					}else{
-						$this->addFlash('danger',"Erreur : l'utilisateur ".$username." n'existe pas dans l'annuaire LDAP");
-					}
-				}else{
+				if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute($this->container->getParameter('ldap_uid_key'))[0] == $user->getUsername()){
+					$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
+					$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
 					$em->persist($user);
 					$em->flush();
 					$this->addFlash('success','Utilisateur ajouté');
+				}else{
+					$this->addFlash('danger',"Erreur : l'utilisateur ".$username." n'existe pas dans l'annuaire LDAP");
 				}
 				$user = new User();
 				$formBuilder = $this->createFormBuilder($user)->add('username', TextType::class);
-				if(!$this->container->hasParameter('ldap_url')){
-					$formBuilder->add('fullname', TextType::class)
-						->add('email', TextType::class);
-				}
 				$form = $formBuilder->add('save', SubmitType::class, array('label' => 'Create User'))->getForm();
 			}
 		}
@@ -167,10 +156,10 @@ class UserController extends Controller{
 
 			$ldap = Ldap::create('ext_ldap', array('connection_string' => 'ldap://'.$this->container->getParameter('ldap_url').':'.$this->container->getParameter('ldap_port')));
 			$ldap->bind($this->container->getParameter('ldap_bind_dn'), $this->container->getParameter('ldap_bind_pw'));
-			$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '(&(objectclass=person)(uid='.$username.'))');
+			$ldapQuery = $ldap->query($this->container->getParameter('ldap_base_dn'), '('.$this->container->getParameter('ldap_uid_key').'='.$username.')');
 			$ldapResults = $ldapQuery->execute()->toArray();
 
-			if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute('uid')[0] == $username){
+			if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute($this->container->getParameter('ldap_uid_key'))[0] == $username){
 				$user = new User();
 				$user->setUsername($username);
 				$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
