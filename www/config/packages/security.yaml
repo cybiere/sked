@@ -5,11 +5,11 @@ security:
         my_ldap:
             ldap:
                 service: Symfony\Component\Ldap\Ldap
-                base_dn: dc=planetexpress,dc=com
-                search_dn: "cn=admin,dc=planetexpress,dc=com"
-                search_password: "GoodNewsEveryone"
+                base_dn: %ldap_base_dn%
+                search_dn: %ldap_bind_dn%
+                search_password: %ldap_bind_pw%
                 default_roles: ROLE_USER
-                uid_key: uid
+                uid_key: %ldap_uid_key%
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -23,8 +23,8 @@ security:
                 always_use_default_target_path: true
                 default_target_path: /user/enrol
                 service: Symfony\Component\Ldap\Ldap
-                dn_string: 'ou=people,dc=planetexpress,dc=com'
-                query_string: '(uid={username})'
+                dn_string: %ldap_base_dn%
+                query_string: '(%ldap_uid_key%={username})'
             logout: 
                 path: /logout
                 target: /
