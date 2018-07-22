@@ -165,7 +165,6 @@
 $('.project').each(function(index){
 	$(this).outerWidth($(this).parents('td').outerWidth()*$(this).data("duration")-3);
 });
-
 $( ".project" ).contextmenu(function() {
 	$(this).popover('show')
 	return false;
@@ -173,9 +172,6 @@ $( ".project" ).contextmenu(function() {
 $( ".project" ).on('blur',function() {
 	$(this).popover('hide')
 });
-$(function () {
-	$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
-})
 					{% if app.session.get('user').admin %}
 $(".project").resizable({
 	handles: "e",
@@ -344,4 +340,29 @@ function addPlanning(){
 					{% endif %}
 </script>
 
+{% endblock %}
+
+
+{% block helpContent %}
+<ul>
+	<li>Pour afficher le détail d'un projet, faire un clic droit dessus</li>
+	<li>Légende des couleurs :
+		<ul>
+			<li><span class='legend absence'>Jaune</span> Absent du bureau</li>
+			<li><span class='legend non-billable'>Bleu</span> Projet interne, non facturable</li>
+			<li><span class='legend billable'>Vert</span> Projet facturable</li>
+			<li><span class='legend meeting'>Rouge</span> Réunion, déplacement</li>
+			<li><span class='legend billable-unconfirmed'>Hachuré</span> Date non confirmée</li>
+		</ul>
+	</li>
+	{% if app.session.get('user').admin %}
+	<li>Actions d'administration (dans le détail projet)
+		<ul>
+			<li><span class='btn btn-sm btn-outline-success'><i class='far fa-check-circle'></i></span>Confirmer l'élément de planning</li>
+			<li><span class='btn btn-sm btn-outline-warning'><i class='fas fa-edit'></i></span>Modifier le projet</li>
+			<li><span class='btn btn-sm btn-outline-danger'><i class='fas fa-trash'></i></span>Supprimer l'élément de planning</li>
+		</ul>
+	</li>
+	{% endif %}
+</ul>
 {% endblock %}

@@ -39,6 +39,9 @@
 				<ul class="navbar-nav">
 					<li class="nav-item"><span class="navbar-text">Connecté en tant que {{ app.session.get('user').fullname }}</span></li>
 					<li class="nav-item">
+						<a tabindex="0" class="btn btn-outline-info mx-2" role="button" data-toggle="popover" data-html="true" title="Aide de la page" data-content="{% block helpContent %}Aucun contenu d'aide n'est disponible pour cette page{% endblock %}" id="helpBtn">Aide</a>
+					</li>
+					<li class="nav-item">
 						<a class="btn btn-outline-danger mx-2" href="{{ path('logout') }}">Déconnecter</a>
 					</li>
 				</ul>
@@ -62,16 +65,25 @@
 
 			{% block body %}{% endblock %}
 
-		</main><!-- /.container -->
+		</main>
 
-		<!-- Bootstrap core JavaScript
-	  ================================================== -->
-	  <!-- Placed at the end of the document so the pages load faster -->
-	  <script src="/js/jquery.js"></script>
-	  <script src="/js/jquery-ui.min.js"></script>
-	  <script src="/js/popper.min.js"></script>
-	  <script src="/js/bootstrap.min.js"></script>
-	  <script src="/js/fontawesome-all.min.js"></script>
-	  {% block extraJs %}{% endblock %}
+		<script src="/js/jquery.js"></script>
+		<script src="/js/jquery-ui.min.js"></script>
+		<script src="/js/popper.min.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
+		<script src="/js/fontawesome-all.min.js"></script>
+		<script>
+			$( "#helpBtn" ).click(function() {
+				$(this).popover('toggle')
+				return false;
+			});
+			$( "#helpBtn" ).on('blur',function() {
+				$(this).popover('hide')
+			});
+			$(function () {
+				$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
+			})
+		</script>
+		{% block extraJs %}{% endblock %}
 	</body>
 </html>
