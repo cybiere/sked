@@ -24,14 +24,14 @@
 
 			<div class="collapse navbar-collapse">
 				<ul class="navbar-nav mr-auto">
-					<li class="nav-item{% if app.request.attributes.get('_route') == "planning_index" %} active{% endif %}">
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["planning_index"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('planning_index') }}">Planning</a>
 					</li>
-					<li class="nav-item{% if app.request.attributes.get('_route') == "project_index" %} active{% endif %}">
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["project_index","project_view","project_edit"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('project_index') }}">Projets</a>
 					</li>
 					{% if app.session.get('user').admin %}
-					<li class="nav-item{% if app.request.attributes.get('_route') == "user_index" %} active{% endif %}">
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_index"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('user_index') }}">Utilisateurs</a>
 					</li>
 					{% endif %}
@@ -42,7 +42,7 @@
 						<a tabindex="0" class="btn btn-outline-info mx-2" role="button" data-toggle="popover" data-html="true" title="Aide de la page" data-content="{% block helpContent %}Aucun contenu d'aide n'est disponible pour cette page{% endblock %}" id="helpBtn">Aide</a>
 					</li>
 					<li class="nav-item">
-						<a class="btn btn-outline-danger mx-2" href="{{ path('logout') }}">Déconnecter</a>
+						<a class="btn btn-outline-danger" href="{{ path('logout') }}">Déconnecter</a>
 					</li>
 				</ul>
 			</div>

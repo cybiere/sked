@@ -37,6 +37,7 @@ class AppExtension extends AbstractExtension
 		<div id="kanDetails-<?php echo $project->getId(); ?>" class="collapse">
 			<div class="card-body">
 				<ul class="list-unstyled">
+					<li> <a href="<?php echo $this->router->generate('project_view',array("projectId"=>$project->getId())); ?>">Détails</a></li>
 					<li> Code projet : <?php echo $project->getReference(); ?></li>
 					<li> Nom : <?php echo $project->getName(); ?></li>
 					<li> Client : <?php echo $project->getClient(); ?></li>
@@ -49,7 +50,7 @@ class AppExtension extends AbstractExtension
 				<div class="row">
 					<div class="col">
 						<?php if($project->getStatus() == 0) echo "<i class='fas fa-chevron-circle-left'></i>"; else { ?>
-							<a href='<?php echo $this->router->generate('project_index',array("projectId"=>$project->getId(),"way"=>"dec")); ?>'><i class='fas fa-chevron-circle-left'></i></a>
+							<a href='<?php echo $this->router->generate('project_movelink',array("projectId"=>$project->getId(),"way"=>"dec")); ?>'><i class='fas fa-chevron-circle-left'></i></a>
 						<?php } ?>
 					</div>
 					<div class="col">
@@ -60,7 +61,7 @@ class AppExtension extends AbstractExtension
 					</div>
 					<div class="col">
 						<?php if($project->getStatus() == 6) echo "<i class='fas fa-chevron-circle-right'></i>"; else { ?>
-							<a href='<?php echo $this->router->generate('project_index',array("projectId"=>$project->getId(),"way"=>"inc")); ?>'><i class='fas fa-chevron-circle-right'></i></a>
+							<a href='<?php echo $this->router->generate('project_movelink',array("projectId"=>$project->getId(),"way"=>"inc")); ?>'><i class='fas fa-chevron-circle-right'></i></a>
 						<?php } ?>
 					</div>
 				</div>
@@ -72,11 +73,14 @@ class AppExtension extends AbstractExtension
 	}
 
 
-	public function printPlanningFunction($planning,$isAdmin){
+	public function printPlanningFunction($planning,$isAdmin,$project=0){
 ?>
 	<div
 		class="project <?php 
-			if($planning->getProject() == NULL){
+		if($project != 0 && ($planning->getProject() == NULL || $planning->getProject()->getId() != $project)){
+				echo "otherProject";
+			}
+			elseif($planning->getProject() == NULL){
 				echo "absence"; 
 			}elseif($planning->getProject()->isBillable()){
 				if($planning->isConfirmed()){
@@ -93,7 +97,7 @@ class AppExtension extends AbstractExtension
 		data-planningId="<?php echo $planning->getId(); ?>"
 		data-toggle="popover"
 		data-html="true"
-		title="<?php echo $planning->getProject() == NULL?"Absence":$planning->getProject()->getName(); ?>"
+		title="<?php echo $planning->getProject() == NULL?"Absence":"<a href='".$this->router->generate('project_view',array("projectId"=>$planning->getProject()->getId()))."'>".$planning->getProject()->getName()."</a>"; ?>"
 		data-content="
 			<div class='row'>
 <?php if($planning->getProject() != NULL){ ?>
@@ -101,12 +105,12 @@ class AppExtension extends AbstractExtension
 			<dt class='col-md-6'>Client</dt><dd class='col-md-6'><?php echo $planning->getProject()->getClient(); ?></dd>
 			<dt class='col-md-6'>jh planif/vendus</dt><dd class='col-md-6'><?php echo $planning->getProject()->getPlannedDays()."/".$planning->getProject()->getNbDays(); ?></dd>
 			<dt class='col-md-6'>Commentaires</dt><dd class='col-md-6'><?php echo $planning->getProject()->getComments(); ?></dd>
-<?php if($isAdmin){ ?>
+<?php if($isAdmin && $project == 0){ ?>
 			<div class='action col-md-4'><a class='btn btn-outline-success' href='<?php echo $this->router->generate('planning_confirm',array("planningId"=>$planning->getId())); ?>'><i class='far fa-check-circle'></i></a></div>
 			<div class='action col-md-4'><a class='btn btn-outline-warning' href='<?php echo $this->router->generate('project_edit',array("projectId"=>$planning->getProject()->getId())); ?>'><i class='fas fa-edit'></i></a></div>
 <?php } ?>
 <?php } ?>
-<?php if($isAdmin){ ?>
+<?php if($isAdmin && $project == 0){ ?>
 			<div class='action col-md-4'><a class='btn btn-outline-danger' href='<?php echo $this->router->generate('planning_del',array("planningId"=>$planning->getId())); ?>'><i class='fas fa-trash'></i></a></div>
 <?php } ?>
 			</div>

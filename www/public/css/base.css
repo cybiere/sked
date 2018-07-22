@@ -110,6 +110,11 @@ th.schedUser{
 	background:#7b6;
 	border-color:#150;
 }
+.otherProject {
+	background:#eee;
+	border-color:#ccc;
+	color:#ccc;
+}
 .meeting {
 	background:#b76;
 	border-color:#510;
