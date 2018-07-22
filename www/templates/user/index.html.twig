@@ -37,3 +37,19 @@
 </table>
 
 {% endblock %}
+
+{% block helpContent %}
+<ul>
+	<li>Ressource : afficher l'utilisateur dans le tableau de planning</li>
+	<li>Admin : droit de modification et de suppression sur tous les éléments</li>
+	<li>Il n'est pas possible de supprimer un utilisateur administrateur</li>
+	<li>Il n'est pas possible de se retirer les droits utilisateurs</li>
+	<li>Actions d'administration
+		<ul>
+			<li><i class='fas fa-user-circle'></i>Donner/retirer le statut ressource</li>
+			<li><i class='fas fa-chess-king'></i>Donner/retirer le statut admin</li>
+			<li><i class='fas fa-trash'></i>Supprimer l'utilisateur</li>
+		</ul>
+	</li>
+</ul>
+{% endblock %}

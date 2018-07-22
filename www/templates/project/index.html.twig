@@ -185,3 +185,20 @@
 </script>
 {% endif %}
 {% endblock %}
+
+{% block helpContent %}
+{% if app.session.get('user').admin %}
+<ul>
+	<li>Seuls les projets archivés peuvent être supprimés</li>
+	<li>Actions d'administration
+		<ul>
+			<li><i class='fa fa-chevron-circle-left'></i><i class='fa fa-chevron-circle-right'></i> Déplacer le projet sur le tableau</li>
+			<li><i class='fa fa-edit'></i> Modifier le projet</li>
+			<li><i class='fa fa-caret-square-down'></i> Archiver le projet</li>
+			<li><i class='fa fa-caret-square-up'></i> Désarchiver le projet</li>
+			<li><i class='fa fa-trash'></i> Supprimer le projet</li>
+		</ul>
+	</li>
+</ul>
+{% endif %}
+{% endblock %}

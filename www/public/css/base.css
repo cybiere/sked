@@ -146,3 +146,10 @@ th.schedUser{
 .modal-dialog {
 	max-width:1000px !important;
 }
+.legend {
+	display : inline-block;
+	border: 1px solid;
+	border-radius: 5px;
+	width : 60px;
+	text-align:center;
+}
