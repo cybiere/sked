@@ -30,6 +30,9 @@
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["project_index","project_view","project_edit"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('project_index') }}">Projets</a>
 					</li>
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["task_index"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('task_index') }}">Tâches</a>
+					</li>
 					{% if app.session.get('user').admin %}
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_index"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('user_index') }}">Utilisateurs</a>

@@ -60,10 +60,16 @@ class Project
 	 */
 	private $plannings;
 
+	/**
+     * @ORM\OneToMany(targetEntity="App\Entity\Task", mappedBy="project", orphanRemoval=true)
+	 */
+	private $tasks;
+
 
     public function __construct()
     {
         $this->plannings = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
     }
 
 	public function __toString(){
@@ -133,12 +139,12 @@ class Project
 		$this->billable = $billable?true:false;
 	}
 
-	/**
-     * @return Collection|Planning[]
-     */
-    public function getPlannings()
-    {
+    public function getPlannings(){
         return $this->plannings;
+	}
+
+    public function getTasks(){
+        return $this->tasks;
 	}
 
 	public function getPlannedDays(){
