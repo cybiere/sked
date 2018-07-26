@@ -77,8 +77,11 @@ class ProjectController extends Controller
 				$userIds[] = $planning->getUser()->getId();
 			}
 		}
-
-		$startDateObj = $plannings[0]->getStartDate();
+		if(isset($plannings[0])){
+			$startDateObj = $plannings[0]->getStartDate();
+		}else{
+			$startDateObj = new \DateTime();
+		}
 		$baseYear = intval($startDateObj->format('Y'));
 		$holidays = array();
 		for($i=-1;$i<=1;$i++){

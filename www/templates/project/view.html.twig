@@ -45,6 +45,9 @@
 </div>
 <div class="projectPlannings">
 <h2>Planning du projet</h2>
+{% if plannings is empty %}
+<span class="noPlannings">Aucun planning n'a été saisi pour ce projet</span>
+{% else %}
 {% set planningStart = plannings[0].startDate|date_modify('first day of this month') %}
 {% set baseDate = planningStart|date('d-m-Y') %}
 {% set difference = date(plannings|last.startDate).diff(date(planningStart)) %}
@@ -101,6 +104,7 @@
 	</tbody>
 </table>
 {% endfor %}
+{% endif %}
 </div>
 {% endblock %}
 
