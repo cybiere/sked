@@ -100,8 +100,11 @@ th.schedUser{
 	background: #cfc;
 }
 .popover {
-    max-width: 350px;
+    max-width: 450px;
     width: 350px;
+}
+.popover ul{
+	padding-left:1em;
 }
 .action {
 	text-align:center;
@@ -150,11 +153,12 @@ th.schedUser{
 }
 .modal-dialog {
 	max-width:1000px !important;
-}
+} 
 .legend {
 	display : inline-block;
 	border: 1px solid;
 	border-radius: 5px;
-	width : 60px;
+	width : 70px;
 	text-align:center;
 }
+
