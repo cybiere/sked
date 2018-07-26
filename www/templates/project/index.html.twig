@@ -94,6 +94,7 @@
 			<td>{{ project.nbDays }}</td>
 			<td>{{ project.plannedDays }}</td>
 			<td>
+				<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
 				{% if app.session.get('user').admin %}
 				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
 				<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-down"></i></a>
@@ -124,6 +125,7 @@
 			<td>{{ project.name }}</td>
 			<td>{{ project.client }}</td>
 			<td>
+				<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
 				{% if app.session.get('user').admin %}
 				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
 				<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Désarchiver" class="fas fa-caret-square-up"></i></a>

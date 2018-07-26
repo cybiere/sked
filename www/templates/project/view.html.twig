@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block pageTitle %}Détail du projet {{ project.client }} {{ project.name }}{% endblock %}
+
+{% block body %}
+{% set days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'] %}
+{% set months = ['','Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'] %}
+<h1>Projet {{ project.client }} {{ project.name }}
+	<a class="btn btn-outline-dark float-right" href="{{ path('project_index')}}">Retour</a>
+	{% if app.session.get('user').admin %}
+	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('project_edit',{'projectId':project.id})}}">Modifier</a>
+	{% endif %}
+</h1>
+<hr />
+<h2>Informations</h2>
+<div class="row">
+	<div class="col">
+		<table class="table table-sm table-hover">
+			<tr>
+				<th>Code projet</th>
+				<td>{{ project.reference }}</td>
+			</tr>
+			<tr>
+				<th>Client</th>
+				<td>{{ project.client }}</td>
+			</tr>
+			<tr>
+				<th>Nom du projet</th>
+				<td>{{ project.name }}</td>
+			</tr>
+			<tr>
+				<th>Jours vendus</th>
+				<td>{{ project.nbDays }}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">Commentaires :</h5>
+				{{ project.comments|nl2br }}
+			</div>
+		</div>
+	</div>
+</div>
+<div class="projectPlannings">
+<h2>Planning du projet</h2>
+{% if plannings is empty %}
+<span class="noPlannings">Aucun planning n'a été saisi pour ce projet</span>
+{% else %}
+{% set planningStart = plannings[0].startDate|date_modify('first day of this month') %}
+{% set baseDate = planningStart|date('d-m-Y') %}
+{% set difference = date(plannings|last.startDate).diff(date(planningStart)) %}
+{% set nbMonths = difference.m+1 %}
+{% set today = "now"|date('d-m-Y') %}
+
+{% for i in range(0,nbMonths-1) %}
+
+{% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
+{% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
+{% set nbSlices = 0 %}
+<table class="table table-sm table-hover schedule">
+	<thead>
+		<tr>
+			<th class="schedUser schedDate">{{ months[startDate|date('n')] ~ ' ' ~ startDate|date('Y') }}</th>
+			{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
+			{% if x|date('N') < 6 %}
+			{% set nbSlices = nbSlices+2 %}
+			<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}{% if x in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">{{ days[x|date('w')] ~ ' ' ~ x|date('d') }}</th>
+			{% endif %}
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for user in users %}
+		<tr>
+			{% set slicesShown = 0 %}
+			<th class="schedUser">{{ user.username }}</th>
+			{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
+			{% if x|date('N') < 6 %}
+			<td class="schedHour{% if x in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+				{% set slicesShown = slicesShown+1 %}
+				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+					{% for planning in user.plannings %}
+					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
+					{{ printPlanning(planning,app.session.get('user').admin,project.id) }}
+					{% endif %}
+					{% endfor %}
+				</div>
+			</td>
+			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+				{% set slicesShown = slicesShown+1 %}
+				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+					{% for planning in user.plannings %}
+					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
+					{{ printPlanning(planning,app.session.get('user').admin,project.id) }}
+					{% endif %}
+					{% endfor %}
+				</div></td>
+				{% endif %}
+				{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endfor %}
+{% endif %}
+</div>
+{% endblock %}
+
+{% block extraJs %}
+<script>
+$('.project').each(function(index){
+	$(this).outerWidth($(this).parents('td').outerWidth()*$(this).data("duration")-3);
+});
+$( ".project" ).contextmenu(function() {
+	$(this).popover('show')
+	return false;
+});
+$( ".project" ).on('blur',function() {
+	$(this).popover('hide')
+});
+</script>
+{% endblock %}
+
+{% block helpContent %}
+{% if app.session.get('user').admin %}
+<ul>
+	<li>Seuls les projets archivés peuvent être supprimés</li>
+	<li>Actions d'administration
+		<ul>
+			<li><i class='fa fa-chevron-circle-left'></i><i class='fa fa-chevron-circle-right'></i> Déplacer le projet sur le tableau</li>
+			<li><i class='fa fa-edit'></i> Modifier le projet</li>
+			<li><i class='fa fa-caret-square-down'></i> Archiver le projet</li>
+			<li><i class='fa fa-caret-square-up'></i> Désarchiver le projet</li>
+			<li><i class='fa fa-trash'></i> Supprimer le projet</li>
+		</ul>
+	</li>
+</ul>
+{% endif %}
+{% endblock %}
