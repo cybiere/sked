@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Planning;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -64,7 +65,7 @@ class UserController extends Controller{
 		$formBuilder = $this->createFormBuilder($user)->add('username', TextType::class,array('label'=>"Nom d'utilisateur"));
 		if(!$this->container->hasParameter('ldap_url')){
 			$formBuilder->add('fullname', TextType::class)
-				->add('email', TextType::class);
+			   ->add('email', TextType::class);
 		}
 		$form = $formBuilder->add('save', SubmitType::class, array('label' => "Ajouter l'utilisateur"))->getForm();
 
@@ -166,9 +167,13 @@ class UserController extends Controller{
 		$username = str_replace(array_keys($sanitized),array_values($sanitized),$this->get('security.token_storage')->getToken()->getUser()->getUsername());	
 
 		if(!($user = $userRepository->findOneBy(['username' => $username]))){
-			if($this->addUser($username)){
-				$this->addFlash('success','Bienvenue sur Sked');
-				$user = $userRepository->findOneBy(['username' => $username]);
+			if(!$userRepository->findAll()){
+				if($this->addUser($username)){
+					$this->addFlash('success','Bienvenue sur Sked');
+					$user = $userRepository->findOneBy(['username' => $username]);
+				}else{
+					return $this->redirectToRoute('logout');
+				}
 			}else{
 				return $this->redirectToRoute('logout');
 			}
@@ -176,5 +181,55 @@ class UserController extends Controller{
 
 		$this->get('session')->set('user',$user);
 		return $this->redirectToRoute('planning_index');
+	}
+
+	/**
+	 * @Route("/profile/{userId}", name="user_view", defaults={"userId"=0},requirements={"userId"="\d+"})
+	 */
+	public function viewUser($userId=0){
+		$em = $this->getDoctrine()->getManager();
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+
+		if($this->get('session')->get('user')->isAdmin()){
+			if(!($user = $userRepository->find($userId))){
+				$user = $userRepository->find($this->get('session')->get('user')->getId());
+			}
+		}else{
+			$user = $userRepository->find($this->get('session')->get('user')->getId());
+		}
+
+		$plannings = $planningRepository->findBy(
+			array('user'=>$userId),
+			array('startDate'=>'ASC','startHour'=>'ASC'));
+
+		$startDateObj = new \DateTime();
+		$baseYear = intval($startDateObj->format('Y'));
+		$holidays = array();
+		for($i=-1;$i<=1;$i++){
+			$year=$baseYear+$i;
+			$easterDate  = \easter_date($year);
+			$easterDay   = date('j', $easterDate);
+			$easterMonth = date('n', $easterDate);
+			$easterYear  = date('Y', $easterDate);
+
+				// Dates fixes
+			$holidays[] = mktime(0, 0, 0, 1,  1,  $year);  // 1er janvier
+			$holidays[] = mktime(0, 0, 0, 5,  1,  $year);  // Fête du travail
+			$holidays[] = mktime(0, 0, 0, 5,  8,  $year);  // Victoire des alliés
+			$holidays[] = mktime(0, 0, 0, 7,  14, $year);  // Fête nationale
+			$holidays[] = mktime(0, 0, 0, 8,  15, $year);  // Assomption
+			$holidays[] = mktime(0, 0, 0, 11, 1,  $year);  // Toussaint
+			$holidays[] = mktime(0, 0, 0, 11, 11, $year);  // Armistice
+			$holidays[] = mktime(0, 0, 0, 12, 25, $year);  // Noel
+
+				// Dates variables
+			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 1,  $easterYear);
+			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 39, $easterYear);
+			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 50, $easterYear);
+		}
+		sort($holidays);
+
+		return $this->render('user/view.html.twig',array('user'=>$user,'plannings'=>$plannings,'holidays'=>$holidays));
 	}
 }

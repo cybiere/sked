@@ -56,6 +56,11 @@ class Project
 	private $billable=true;
 
 	/**
+	 * @ORM\Column(type="boolean")
+	 */
+	private $archived=true;
+
+	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="project", orphanRemoval=true)
 	 */
 	private $plannings;
@@ -64,6 +69,12 @@ class Project
      * @ORM\OneToMany(targetEntity="App\Entity\Task", mappedBy="project", orphanRemoval=true)
 	 */
 	private $tasks;
+
+	/**
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="managedProjects")
+	 * @ORM\JoinColumn(nullable=true)
+     */
+	private $projectManager;
 
 
     public function __construct()
@@ -109,7 +120,7 @@ class Project
 	}
 
 	public function setStatus($status){
-		if($status>7) $status = 7;
+		if($status>6) $status = 6;
 		if($status<0) $status = 0;
 		$this->status = $status;
 	}
@@ -139,10 +150,25 @@ class Project
 		$this->billable = $billable?true:false;
 	}
 
-    public function getPlannings(){
+	public function isArchived(){
+		return $this->archived;
+	}
+
+	public function setArchived($archived){
+		$this->archived = $archived?true:false;
+	}
+
+	/**
+     * @return Collection|Planning[]
+     */
+    public function getPlannings()
+    {
         return $this->plannings;
 	}
 
+	/**
+     * @return Collection|Task[]
+     */
     public function getTasks(){
         return $this->tasks;
 	}
@@ -153,6 +179,14 @@ class Project
 			$slicesPlanned += $planning->getNbSlices();
 		}	
 		return $slicesPlanned/2;
+	}
+
+	public function getProjectManager(){
+		return $this->projectManager;
+	}
+
+	public function setProjectManager($projectManager){
+		$this->projectManager = $projectManager;
 	}
 
 }

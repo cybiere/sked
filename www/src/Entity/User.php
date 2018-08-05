@@ -46,6 +46,11 @@ class User
 	private $isAdmin=false;
 
 	/**
+     * @ORM\OneToMany(targetEntity="App\Entity\Project", mappedBy="projectManager", orphanRemoval=false)
+	 */
+	private $managedProjects;
+
+	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="user", orphanRemoval=true)
 	 */
 	private $plannings;
@@ -58,6 +63,7 @@ class User
 
     public function __construct()
     {
+        $this->managedProjects = new ArrayCollection();
         $this->plannings = new ArrayCollection();
         $this->tasks = new ArrayCollection();
     }
@@ -108,6 +114,14 @@ class User
 
 	public function setIsAdmin($admin){
 		$this->isAdmin = $admin?true:false;
+	}
+
+	/**
+     * @return Collection|Project[]
+     */
+    public function getManagedProjects()
+    {
+		return $this->managedProjects;
 	}
 
 	/**

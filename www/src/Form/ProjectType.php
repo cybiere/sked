@@ -20,6 +20,7 @@ class ProjectType extends AbstractType
             ->add('reference',null,array('label'=>'Code projet','attr' => array('maxlength' => 10)))
             ->add('name',null,array('label'=>'Nom du projet'))
             ->add('client',null,array('label'=>'Client'))
+            ->add('projectManager',null,array('label'=>'Responsable projet'))
 			->add('status',ChoiceType::class,array('label'=>'Statut',
 												   'choices'=>array(
 														'Non validé'=>0,
@@ -29,9 +30,9 @@ class ProjectType extends AbstractType
 														'Relecture'=>4,
 														'Restitution'=>5,
 														'Facturation'=>6,
-														'Archivé'=>7
 			)))
             ->add('billable',null,array('required'=>false,'label'=>'Facturable'))
+            ->add('archived',null,array('required'=>false,'label'=>'Archivé'))
             ->add('nbDays',NumberType::class,array('required'=>false,'label'=>'Jours vendus'))
             ->add('comments',TextareaType::class,array('required'=>false,'label'=>'Commentaires'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
