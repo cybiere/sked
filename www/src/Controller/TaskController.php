@@ -17,9 +17,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class TaskController extends Controller
 {
     /**
-     * @Route("/", name="task_index")
+     * @Route("/{taskId}", name="task_index", defaults={"taskId"=0},requirements={"taskId"="\d+"})
      */
-    public function index(Request $request)
+    public function index(Request $request, $taskId=0)
 	{
 		if(!$this->get('session')->get('user')->isAdmin()){
 			throw $this->createNotFoundException("Cette page n'existe pas");
@@ -27,13 +27,16 @@ class TaskController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
 
-		$task = new Task();
+		if(!($task = $taskRepository->find($taskId)))
+			$task = new Task();
+
 		$form = $this->createForm(TaskType::class,$task);
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$em->persist($task);
 			$em->flush();
 			$this->addFlash('success','Tâche enregistrée');
+			return $this->redirectToRoute('task_index');
 		}
 
 		$tasks = $taskRepository->findAll();

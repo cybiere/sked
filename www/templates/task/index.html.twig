@@ -24,7 +24,7 @@
 			<td><a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a></td>
 			<td>{{ task.name }}</td>
 			<td>{% if task.assignedTo %}{{ task.assignedTo.fullname }}{% endif %}</td>
-			<td></td>
+			<td><a href="{{ path('task_index',{'taskId':task.id})}}"><i title='Modifier' class='fas fa-edit'></i></a></td>
 		</tr>
 		{% endfor %}
 	</tbody>
