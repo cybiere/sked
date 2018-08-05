@@ -16,7 +16,7 @@
 	{% for user in users %}
 	<tr {% if user.id == app.session.get('user').id %}class="table-info"{% endif %}>
 		<td>{{user.id}}</td>
-		<td>{{user.fullname}}</td>
+		<td><a href="{{ path("user_view",{'userId':user.id}) }}">{{user.fullname}}</a></td>
 		<td>{{user.username}}</td>
 		<td>
 			{% if user.resource %}

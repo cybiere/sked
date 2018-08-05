@@ -41,7 +41,13 @@ class AppExtension extends AbstractExtension
 					<li> Code projet : <?php echo htmlspecialchars($project->getReference()); ?></li>
 					<li> Nom : <?php echo htmlspecialchars($project->getName()); ?></li>
 					<li> Client : <?php echo htmlspecialchars($project->getClient()); ?></li>
-					<li> Responsable projet : <?php if($project->getProjectManager()) echo htmlspecialchars($project->getProjectManager()->getFullname()); ?></li>
+					<li> Responsable projet : <?php if($project->getProjectManager()){
+							if($isAdmin){
+								echo'<a href="'.$this->router->generate('user_view',array("userId"=>$project->getProjectManager()->getId())).'">'.htmlspecialchars($project->getProjectManager()->getFullname()).'</a>';
+							}else{
+								echo htmlspecialchars($project->getProjectManager()->getFullname());
+							}
+						} ?></li>
 					<li> Jours vendus : <?php echo $project->getNbDays()?htmlspecialchars($project->getNbDays()):"?"; ?>jh</li>
 					<li> Jours planifiés : <?php echo htmlspecialchars($project->getPlannedDays()); ?>jh</li>
 				</ul>

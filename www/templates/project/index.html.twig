@@ -92,7 +92,15 @@
 		{% for project in internalProjects %}
 		<tr>
 			<td>{{ project.name }}</td>
-			<td>{% if project.projectManager %}{{ project.projectManager }}{% endif %}</td>
+			<td>{% if project.projectManager %}
+				{% if app.session.get('user').admin %}
+					<a href="{{ path("user_view",{"userId":project.projectManager.id}) }}">
+					{{ project.projectManager.fullname }}
+					</a>
+				{% else %}
+					{{ project.projectManager.fullname }}
+				{% endif %}
+				{% endif %}</td>
 			<td>{{ project.nbDays }}</td>
 			<td>{{ project.plannedDays }}</td>
 			<td>

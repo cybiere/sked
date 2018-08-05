@@ -35,6 +35,9 @@
 						<a class="nav-link" href="{{ path('user_index') }}">Utilisateurs</a>
 					</li>
 					{% endif %}
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_view"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('user_view') }}">Mon profil</a>
+					</li>
 				</ul>
 				<ul class="navbar-nav">
 					<li class="nav-item"><span class="navbar-text">Connecté en tant que {{ app.session.get('user').fullname }}</span></li>
