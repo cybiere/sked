@@ -15,6 +15,7 @@ class TaskType extends AbstractType
         $builder
             ->add('project',null,array('label'=>'Projet'))
             ->add('name',null,array('label'=>'Nom de la tâche'))
+            ->add('assignedTo',null,array('label'=>'Assignée à'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
         ;
     }

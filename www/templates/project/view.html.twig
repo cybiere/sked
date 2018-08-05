@@ -37,11 +37,12 @@
 	<div class="col">
 		<table class="table table-sm table-hover">
 			<tr>
-				<th>Tâches</th>
+				<th colspan="2">Tâches</th>
 			</tr>
 			{% for task in project.tasks %}
 			<tr>
 				<td>{{ task.name }}</td>
+				<td>{% if task.assignedTo %}{{ task.assignedTo.fullname }}{% endif %}</td>
 			</tr>
 			{% endfor %}
 			<tr>

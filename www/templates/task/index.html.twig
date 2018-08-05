@@ -16,6 +16,7 @@
 	<tr>
 		<th>Projet</th>
 		<th>Tâche</th>
+		<th>Assignation</th>
 		<th class="actions">Actions</th>
 	</tr>
 	</thead>
@@ -24,6 +25,7 @@
 		<tr>
 			<td><a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a></td>
 			<td>{{ task.name }}</td>
+			<td>{% if task.assignedTo %}{{ task.assignedTo.fullname }}{% endif %}</td>
 			<td></td>
 		</tr>
 		{% endfor %}

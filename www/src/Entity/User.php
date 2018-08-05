@@ -50,10 +50,16 @@ class User
 	 */
 	private $plannings;
 
+	/**
+     * @ORM\OneToMany(targetEntity="App\Entity\Task", mappedBy="assignedTo", orphanRemoval=true)
+	 */
+	private $tasks;
+
 
     public function __construct()
     {
         $this->plannings = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
     }
 
 	public function __toString(){
@@ -110,5 +116,13 @@ class User
     public function getPlannings()
     {
         return $this->plannings;
+	}
+
+	/**
+     * @return Collection|Task[]
+     */
+    public function getTasks()
+    {
+        return $this->tasks;
     }
 }

@@ -27,6 +27,12 @@ class Task
      */
 	private $project;
 
+	/**
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="tasks")
+	 * @ORM\JoinColumn(nullable=true)
+     */
+	private $assignedTo;
+
 	public function getId(){
 		return $this->id;
 	}
@@ -45,6 +51,14 @@ class Task
 
 	public function setProject($project){
 		$this->project = $project;
+	}
+
+	public function getAssignedTo(){
+		return $this->assignedTo;
+	}
+
+	public function setAssignedTo($assignedTo){
+		$this->assignedTo = $assignedTo;
 	}
 
 }
