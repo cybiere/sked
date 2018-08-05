@@ -64,7 +64,7 @@ class UserController extends Controller{
 		$formBuilder = $this->createFormBuilder($user)->add('username', TextType::class,array('label'=>"Nom d'utilisateur"));
 		if(!$this->container->hasParameter('ldap_url')){
 			$formBuilder->add('fullname', TextType::class)
-				->add('email', TextType::class);
+			   ->add('email', TextType::class);
 		}
 		$form = $formBuilder->add('save', SubmitType::class, array('label' => "Ajouter l'utilisateur"))->getForm();
 
@@ -166,9 +166,13 @@ class UserController extends Controller{
 		$username = str_replace(array_keys($sanitized),array_values($sanitized),$this->get('security.token_storage')->getToken()->getUser()->getUsername());	
 
 		if(!($user = $userRepository->findOneBy(['username' => $username]))){
-			if($this->addUser($username)){
-				$this->addFlash('success','Bienvenue sur Sked');
-				$user = $userRepository->findOneBy(['username' => $username]);
+			if(!$userRepository->findAll()){
+				if($this->addUser($username)){
+					$this->addFlash('success','Bienvenue sur Sked');
+					$user = $userRepository->findOneBy(['username' => $username]);
+				}else{
+					return $this->redirectToRoute('logout');
+				}
 			}else{
 				return $this->redirectToRoute('logout');
 			}
