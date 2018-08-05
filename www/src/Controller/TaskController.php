@@ -21,6 +21,9 @@ class TaskController extends Controller
      */
     public function index(Request $request)
 	{
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
 		$em = $this->getDoctrine()->getManager();
 		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
 
@@ -28,9 +31,6 @@ class TaskController extends Controller
 		$form = $this->createForm(TaskType::class,$task);
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
-			if(!$this->get('session')->get('user')->isAdmin()){
-				throw $this->createNotFoundException("Cette page n'existe pas");
-			}
 			$em->persist($task);
 			$em->flush();
 			$this->addFlash('success','Tâche enregistrée');
