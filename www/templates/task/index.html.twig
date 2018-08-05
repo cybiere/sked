@@ -16,13 +16,15 @@
 	<tr>
 		<th>Projet</th>
 		<th>Tâche</th>
+		<th class="actions">Actions</th>
 	</tr>
 	</thead>
 	<tbody>
 		{% for task in tasks %}
 		<tr>
-			<td>{{ task.project.client }} {{ task.project.name }}</td>
+			<td><a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a></td>
 			<td>{{ task.name }}</td>
+			<td></td>
 		</tr>
 		{% endfor %}
 	</tbody>

@@ -35,6 +35,19 @@
 		</table>
 	</div>
 	<div class="col">
+		<table class="table table-sm table-hover">
+			<tr>
+				<th>Tâches</th>
+			</tr>
+			{% for task in project.tasks %}
+			<tr>
+				<td>{{ task.name }}</td>
+			</tr>
+			{% endfor %}
+			<tr>
+		</table>
+	</div>
+	<div class="col">
 		<div class="card">
 			<div class="card-body">
 				<h5 class="card-title">Commentaires :</h5>
