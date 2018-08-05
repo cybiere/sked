@@ -82,6 +82,7 @@
 	<thead class="thead-light">
 		<tr>
 			<th>Nom du projet</th>
+			<th>Responsable projet</th>
 			<th>Jours définis</th>
 			<th>Jours planifiés</th>
 			<th>Actions</th>
@@ -91,6 +92,7 @@
 		{% for project in internalProjects %}
 		<tr>
 			<td>{{ project.name }}</td>
+			<td>{% if project.projectManager %}{{ project.projectManager }}{% endif %}</td>
 			<td>{{ project.nbDays }}</td>
 			<td>{{ project.plannedDays }}</td>
 			<td>

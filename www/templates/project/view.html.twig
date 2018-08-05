@@ -29,6 +29,10 @@
 				<td>{{ project.name }}</td>
 			</tr>
 			<tr>
+				<th>Responsable projet</th>
+				<td>{% if project.projectManager %}{{ project.projectManager.fullname }}{% endif %}</td>
+			</tr>
+			<tr>
 				<th>Jours vendus</th>
 				<td>{{ project.nbDays }}</td>
 			</tr>

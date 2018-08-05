@@ -41,6 +41,7 @@ class AppExtension extends AbstractExtension
 					<li> Code projet : <?php echo htmlspecialchars($project->getReference()); ?></li>
 					<li> Nom : <?php echo htmlspecialchars($project->getName()); ?></li>
 					<li> Client : <?php echo htmlspecialchars($project->getClient()); ?></li>
+					<li> Responsable projet : <?php if($project->getProjectManager()) echo htmlspecialchars($project->getProjectManager()->getFullname()); ?></li>
 					<li> Jours vendus : <?php echo $project->getNbDays()?htmlspecialchars($project->getNbDays()):"?"; ?>jh</li>
 					<li> Jours planifiés : <?php echo htmlspecialchars($project->getPlannedDays()); ?>jh</li>
 				</ul>
@@ -103,6 +104,7 @@ class AppExtension extends AbstractExtension
 <?php if($planning->getProject() != NULL){ ?>
 			<dt class='col-md-6'>Code projet</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getReference()); ?></dd>
 			<dt class='col-md-6'>Client</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getClient()); ?></dd>
+			<dt class='col-md-6'>Responsable projet</dt><dd class='col-md-6'><?php if($planning->getProject()->getProjectManager()) echo htmlspecialchars($planning->getProject()->getProjectManager()->getFullname()); ?></dd>
 			<dt class='col-md-6'>jh planif/vendus</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getPlannedDays())."/".htmlspecialchars($planning->getProject()->getNbDays()); ?></dd>
 			<dt class='col-md-6'>Commentaires</dt><dd class='col-md-6'><?php echo nl2br(htmlspecialchars($planning->getProject()->getComments())); ?></dd>
 <?php if($isAdmin && $project == 0){ ?>

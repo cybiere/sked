@@ -60,6 +60,12 @@ class Project
 	 */
 	private $plannings;
 
+	/**
+	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="managedProjects")
+	 * @ORM\JoinColumn(nullable=true)
+     */
+	private $projectManager;
+
 
     public function __construct()
     {
@@ -147,6 +153,14 @@ class Project
 			$slicesPlanned += $planning->getNbSlices();
 		}	
 		return $slicesPlanned/2;
+	}
+
+	public function getProjectManager(){
+		return $this->projectManager;
+	}
+
+	public function setProjectManager($projectManager){
+		$this->projectManager = $projectManager;
 	}
 
 }
