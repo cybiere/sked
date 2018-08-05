@@ -5,7 +5,7 @@
 {% block body %}
 {% set days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'] %}
 {% set months = ['','Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'] %}
-<h1>Projet {{ project.client }} {{ project.name }}
+<h1>Projet {{ project.client }} {{ project.name }} {% if project.archived %}<span class="badge badge-secondary">Archivé</span>{% endif %}
 	<a class="btn btn-outline-dark float-right" href="{{ path('project_index')}}">Retour</a>
 	{% if app.session.get('user').admin %}
 	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('project_edit',{'projectId':project.id})}}">Modifier</a>
@@ -27,6 +27,10 @@
 			<tr>
 				<th>Nom du projet</th>
 				<td>{{ project.name }}</td>
+			</tr>
+			<tr>
+				<th>Responsable projet</th>
+				<td>{% if project.projectManager %}{{ project.projectManager.fullname }}{% endif %}</td>
 			</tr>
 			<tr>
 				<th>Jours vendus</th>

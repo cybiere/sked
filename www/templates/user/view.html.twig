@@ -1,0 +1,104 @@
+{% extends "base.html.twig" %}
+
+{% block pageTitle %}Profil de {{ user.fullname }}{% if user.resource %}<span class="badge badge-success">Ressource</span>{% endif %}{% if user.admin %}<span class="badge badge-warning">Admin</span>{% endif %}{% endblock %}
+
+{% block body %}
+{% set days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'] %}
+{% set months = ['','Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'] %}
+<h1>{{ user.fullname }}
+	{% if app.session.get('user').admin %}
+	<a class="btn btn-outline-dark float-right" href="{{ path('user_index')}}">Retour</a>
+	{% endif %}
+</h1>
+<div class="row">
+	<div class="col">
+		<h2>Responsable des projets :</h2>
+		<table class="table table-sm table-hover">
+			{% for project in user.managedProjects %}
+			<tr>
+				<td>
+					<a href="{{ path('project_view',{'projectId':project.id}) }}">{{ project.client }} {{ project.name }}</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+</div>
+<div class="userPlannings">
+	<h2>Planning</h2>
+	{% if plannings is empty %}
+	<span class="noPlannings">Aucun planning n'a été saisi pour cet utilisateur</span>
+	{% else %}
+	{% set baseDate = "now"|date('d-m-Y') %}
+	{% set nbMonths = 3 %}
+	{% set today = "now"|date('d-m-Y') %}
+
+	{% for i in range(0,nbMonths-1) %}
+
+	{% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
+	{% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
+	{% set nbSlices = 0 %}
+	<table class="table table-sm table-hover schedule">
+		<thead>
+			<tr>
+				<th class="schedUser schedDate">{{ months[startDate|date('n')] ~ ' ' ~ startDate|date('Y') }}</th>
+				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
+				{% if x|date('N') < 6 %}
+				{% set nbSlices = nbSlices+2 %}
+				<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}{% if x in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">{{ days[x|date('w')] ~ ' ' ~ x|date('d') }}</th>
+				{% endif %}
+				{% endfor %}
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				{% set slicesShown = 0 %}
+				<th class="schedUser">{{ user.username }}</th>
+				{% for x in range(startDate|date('U'), endDate|date('U'), 86400 ) %}
+				{% if x|date('N') < 6 %}
+				<td class="schedHour{% if x in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+					{% set slicesShown = slicesShown+1 %}
+					<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+						{% for planning in user.plannings %}
+						{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
+						{{ printPlanning(planning,app.session.get('user').admin) }}
+						{% endif %}
+						{% endfor %}
+					</div>
+				</td>
+				<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+					{% set slicesShown = slicesShown+1 %}
+					<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+						{% for planning in user.plannings %}
+						{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
+						{{ printPlanning(planning,app.session.get('user').admin) }}
+						{% endif %}
+						{% endfor %}
+					</div></td>
+					{% endif %}
+					{% endfor %}
+			</tr>
+		</tbody>
+	</table>
+	{% endfor %}
+	{% endif %}
+
+</div>
+{% endblock %}
+
+{% block extraJs %}
+<script>
+$('.project').each(function(index){
+	$(this).outerWidth($(this).parents('td').outerWidth()*$(this).data("duration")-3);
+});
+$( ".project" ).contextmenu(function() {
+	$(this).popover('show')
+	return false;
+});
+$( ".project" ).on('blur',function() {
+	$(this).popover('hide')
+});
+</script>
+{% endblock %}
+
+
