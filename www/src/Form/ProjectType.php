@@ -30,9 +30,9 @@ class ProjectType extends AbstractType
 														'Relecture'=>4,
 														'Restitution'=>5,
 														'Facturation'=>6,
-														'Archivé'=>7
 			)))
             ->add('billable',null,array('required'=>false,'label'=>'Facturable'))
+            ->add('archived',null,array('required'=>false,'label'=>'Archivé'))
             ->add('nbDays',NumberType::class,array('required'=>false,'label'=>'Jours vendus'))
             ->add('comments',TextareaType::class,array('required'=>false,'label'=>'Commentaires'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))

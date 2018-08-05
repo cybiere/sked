@@ -39,17 +39,20 @@ class ProjectController extends Controller
 		}
 
 		$projects = $projectRepository->findAll();
-		$sortedProjects = array(array(),array(),array(),array(),array(),array(),array(),array());
+		$sortedProjects = array(array(),array(),array(),array(),array(),array(),array());
 		$internalProjects = array();
+		$archivedProjects = array();
 		foreach($projects as $project){
-			if(!$project->isBillable() && $project->getStatus() != 7){
+			if($project->isArchived()){
+				$archivedProjects[] = $project;
+			}elseif(!$project->isBillable()){
 				$internalProjects[] = $project;
 			}else{
 				$sortedProjects[$project->getStatus()][] = $project;
 			}
 		}
 
-		return $this->render('project/index.html.twig',array('projects'=>$sortedProjects,'internalProjects'=>$internalProjects,'form'=>$form->createView()));
+		return $this->render('project/index.html.twig',array('projects'=>$sortedProjects,'internalProjects'=>$internalProjects,'archivedProjects'=>$archivedProjects,'form'=>$form->createView()));
 	}
 
 	/**
@@ -157,13 +160,11 @@ class ProjectController extends Controller
 			return $this->redirectToRoute('project_index');
 		}
 
-		if($project->getStatus() == 7){
-			$project->setStatus(0);
-			$em->flush();
+		$project->setArchived(!$project->isArchived());
+		$em->flush();
+		if($project->isArchived()){
 			$this->addFlash('success','Projet désarchivé');
 		}else{
-			$project->setStatus(7);
-			$em->flush();
 			$this->addFlash('success','Projet archivé');
 		}
 		return $this->redirectToRoute('project_index');
@@ -207,7 +208,7 @@ class ProjectController extends Controller
 			$arrData = ['success' => false, 'errormsg' => 'Projet non trouvé'];
 		}else{
 			if($newStatus < 0) $newStatus = 0;
-			if($newStatus > 7) $newStatus = 7;
+			if($newStatus > 6) $newStatus = 6;
 			$project->setStatus($newStatus);
 			$em->flush();
 			$arrData = ['success' => true];
@@ -229,7 +230,7 @@ class ProjectController extends Controller
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Projet inexistant');
 		}else{
-			if($project->getStatus() == 7){
+			if($project->isArchived()){
 				$em->remove($project);
 				$em->flush();
 				$this->addFlash('success','Projet supprimé');
