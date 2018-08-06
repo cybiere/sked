@@ -200,7 +200,7 @@ class UserController extends Controller{
 		}
 
 		$plannings = $planningRepository->findBy(
-			array('user'=>$userId),
+			array('user'=>$user->getId()),
 			array('startDate'=>'ASC','startHour'=>'ASC'));
 
 		$startDateObj = new \DateTime();
