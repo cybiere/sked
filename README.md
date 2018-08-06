@@ -5,7 +5,9 @@ Outil de gestion de planning.
 ## Fonctionnalités
 
 > **Note sur l'internationalisation :**
+>
 > (fr) Bien que le code soit rédigé en anglais, Sked a été réalisé pour un contexte francophone. Au delà de la langue du site, celui-ci utilise aussi les jours fériés Français.
+>
 > (en) Although code is in english, Sked was developped for a french environment, including french holidays.
 
 ## Installation
