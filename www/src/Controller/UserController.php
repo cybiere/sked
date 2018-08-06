@@ -18,7 +18,7 @@ use Symfony\Component\Ldap\Ldap;
 class UserController extends Controller{
 
 
-	private function addUser($username){
+	private function addUser($username,$isAdmin=false){
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 
@@ -36,13 +36,21 @@ class UserController extends Controller{
 			$ldapResults = $ldapQuery->execute()->toArray();
 
 			if(isset($ldapResults[0]) && $ldapResults[0]->getAttribute($this->container->getParameter('ldap_uid_key'))[0] == $username){
-				$user = new User();
-				$user->setUsername($ldapResults[0]->getAttribute($this->container->getParameter('ldap_uid_key'))[0]);
-				$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
-				$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
-				$em->persist($user);
-				$em->flush();
-				return true;
+				if($ldapResults[0]->getAttribute('mail') == NULL){
+					$this->addFlash('danger',"Erreur : l'utilisateur ".$username." n'a pas d'adresse email dans l'annuaire (champ \"mail\")");
+					return false;
+				}
+				else
+				{
+					$user = new User();
+					$user->setUsername($ldapResults[0]->getAttribute($this->container->getParameter('ldap_uid_key'))[0]);
+					$user->setFullname($ldapResults[0]->getAttribute('cn')[0]);
+					$user->setEmail($ldapResults[0]->getAttribute('mail')[0]);
+					$user->setIsAdmin($isAdmin);
+					$em->persist($user);
+					$em->flush();
+					return true;
+				}
 			}else{
 				$this->addFlash('danger',"Erreur : l'utilisateur ".$username." n'existe pas dans l'annuaire LDAP");
 				return false;
@@ -168,8 +176,9 @@ class UserController extends Controller{
 
 		if(!($user = $userRepository->findOneBy(['username' => $username]))){
 			if(!$userRepository->findAll()){
-				if($this->addUser($username)){
+				if($this->addUser($username,true)){
 					$this->addFlash('success','Bienvenue sur Sked');
+					$this->addFlash('warning','En tant que premier utilisateur, vous avez les droits administrateur. Vous pouvez ajouter et gérer les utilisateurs dans l\'onglet "Utilisateurs"');
 					$user = $userRepository->findOneBy(['username' => $username]);
 				}else{
 					return $this->redirectToRoute('logout');
@@ -213,7 +222,7 @@ class UserController extends Controller{
 			$easterMonth = date('n', $easterDate);
 			$easterYear  = date('Y', $easterDate);
 
-				// Dates fixes
+			// Dates fixes
 			$holidays[] = mktime(0, 0, 0, 1,  1,  $year);  // 1er janvier
 			$holidays[] = mktime(0, 0, 0, 5,  1,  $year);  // Fête du travail
 			$holidays[] = mktime(0, 0, 0, 5,  8,  $year);  // Victoire des alliés
@@ -223,7 +232,7 @@ class UserController extends Controller{
 			$holidays[] = mktime(0, 0, 0, 11, 11, $year);  // Armistice
 			$holidays[] = mktime(0, 0, 0, 12, 25, $year);  // Noel
 
-				// Dates variables
+			// Dates variables
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 1,  $easterYear);
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 39, $easterYear);
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 50, $easterYear);
