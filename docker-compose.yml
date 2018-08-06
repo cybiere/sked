@@ -3,7 +3,7 @@ site:
   ports :
    - "80:80"
   volumes:
-   - /home/ncnd/info/teamManager/www:/var/www/html/
+   - ./www:/var/www/html/
   links:
    - database
    - ldap
