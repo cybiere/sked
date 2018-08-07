@@ -48,6 +48,22 @@ La branche de développement contient les sources ainsi que les configurations d
 
 Le tout est orchestré par docker-compose.
 
+```
+git clone https://github.com/ncosnard/sked.git
+cd sked
+git checkout dev
+docker-compose build
+docker-compose up -d
+docker exec -ti sked_site_1 /bin/bash
+##### Dans le docker : #####
+composer update
+exit
+##### Hors du docker #####
+##### Modifier /opt/sked/www/.env avec les informations de connexion à la base de données #####
+```
+
+Par défaut, l'environnement est accessible sur http://localhost:80
+
 ## Documentation
 
 La documentation est en cours de rédaction et sera bientôt disponible sur [le site de sked](https://sked.team).
