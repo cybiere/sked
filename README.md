@@ -20,7 +20,7 @@ Sur la base d'un environnement Debian 9 à jour :
 
 ```
 cd /opt
-##### GIT CLONE #####
+git clone https://github.com/ncosnard/sked.git
 apt-get install git apache2 php mysql-server composer zip zlib1g-dev libldap2-dev php-mysql php-zip php-ldap php-xml
 mysql_secure_installation
 a2enmod rewrite
