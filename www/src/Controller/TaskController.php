@@ -66,4 +66,25 @@ class TaskController extends Controller
 		$em->flush();
 		return $this->redirect($referer);
 	}
+
+	/**
+	 * @Route("/toggleClosed/{taskId}", name="task_toggleClosed", defaults={"taskId"=0},requirements={"taskId"="\d+"})
+	 */
+	public function toggleClosed(Request $request, $taskId=0){
+		$referer = $request->headers->get('referer');
+		$em = $this->getDoctrine()->getManager();
+		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+
+		if(!($task = $taskRepository->find($taskId))){
+			$this->addFlash('danger','Erreur : tâche non trouvée');
+			return $this->redirect($referer);
+		}
+		if(!$this->get('session')->get('user')->isAdmin() && ($task->getProject() == NULL || $task->getProject()->getProjectManager()->getId() != $this->get('session')->get('user')->getId())){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$task->setClosed(!$task->isClosed());
+		$em->flush();
+		return $this->redirect($referer);
+	}
 }

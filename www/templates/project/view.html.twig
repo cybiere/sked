@@ -49,10 +49,14 @@
 	<div class="col">
 		<table class="table table-sm table-hover">
 			<tr>
-				<th colspan="2">Tâches</th>
+				<th>Tâches</th>
+				<th></th>
+				<th>Terminé</th>
+				<th>Clôturé</th>
+				<th class="actions">Actions</th>
 			</tr>
 			{% for task in project.tasks %}
-			<tr>
+			<tr{% if task.done %} class="table-secondary"{% endif %}>
 				<td>{{ task.name }}</td>
 				<td>{% if task.assignedTo %}
 					{% if app.session.get('user').admin %}
@@ -60,8 +64,18 @@
 					{% else %}
 						{{ task.assignedTo.fullname }}
 					{% endif %}
-					{% endif %}</td>
-
+					{% endif %}
+				</td>
+				<td>{% if task.done %}<span class="fas fa-check-circle"></span>{% endif %}</td>
+				<td>{% if task.closed %}<span class="fas fa-lock"></span>{% endif %}</td>
+				<td class="actions">
+					{% if task.assignedTo.id == app.session.get('user').id or app.session.get('user').admin %}
+						<a href="{{ path('task_toggleDone',{'taskId':task.id}) }}"><span class="fas fa-check-circle"></span></a>
+					{% endif %}
+					{% if task.project.projectManager.id == app.session.get('user').id or app.session.get('user').admin %}
+					<a href="{{ path('task_toggleClosed',{'taskId':task.id}) }}"><span class="fas fa-lock{% if task.closed %}-open{% endif %}"></span></a>
+					{% endif %}
+				</td>
 			</tr>
 			{% endfor %}
 			<tr>
