@@ -30,7 +30,15 @@
 			</tr>
 			<tr>
 				<th>Responsable projet</th>
-				<td>{% if project.projectManager %}{{ project.projectManager.fullname }}{% endif %}</td>
+				<td>
+					{% if project.projectManager %}
+					{% if app.session.get('user').admin %}
+					<a href="{{ path('user_view',{'userId':project.projectManager.id}) }}">{{ project.projectManager.fullname }}</a>
+					{% else %}
+						{{ project.projectManager.fullname }}
+					{% endif %}
+					{% endif %}
+				</td>
 			</tr>
 			<tr>
 				<th>Jours vendus</th>
@@ -46,7 +54,14 @@
 			{% for task in project.tasks %}
 			<tr>
 				<td>{{ task.name }}</td>
-				<td>{% if task.assignedTo %}{{ task.assignedTo.fullname }}{% endif %}</td>
+				<td>{% if task.assignedTo %}
+					{% if app.session.get('user').admin %}
+					<a href="{{ path('user_view',{'userId':task.assignedTo.id}) }}">{{ task.assignedTo.fullname }}</a>
+					{% else %}
+						{{ task.assignedTo.fullname }}
+					{% endif %}
+					{% endif %}</td>
+
 			</tr>
 			{% endfor %}
 			<tr>

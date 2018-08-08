@@ -23,6 +23,23 @@
 			{% endfor %}
 		</table>
 	</div>
+	<div class="col">
+		<table class="table table-sm table-hover">
+			<tr>
+				<th colspan="2">Tâches</th>
+			</tr>
+			{% for task in user.tasks %}
+			<tr>
+				<td>{{ task.name }}</td>
+				<td>
+					<a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a>
+					</td>
+
+			</tr>
+			{% endfor %}
+			<tr>
+		</table>
+	</div>
 </div>
 <div class="userPlannings">
 	<h2>Planning</h2>
