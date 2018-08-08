@@ -58,12 +58,16 @@ class TaskController extends Controller
 			$this->addFlash('danger','Erreur : tâche non trouvée');
 			return $this->redirect($referer);
 		}
-		if(!$this->get('session')->get('user')->isAdmin() && $task->getAssignedTo()->getId() != $this->get('session')->get('user')->getId()){
+		if(!$this->get('session')->get('user')->isAdmin() && $task->getAssignedTo()->getId() != $this->get('session')->get('user')->getId() && ($task->getProject() != NULL && $task->getProject()->getProjectManager()->getId() != $this->get('session')->get('user')->getId())){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
-		$task->setDone(!$task->isDone());
-		$em->flush();
+		if($task->isClosed()){
+			$this->addFlash('danger','Erreur : impossible de modifier une tâche clôturée');
+		}else{
+			$task->setDone(!$task->isDone());
+			$em->flush();
+		}
 		return $this->redirect($referer);
 	}
 

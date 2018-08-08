@@ -69,7 +69,7 @@
 				<td>{% if task.done %}<span class="fas fa-check-circle"></span>{% endif %}</td>
 				<td>{% if task.closed %}<span class="fas fa-lock"></span>{% endif %}</td>
 				<td class="actions">
-					{% if task.assignedTo.id == app.session.get('user').id or app.session.get('user').admin %}
+					{% if not task.closed and (task.assignedTo.id == app.session.get('user').id or app.session.get('user').admin or task.project.projectManager.id == app.session.get('user').id) %}
 						<a href="{{ path('task_toggleDone',{'taskId':task.id}) }}"><span class="fas fa-check-circle"></span></a>
 					{% endif %}
 					{% if task.project.projectManager.id == app.session.get('user').id or app.session.get('user').admin %}

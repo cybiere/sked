@@ -36,7 +36,7 @@
 					<a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a>
 					{% endif %}
 				</td>
-				<td class="actions"><a class="btn btn-sm btn-outline-{% if task.done %}secondary{% else %}warning{% endif %}" href="{{ path('task_toggleDone',{'taskId':task.id}) }}">Marquer comme {% if task.done %}non {% endif %}fait</a></td>
+				<td class="actions">{% if not task.closed %}<a class="btn btn-sm btn-outline-{% if task.done %}secondary{% else %}warning{% endif %}" href="{{ path('task_toggleDone',{'taskId':task.id}) }}">Marquer comme {% if task.done %}non {% endif %}fait</a>{% else %}<span class="fas fa-lock"></span>{% endif %}</td>
 			</tr>
 			{% endfor %}
 		</table>
