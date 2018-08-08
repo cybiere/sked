@@ -20,7 +20,7 @@ Sur la base d'un environnement Debian 9 à jour :
 
 ```
 cd /opt
-##### GIT CLONE #####
+git clone https://github.com/ncosnard/sked.git
 apt-get install git apache2 php mysql-server composer zip zlib1g-dev libldap2-dev php-mysql php-zip php-ldap php-xml
 mysql_secure_installation
 a2enmod rewrite
@@ -47,6 +47,22 @@ Une fois l'installation effectuée, il suffit d'aller sur le site web et de se c
 La branche de développement contient les sources ainsi que les configurations docker pour le projet. Cela inclut le conteneur "site" (Apache + php7.1 + extensions, voir Dockerfile), le conteneur "mysql" pour la base de données et le conteneur "ldap" pour le serveur ldap. Ce dernier repose sur l'image ["rroemhild/test-openldap"](https://github.com/rroemhild/docker-test-openldap) qui contient des données de test basées sur les personnages de la série Futurama.
 
 Le tout est orchestré par docker-compose.
+
+```
+git clone https://github.com/ncosnard/sked.git
+cd sked
+git checkout dev
+docker-compose build
+docker-compose up -d
+docker exec -ti sked_site_1 /bin/bash
+##### Dans le docker : #####
+composer update
+exit
+##### Hors du docker #####
+##### Modifier /opt/sked/www/.env avec les informations de connexion à la base de données #####
+```
+
+Par défaut, l'environnement est accessible sur http://localhost:80
 
 ## Documentation
 
