@@ -12,14 +12,14 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
-  * @Route("/task")
-  */
+ * @Route("/task")
+ */
 class TaskController extends Controller
 {
-    /**
-     * @Route("/{taskId}", name="task_index", defaults={"taskId"=0},requirements={"taskId"="\d+"})
-     */
-    public function index(Request $request, $taskId=0)
+	/**
+	 * @Route("/{taskId}", name="task_index", defaults={"taskId"=0},requirements={"taskId"="\d+"})
+	 */
+	public function index(Request $request, $taskId=0)
 	{
 		if(!$this->get('session')->get('user')->isAdmin()){
 			throw $this->createNotFoundException("Cette page n'existe pas");
@@ -40,9 +40,30 @@ class TaskController extends Controller
 		}
 
 		$tasks = $taskRepository->findAll();
-        return $this->render('task/index.html.twig', [
+		return $this->render('task/index.html.twig', [
 			'form' => $form->createView(),
 			'tasks'=>$tasks
-        ]);
-    }
+		]);
+	}
+
+	/**
+	 * @Route("/toggleDone/{taskId}", name="task_toggleDone", defaults={"taskId"=0},requirements={"taskId"="\d+"})
+	 */
+	public function toggleDone(Request $request, $taskId=0){
+		$referer = $request->headers->get('referer');
+		$em = $this->getDoctrine()->getManager();
+		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+
+		if(!($task = $taskRepository->find($taskId))){
+			$this->addFlash('danger','Erreur : tâche non trouvée');
+			return $this->redirect($referer);
+		}
+		if(!$this->get('session')->get('user')->isAdmin() && $task->getAssignedTo()->getId() != $this->get('session')->get('user')->getId()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$task->setDone(!$task->isDone());
+		$em->flush();
+		return $this->redirect($referer);
+	}
 }

@@ -33,6 +33,17 @@ class Task
      */
 	private $assignedTo;
 
+	/**
+     * @ORM\Column(type="boolean")
+     */
+	private $done=false;
+
+	/**
+     * @ORM\Column(type="boolean")
+     */
+	private $closed=false;
+
+
 	public function getId(){
 		return $this->id;
 	}
@@ -59,6 +70,22 @@ class Task
 
 	public function setAssignedTo($assignedTo){
 		$this->assignedTo = $assignedTo;
+	}
+
+	public function isDone(){
+		return $this->done;
+	}
+
+	public function setDone($isDone){
+		$this->done = $isDone?true:false;
+	}
+
+	public function isClosed(){
+		return $this->closed;
+	}
+
+	public function setClosed($isClosed){
+		$this->closed = $isClosed?true:false;
 	}
 
 }

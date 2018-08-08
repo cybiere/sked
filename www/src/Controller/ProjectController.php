@@ -58,14 +58,15 @@ class ProjectController extends Controller
 	/**
 	 * @Route("/{projectId}", name="project_view", defaults={"projectId"=0},requirements={"projectId"="\d+"})
 	 */
-	public function view($projectId){
+	public function view(Request $request, $projectId){
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
 
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Erreur : projet non trouvé');
-			return $this->redirectToRoute('project_index');
+			$referer = $request->headers->get('referer');
+			return $this->redirect($referer);
 		}
 
 		$plannings = $planningRepository->findBy(
@@ -128,7 +129,8 @@ class ProjectController extends Controller
 
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Erreur : projet non trouvé');
-			return $this->redirectToRoute('project_index');
+			$referer = $request->headers->get('referer');
+			return $this->redirect($referer);
 		}
 
 		$form = $this->createForm(ProjectType::class,$project);
@@ -152,12 +154,13 @@ class ProjectController extends Controller
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
+		$referer = $request->headers->get('referer');
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Erreur : projet non trouvé');
-			return $this->redirectToRoute('project_index');
+			return $this->redirect($referer);
 		}
 
 		$project->setArchived(!$project->isArchived());
@@ -167,7 +170,7 @@ class ProjectController extends Controller
 		}else{
 			$this->addFlash('success','Projet archivé');
 		}
-		return $this->redirectToRoute('project_index');
+		return $this->redirect($referer);
 	}
 
 	/**
@@ -190,7 +193,8 @@ class ProjectController extends Controller
 		}else{
 			$this->addFlash('danger','Erreur : projet non trouvé');
 		}
-		return $this->redirectToRoute('project_index');
+		$referer = $request->headers->get('referer');
+		return $this->redirect($referer);
 	}
 
 	/**
@@ -238,7 +242,8 @@ class ProjectController extends Controller
 				$this->addFlash('warning','Vous devez archiver un projet avant de le supprimer');
 			}
 		}
-		return $this->redirectToRoute('project_index');
+		$referer = $request->headers->get('referer');
+		return $this->redirect($referer);
 	}
 
 }

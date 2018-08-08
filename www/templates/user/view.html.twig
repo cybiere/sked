@@ -26,18 +26,19 @@
 	<div class="col">
 		<table class="table table-sm table-hover">
 			<tr>
-				<th colspan="2">Tâches</th>
+				<th colspan="3">Tâches</th>
 			</tr>
 			{% for task in user.tasks %}
-			<tr>
+			<tr{% if task.done %} class="table-secondary"{% endif %}>
 				<td>{{ task.name }}</td>
 				<td>
+					{% if task.project %}
 					<a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a>
-					</td>
-
+					{% endif %}
+				</td>
+				<td class="actions"><a class="btn btn-sm btn-outline-{% if task.done %}secondary{% else %}warning{% endif %}" href="{{ path('task_toggleDone',{'taskId':task.id}) }}">Marquer comme {% if task.done %}non {% endif %}fait</a></td>
 			</tr>
 			{% endfor %}
-			<tr>
 		</table>
 	</div>
 </div>

@@ -146,12 +146,12 @@ class PlanningController extends Controller
 
 		if(!($planning = $planningRepository->find($planningId))){
 			$this->addFlash('danger','Erreur : élément de planning non trouvé');
-			return $this->redirectToRoute('planning_index');
+		}else{
+			$em->remove($planning);
+			$em->flush();
 		}
-
-		$em->remove($planning);
-		$em->flush();
-		return $this->redirectToRoute('planning_index');
+		$referer = $request->headers->get('referer');
+		return $this->redirect($referer);
 	}
 
 	/**
@@ -166,12 +166,13 @@ class PlanningController extends Controller
 
 		if(!($planning = $planningRepository->find($planningId))){
 			$this->addFlash('danger','Erreur : élément de planning non trouvé');
-			return $this->redirectToRoute('planning_index');
+		}else{
+			$planning->setConfirmed($planning->isConfirmed()?false:true);
+			$em->flush();
 		}
 
-		$planning->setConfirmed($planning->isConfirmed()?false:true);
-		$em->flush();
-		return $this->redirectToRoute('planning_index');
+		$referer = $request->headers->get('referer');
+		return $this->redirect($referer);
 	}
 
 
