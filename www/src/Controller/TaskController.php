@@ -27,8 +27,14 @@ class TaskController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
 
-		if(!($task = $taskRepository->find($taskId)))
+		if(($task = $taskRepository->find($taskId))){
+			if($task->isClosed()){
+				$this->addFlash('danger','Impossible de modifier une tâche clôturée');
+				return $this->redirectToRoute('task_index');
+			}
+		}else{
 			$task = new Task();
+		}
 
 		$form = $this->createForm(TaskType::class,$task);
 		$form->handleRequest($request);
@@ -95,13 +101,18 @@ class TaskController extends Controller
 	/**
 	 * @Route("/edit/{taskId}", name="task_edit", defaults={"taskId"=0},requirements={"taskId"="\d+"})
 	 */
-	public function edit(Request $request, $taskId=0)
-	{
+	public function edit(Request $request, $taskId=0){
+		$referer = $request->headers->get('referer');
 		$em = $this->getDoctrine()->getManager();
 		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
 
 		if(!($task = $taskRepository->find($taskId))){
 			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		if($task->isClosed()){
+			$this->addFlash('danger','Impossible de modifier une tâche clôturée');
+			return $this->redirect($referer);
 		}
 
 		if(!$this->get('session')->get('user')->isAdmin() && !($task->getProject() != null && $task->getProject()->getProjectManager() != null && $task->getProject()->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
