@@ -18,9 +18,14 @@
 		<th>Réalisée</th>
 		<th class="actions">Actions</th>
 	</tr>
+	<tr>
+		<th colspan="5">
+			Tâches ouvertes
+		</th>
+	</tr>
 	</thead>
 	<tbody>
-		{% for task in tasks %}
+		{% for task in tasks if not task.closed %}
 		<tr{% if task.done %} class="table-secondary"{% endif %}>
 			<td><a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a></td>
 			<td>{{ task.name }}</td>
@@ -29,11 +34,33 @@
 			<td class="actions">
 				<a href="{{ path('task_index',{'taskId':task.id})}}"><i title='Modifier' class='fas fa-edit'></i></a>
 				<a href="{{ path('task_toggleDone',{'taskId':task.id})}}"><i title='Marquer comme réalisée' class='fas fa-check-circle'></i></a>
+				<a href="{{ path('task_toggleClosed',{'taskId':task.id}) }}"><span class="fas fa-lock{% if task.closed %}-open{% endif %}"></span></a>
 			</td>
 		</tr>
 		{% endfor %}
 	</tbody>
-</table>
+	<thead>
+	<tr>
+		<th colspan="5">
+			Tâches clôturées
+		</th>
+	</tr>
+	</thead>
+	<tbody>
+		{% for task in tasks if task.closed %}
+		<tr{% if task.done %} class="table-secondary"{% endif %}>
+			<td><a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a></td>
+			<td>{{ task.name }}</td>
+			<td>{% if task.assignedTo %}{{ task.assignedTo.fullname }}{% endif %}</td>
+			<td>{% if task.done %}<span class="fas fa-check-circle"></span>{% endif %}</td>
+			<td class="actions">
+				<a href="{{ path('task_index',{'taskId':task.id})}}"><i title='Modifier' class='fas fa-edit'></i></a>
+				<a href="{{ path('task_toggleDone',{'taskId':task.id})}}"><i title='Marquer comme réalisée' class='fas fa-check-circle'></i></a>
+				<a href="{{ path('task_toggleClosed',{'taskId':task.id}) }}"><span class="fas fa-lock{% if task.closed %}-open{% endif %}"></span></a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
 </table>
 {% endblock %}
 
