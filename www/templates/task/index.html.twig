@@ -34,7 +34,7 @@
 			<td class="actions">
 				<a href="{{ path('task_index',{'taskId':task.id})}}"><i title='Modifier' class='fas fa-edit'></i></a>
 				<a href="{{ path('task_toggleDone',{'taskId':task.id})}}"><i title='Marquer comme réalisée' class='fas fa-check-circle'></i></a>
-				<a href="{{ path('task_toggleClosed',{'taskId':task.id}) }}"><span class="fas fa-lock{% if task.closed %}-open{% endif %}"></span></a>
+				<a href="{{ path('task_toggleClosed',{'taskId':task.id}) }}"><span class="fas fa-lock"></span></a>
 			</td>
 		</tr>
 		{% endfor %}
@@ -56,7 +56,8 @@
 			<td class="actions">
 				<a href="{{ path('task_index',{'taskId':task.id})}}"><i title='Modifier' class='fas fa-edit'></i></a>
 				<a href="{{ path('task_toggleDone',{'taskId':task.id})}}"><i title='Marquer comme réalisée' class='fas fa-check-circle'></i></a>
-				<a href="{{ path('task_toggleClosed',{'taskId':task.id}) }}"><span class="fas fa-lock{% if task.closed %}-open{% endif %}"></span></a>
+				<a href="{{ path('task_toggleClosed',{'taskId':task.id}) }}"><span class="fas fa-lock-open"></span></a>
+				<a href="{{ path('task_del',{'taskId':task.id}) }}" class="text-danger"><span class="fas fa-trash"></span></a>
 			</td>
 		</tr>
 		{% endfor %}

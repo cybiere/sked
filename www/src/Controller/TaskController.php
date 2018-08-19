@@ -83,7 +83,7 @@ class TaskController extends Controller
 			$this->addFlash('danger','Erreur : tâche non trouvée');
 			return $this->redirect($referer);
 		}
-		if(!$this->get('session')->get('user')->isAdmin() && ($task->getProject() == NULL || $task->getProject()->getProjectManager()->getId() != $this->get('session')->get('user')->getId())){
+		if(!$this->get('session')->get('user')->isAdmin() && !($task->getProject() != null && $task->getProject()->getProjectManager() != null && $task->getProject()->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
@@ -123,4 +123,32 @@ class TaskController extends Controller
 			'form' => $form->createView()
 		]);
 	}
+
+	/**
+	 * @Route("/del/{taskId}", name="task_del", defaults={"taskId"=0},requirements={"taskId"="\d+"})
+	 */
+	public function del(Request $request, $taskId=0){
+		$referer = $request->headers->get('referer');
+		$em = $this->getDoctrine()->getManager();
+		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+
+		if(!($task = $taskRepository->find($taskId))){
+			$this->addFlash('danger','Erreur : tâche non trouvée');
+			return $this->redirect($referer);
+		}
+
+		if(!$this->get('session')->get('user')->isAdmin() && !($task->getProject() != null && $task->getProject()->getProjectManager() != null && $task->getProject()->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		if(!$task->isClosed()){
+			$this->addFlash('danger',"Une tâche doit être fermée avant d'être supprimée.");
+		}else{
+			$em->remove($task);
+			$em->flush();
+			$this->addFlash('success','Tâche supprimée');
+		}
+		return $this->redirect($referer);
+	}
+
 }

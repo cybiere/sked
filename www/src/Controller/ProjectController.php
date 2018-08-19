@@ -76,9 +76,7 @@ class ProjectController extends Controller
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			if($this->get('session')->get('user')->isAdmin() || ($project->getProjectManager() != null && $project->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
-				if($task->getProject() != $project){
-					throw $this->createNotFoundException("Cette page n'existe pas");
-				}
+				$task->setProject($project);
 				$em->persist($task);
 				$em->flush();
 				$this->addFlash('success','Tâche enregistrée');
