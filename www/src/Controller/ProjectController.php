@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Project;
 use App\Entity\Planning;
 use App\Form\ProjectType;
+use App\Entity\Task;
+use App\Form\TaskType;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -69,6 +71,24 @@ class ProjectController extends Controller
 			return $this->redirect($referer);
 		}
 
+		$task = new Task();
+		$form = $this->createForm(TaskType::class,$task,["project"=>$project]);
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			if($this->get('session')->get('user')->isAdmin() || ($project->getProjectManager() != null && $project->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
+				if($task->getProject() != $project){
+					throw $this->createNotFoundException("Cette page n'existe pas");
+				}
+				$em->persist($task);
+				$em->flush();
+				$this->addFlash('success','Tâche enregistrée');
+				$task = new Task();
+				$form = $this->createForm(TaskType::class,$task,['project'=>$project]);
+			}else{
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
+		}
+
 		$plannings = $planningRepository->findBy(
 			array('project'=>$projectId),
 			array('startDate'=>'ASC','startHour'=>'ASC'));
@@ -95,7 +115,7 @@ class ProjectController extends Controller
 			$easterMonth = date('n', $easterDate);
 			$easterYear  = date('Y', $easterDate);
 
-				// Dates fixes
+			// Dates fixes
 			$holidays[] = mktime(0, 0, 0, 1,  1,  $year);  // 1er janvier
 			$holidays[] = mktime(0, 0, 0, 5,  1,  $year);  // Fête du travail
 			$holidays[] = mktime(0, 0, 0, 5,  8,  $year);  // Victoire des alliés
@@ -105,14 +125,14 @@ class ProjectController extends Controller
 			$holidays[] = mktime(0, 0, 0, 11, 11, $year);  // Armistice
 			$holidays[] = mktime(0, 0, 0, 12, 25, $year);  // Noel
 
-				// Dates variables
+			// Dates variables
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 1,  $easterYear);
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 39, $easterYear);
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 50, $easterYear);
 		}
 		sort($holidays);
 
-		return $this->render('project/view.html.twig',array('project'=>$project,'plannings'=>$plannings,'users'=>$users,'holidays'=>$holidays));
+		return $this->render('project/view.html.twig',array('project'=>$project,'plannings'=>$plannings,'users'=>$users,'holidays'=>$holidays,'form'=>$form->createView()));
 	}
 
 

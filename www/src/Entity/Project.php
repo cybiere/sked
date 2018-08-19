@@ -84,7 +84,7 @@ class Project
     }
 
 	public function __toString(){
-		return $this->name." (".$this->reference.")";
+		return $this->client.' - '.$this->name;
 	}
 
 	public function getId(){

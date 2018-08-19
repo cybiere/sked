@@ -11,6 +11,35 @@
 	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('project_edit',{'projectId':project.id})}}">Modifier</a>
 	{% endif %}
 </h1>
+
+{% if app.session.get('user').admin or (project.projectManager and project.projectManager.id == app.session.get('user').id) %}
+<div class="modal fade" id="addTask_Modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+		  <h5 class="modal-title" id="addTask_ModalLabel">Ajouter une tâche</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+	{{ form_start(form) }}
+      <div class="modal-body">
+		{{ form_errors(form) }}
+		{{ form_row(form.project) }}
+		{{ form_row(form.name) }}
+		{{ form_row(form.assignedTo) }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+		{{ form_widget(form.save) }}
+      </div>
+	{{ form_end(form) }}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
 <hr />
 <h2>Informations</h2>
 <div class="row">
@@ -53,7 +82,15 @@
 				<th></th>
 				<th>Terminé</th>
 				<th>Clôturé</th>
-				<th class="actions">Actions</th>
+				<th class="actions">
+					{% if app.session.get('user').admin or (project.projectManager and project.projectManager.id == app.session.get('user').id) %}
+						<button type="button" class="btn btn-sm btn-outline-success" data-toggle="modal" data-target="#addTask_Modal">
+						Ajouter
+						</button>
+					{% else %}
+						Actions
+					{% endif %}
+				</th>
 			</tr>
 			{% for task in project.tasks %}
 			<tr{% if task.done %} class="table-secondary"{% endif %}>
@@ -69,10 +106,10 @@
 				<td>{% if task.done %}<span class="fas fa-check-circle"></span>{% endif %}</td>
 				<td>{% if task.closed %}<span class="fas fa-lock"></span>{% endif %}</td>
 				<td class="actions">
-					{% if not task.closed and (task.assignedTo.id == app.session.get('user').id or app.session.get('user').admin or task.project.projectManager.id == app.session.get('user').id) %}
+					{% if not task.closed and ((task.assignedTo and task.assignedTo.id == app.session.get('user').id) or app.session.get('user').admin or (project.projectManager and project.projectManager.id == app.session.get('user').id)) %}
 						<a href="{{ path('task_toggleDone',{'taskId':task.id}) }}"><span class="fas fa-check-circle"></span></a>
 					{% endif %}
-					{% if task.project.projectManager.id == app.session.get('user').id or app.session.get('user').admin %}
+					{% if (project.projectManager and project.projectManager.id == app.session.get('user').id) or app.session.get('user').admin %}
 					<a href="{{ path('task_toggleClosed',{'taskId':task.id}) }}"><span class="fas fa-lock{% if task.closed %}-open{% endif %}"></span></a>
 					{% endif %}
 				</td>
