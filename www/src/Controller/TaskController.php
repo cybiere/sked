@@ -91,4 +91,36 @@ class TaskController extends Controller
 		$em->flush();
 		return $this->redirect($referer);
 	}
+
+	/**
+	 * @Route("/edit/{taskId}", name="task_edit", defaults={"taskId"=0},requirements={"taskId"="\d+"})
+	 */
+	public function edit(Request $request, $taskId=0)
+	{
+		$em = $this->getDoctrine()->getManager();
+		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+
+		if(!($task = $taskRepository->find($taskId))){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		if(!$this->get('session')->get('user')->isAdmin() && !($task->getProject() != null && $task->getProject()->getProjectManager() != null && $task->getProject()->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$form = $this->createForm(TaskType::class,$task,["project"=>$task->getProject()]);
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$em->persist($task);
+			$em->flush();
+			$this->addFlash('success','Tâche enregistrée');
+			if($task->getProject())
+				return $this->redirectToRoute('project_view',['projectId'=>$task->getProject()->getId()]);
+			return $this->redirectToRoute('task_index');
+		}
+
+		return $this->render('task/edit.html.twig', [
+			'form' => $form->createView()
+		]);
+	}
 }

@@ -110,6 +110,7 @@
 						<a href="{{ path('task_toggleDone',{'taskId':task.id}) }}"><span class="fas fa-check-circle"></span></a>
 					{% endif %}
 					{% if (project.projectManager and project.projectManager.id == app.session.get('user').id) or app.session.get('user').admin %}
+					<a href="{{ path('task_edit',{'taskId':task.id}) }}"><span class="fas fa-edit"></span></a>
 					<a href="{{ path('task_toggleClosed',{'taskId':task.id}) }}"><span class="fas fa-lock{% if task.closed %}-open{% endif %}"></span></a>
 					{% endif %}
 				</td>
