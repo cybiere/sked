@@ -43,6 +43,16 @@ class Task
      */
 	private $closed=false;
 
+	/**
+     * @ORM\Column(type="string", length=1000, nullable=true)
+     */
+	private $comments;
+
+	/**
+     * @ORM\Column(type="decimal", precision=7, scale=2, nullable=true)
+     */
+	private $nbDays;
+
 
 	public function getId(){
 		return $this->id;
@@ -86,6 +96,23 @@ class Task
 
 	public function setClosed($isClosed){
 		$this->closed = $isClosed?true:false;
+	}
+
+	public function getComments(){
+		return $this->comments;
+	}
+
+	public function setComments($comments){
+		$this->comments = $comments;
+	}
+
+	public function getNbDays(){
+		return $this->nbDays;
+	}
+
+	public function setNbDays($nbDays){
+		if($nbDays < 0) $nbDays=0;
+		$this->nbDays = $nbDays;
 	}
 
 }

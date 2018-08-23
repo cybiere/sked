@@ -28,6 +28,8 @@
 		{{ form_row(form.project) }}
 		{{ form_row(form.name) }}
 		{{ form_row(form.assignedTo) }}
+		{{ form_row(form.nbDays) }}
+		{{ form_row(form.comments) }}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
@@ -80,6 +82,7 @@
 			<tr>
 				<th>Tâches</th>
 				<th></th>
+				<th></th>
 				<th>Terminé</th>
 				<th>Clôturé</th>
 				<th class="actions">
@@ -94,7 +97,7 @@
 			</tr>
 			{% for task in project.tasks %}
 			<tr{% if task.done %} class="table-secondary"{% endif %}>
-				<td>{{ task.name }}</td>
+				<td>{% if task.comments %}<a href="#" data-toggle="tooltip" title="{{ task.comments }}">{{ task.name }}</a>{% else %}{{ task.name }}{% endif %}</td>
 				<td>{% if task.assignedTo %}
 					{% if app.session.get('user').admin %}
 					<a href="{{ path('user_view',{'userId':task.assignedTo.id}) }}">{{ task.assignedTo.fullname }}</a>
@@ -103,6 +106,7 @@
 					{% endif %}
 					{% endif %}
 				</td>
+				<td>{% if task.nbDays %}{{ task.nbDays }}jh{% endif %}</td>
 				<td>{% if task.done %}<span class="fas fa-check-circle"></span>{% endif %}</td>
 				<td>{% if task.closed %}<span class="fas fa-lock"></span>{% endif %}</td>
 				<td class="actions">

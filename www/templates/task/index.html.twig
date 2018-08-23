@@ -14,6 +14,7 @@
 	<tr>
 		<th>Projet</th>
 		<th>Tâche</th>
+		<th>Nb. jours</th>
 		<th>Assignation</th>
 		<th>Réalisée</th>
 		<th class="actions">Actions</th>
@@ -28,7 +29,8 @@
 		{% for task in tasks if not task.closed %}
 		<tr{% if task.done %} class="table-secondary"{% endif %}>
 			<td>{% if task.project %}<a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}{% endif %}</a></td>
-			<td>{{ task.name }}</td>
+			<td>{% if task.comments %}<a href="#" data-toggle="tooltip" title="{{ task.comments }}">{{ task.name }}</a>{% else %}{{ task.name }}{% endif %}</td>
+			<td>{% if task.nbDays %}{{ task.nbDays }}{% endif %}</td>
 			<td>{% if task.assignedTo %}{{ task.assignedTo.fullname }}{% endif %}</td>
 			<td>{% if task.done %}<span class="fas fa-check-circle"></span>{% endif %}</td>
 			<td class="actions">
@@ -41,7 +43,7 @@
 	</tbody>
 	<thead>
 	<tr>
-		<th colspan="5">
+		<th colspan="6">
 			Tâches clôturées
 		</th>
 	</tr>
@@ -50,7 +52,8 @@
 		{% for task in tasks if task.closed %}
 		<tr{% if task.done %} class="table-secondary"{% endif %}>
 			<td>{% if task.project %}<a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a>{% endif %}</td>
-			<td>{{ task.name }}</td>
+			<td>{% if task.comments %}<a href="#" data-toggle="tooltip" title="{{ task.comments }}">{{ task.name }}</a>{% else %}{{ task.name }}{% endif %}</td>
+			<td>{% if task.nbDays %}{{ task.nbDays }}{% endif %}</td>
 			<td>{% if task.assignedTo %}{{ task.assignedTo.fullname }}{% endif %}</td>
 			<td>{% if task.done %}<span class="fas fa-check-circle"></span>{% endif %}</td>
 			<td class="actions">

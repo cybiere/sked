@@ -9,6 +9,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class TaskType extends AbstractType
 {
@@ -22,6 +24,8 @@ class TaskType extends AbstractType
         $builder
             ->add('name',null,array('label'=>'Nom de la tâche'))
             ->add('assignedTo',null,array('label'=>'Assignée à'))
+            ->add('nbDays',NumberType::class,array('required'=>false,'label'=>'Jours vendus'))
+            ->add('comments',TextareaType::class,array('required'=>false,'label'=>'Commentaires'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
 		;
     }
