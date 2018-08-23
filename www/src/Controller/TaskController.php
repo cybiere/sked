@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\TaskType;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -161,5 +162,29 @@ class TaskController extends Controller
 		}
 		return $this->redirect($referer);
 	}
+
+	/**
+	 * @Route("/byproject/{projectId}",name="tasks_byproject")
+	 */
+	public function resize(Request $request,$projectId){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		$em = $this->getDoctrine()->getManager();
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+
+		if(!($project = $projectRepository->find($projectId))){
+			$arrData = ['success' => false, 'errormsg' => 'Projet non trouvé'];
+		}else{
+			$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+			$tasks = $taskRepository->findByProject($project);
+			$arrData = ['success' => true,'tasks'=> array()];
+			foreach($tasks as $task){
+				$arrData['tasks'][] = ['id' => $task->getId(), 'name' => $task->getName()];
+			}
+		}
+		return new JsonResponse($arrData);
+	}
+
 
 }

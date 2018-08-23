@@ -345,6 +345,12 @@ function addPlanning(){
 	$('#addPlanning_form').submit();
 }
 
+$('#addForm_projectId').change(function(){
+	if($(this).val() != 0){
+		alert('change');
+	}
+});
+
 					{% endif %}
 </script>
 
