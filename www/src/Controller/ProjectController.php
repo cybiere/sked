@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Project;
 use App\Entity\Planning;
 use App\Form\ProjectType;
+use App\Entity\Task;
+use App\Form\TaskType;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -58,14 +60,31 @@ class ProjectController extends Controller
 	/**
 	 * @Route("/{projectId}", name="project_view", defaults={"projectId"=0},requirements={"projectId"="\d+"})
 	 */
-	public function view($projectId){
+	public function view(Request $request, $projectId){
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
 
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Erreur : projet non trouvé');
-			return $this->redirectToRoute('project_index');
+			$referer = $request->headers->get('referer');
+			return $this->redirect($referer);
+		}
+
+		$task = new Task();
+		$form = $this->createForm(TaskType::class,$task,["project"=>$project]);
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			if($this->get('session')->get('user')->isAdmin() || ($project->getProjectManager() != null && $project->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
+				$task->setProject($project);
+				$em->persist($task);
+				$em->flush();
+				$this->addFlash('success','Tâche enregistrée');
+				$task = new Task();
+				$form = $this->createForm(TaskType::class,$task,['project'=>$project]);
+			}else{
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
 		}
 
 		$plannings = $planningRepository->findBy(
@@ -94,7 +113,7 @@ class ProjectController extends Controller
 			$easterMonth = date('n', $easterDate);
 			$easterYear  = date('Y', $easterDate);
 
-				// Dates fixes
+			// Dates fixes
 			$holidays[] = mktime(0, 0, 0, 1,  1,  $year);  // 1er janvier
 			$holidays[] = mktime(0, 0, 0, 5,  1,  $year);  // Fête du travail
 			$holidays[] = mktime(0, 0, 0, 5,  8,  $year);  // Victoire des alliés
@@ -104,14 +123,14 @@ class ProjectController extends Controller
 			$holidays[] = mktime(0, 0, 0, 11, 11, $year);  // Armistice
 			$holidays[] = mktime(0, 0, 0, 12, 25, $year);  // Noel
 
-				// Dates variables
+			// Dates variables
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 1,  $easterYear);
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 39, $easterYear);
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 50, $easterYear);
 		}
 		sort($holidays);
 
-		return $this->render('project/view.html.twig',array('project'=>$project,'plannings'=>$plannings,'users'=>$users,'holidays'=>$holidays));
+		return $this->render('project/view.html.twig',array('project'=>$project,'plannings'=>$plannings,'users'=>$users,'holidays'=>$holidays,'form'=>$form->createView()));
 	}
 
 
@@ -128,7 +147,8 @@ class ProjectController extends Controller
 
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Erreur : projet non trouvé');
-			return $this->redirectToRoute('project_index');
+			$referer = $request->headers->get('referer');
+			return $this->redirect($referer);
 		}
 
 		$form = $this->createForm(ProjectType::class,$project);
@@ -152,12 +172,13 @@ class ProjectController extends Controller
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
+		$referer = $request->headers->get('referer');
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Erreur : projet non trouvé');
-			return $this->redirectToRoute('project_index');
+			return $this->redirect($referer);
 		}
 
 		$project->setArchived(!$project->isArchived());
@@ -167,7 +188,7 @@ class ProjectController extends Controller
 		}else{
 			$this->addFlash('success','Projet archivé');
 		}
-		return $this->redirectToRoute('project_index');
+		return $this->redirect($referer);
 	}
 
 	/**
@@ -190,7 +211,8 @@ class ProjectController extends Controller
 		}else{
 			$this->addFlash('danger','Erreur : projet non trouvé');
 		}
-		return $this->redirectToRoute('project_index');
+		$referer = $request->headers->get('referer');
+		return $this->redirect($referer);
 	}
 
 	/**
@@ -238,7 +260,8 @@ class ProjectController extends Controller
 				$this->addFlash('warning','Vous devez archiver un projet avant de le supprimer');
 			}
 		}
-		return $this->redirectToRoute('project_index');
+		$referer = $request->headers->get('referer');
+		return $this->redirect($referer);
 	}
 
 }

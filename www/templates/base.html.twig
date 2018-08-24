@@ -5,7 +5,21 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta name="description" content="">
 		<meta name="author" content="">
-		<link rel="icon" href="../../../../favicon.ico">
+
+		<link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+		<link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+		<link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+		<link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+		<link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+		<link rel="icon" type="image/png" sizes="192x192"  href="/favicon/android-icon-192x192.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+		<meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
 
 		<title>Sked - {% block pageTitle %}Accueil{% endblock %}</title>
 
@@ -20,7 +34,7 @@
 	<body>
 
 		<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-			<a class="navbar-brand" href="{{ path('planning_index')}}" title="Sked v1.0.8"><img src="/img/logo_sked_light.png" alt="Logo Sked" /> Sked</a>
+			<a class="navbar-brand" href="{{ path('planning_index')}}" title="Sked v1.1.0"><img src="/img/logo_sked_light.png" alt="Logo Sked" /> Sked</a>
 
 			<div class="collapse navbar-collapse">
 				<ul class="navbar-nav mr-auto">
@@ -31,6 +45,9 @@
 						<a class="nav-link" href="{{ path('project_index') }}">Projets</a>
 					</li>
 					{% if app.session.get('user').admin %}
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["task_index"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('task_index') }}">Tâches</a>
+					</li>
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_index"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('user_index') }}">Utilisateurs</a>
 					</li>
@@ -80,12 +97,12 @@
 				$(this).popover('toggle')
 				return false;
 			});
-			$( "#helpBtn" ).on('blur',function() {
-				$(this).popover('hide')
-			});
-			$(function () {
-				$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
-			})
+$( "#helpBtn" ).on('blur',function() {
+	$(this).popover('hide')
+});
+$(function () {
+	$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
+})
 		</script>
 		{% block extraJs %}{% endblock %}
 	</body>

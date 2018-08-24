@@ -20,6 +20,7 @@ class PlanningType extends AbstractType
             ->add('meeting',null,array('label'=>'Réunion'))
             ->add('confirmed',null,array('label'=>'Confirmé'))
             ->add('project',null,array('label'=>'Projet'))
+            ->add('task',null,array('label'=>'Tâche'))
             ->add('user',null,array('label'=>'Ressource'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
         ;

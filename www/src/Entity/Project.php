@@ -66,8 +66,13 @@ class Project
 	private $plannings;
 
 	/**
+     * @ORM\OneToMany(targetEntity="App\Entity\Task", mappedBy="project", orphanRemoval=true)
+	 */
+	private $tasks;
+
+	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="managedProjects")
-	 * @ORM\JoinColumn(nullable=true)
+	 * @ORM\JoinColumn(nullable=true,onDelete="SET NULL")
      */
 	private $projectManager;
 
@@ -75,10 +80,11 @@ class Project
     public function __construct()
     {
         $this->plannings = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
     }
 
 	public function __toString(){
-		return $this->name." (".$this->reference.")";
+		return $this->client.' - '.$this->name;
 	}
 
 	public function getId(){
@@ -158,6 +164,13 @@ class Project
     public function getPlannings()
     {
         return $this->plannings;
+	}
+
+	/**
+     * @return Collection|Task[]
+     */
+    public function getTasks(){
+        return $this->tasks;
 	}
 
 	public function getPlannedDays(){

@@ -85,7 +85,7 @@
 			<th>Responsable projet</th>
 			<th>Jours définis</th>
 			<th>Jours planifiés</th>
-			<th>Actions</th>
+			<th class="actions">Actions</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -103,7 +103,7 @@
 				{% endif %}</td>
 			<td>{{ project.nbDays }}</td>
 			<td>{{ project.plannedDays }}</td>
-			<td>
+			<td class="actions">
 				<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
 				{% if app.session.get('user').admin %}
 				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
@@ -125,7 +125,7 @@
 			<th>Code projet</th>
 			<th>Nom du projet</th>
 			<th>Client</th>
-			<th>Actions</th>
+			<th class="actions">Actions</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -134,7 +134,7 @@
 			<td>{{ project.reference }}</td>
 			<td>{{ project.name }}</td>
 			<td>{{ project.client }}</td>
-			<td>
+			<td class="actions">
 				<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
 				{% if app.session.get('user').admin %}
 				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>

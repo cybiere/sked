@@ -23,6 +23,25 @@
 			{% endfor %}
 		</table>
 	</div>
+	<div class="col">
+		<table class="table table-sm table-hover">
+			<tr>
+				<th colspan="4">Tâches</th>
+			</tr>
+			{% for task in user.tasks %}
+			<tr{% if task.done %} class="table-secondary"{% endif %}>
+				<td>
+					{% if task.project %}
+					<a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a>
+					{% endif %}
+				</td>
+				<td>{% if task.comments %}<a href="#" data-toggle="tooltip" title="{{ task.comments }}">{{ task.name }}</a>{% else %}{{ task.name }}{% endif %}</td>
+				<td>{% if task.nbDays %}{{ task.nbDays }}jh{% endif %}</td>
+				<td class="actions">{% if not task.closed %}<a class="btn btn-sm btn-outline-{% if task.done %}secondary{% else %}warning{% endif %}" href="{{ path('task_toggleDone',{'taskId':task.id}) }}">Marquer comme {% if task.done %}non {% endif %}fait</a>{% else %}<span class="fas fa-lock"></span>{% endif %}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
 </div>
 <div class="userPlannings">
 	<h2>Planning</h2>
@@ -88,9 +107,9 @@
 
 {% block extraJs %}
 <script>
-$('.project').each(function(index){
-	$(this).outerWidth($(this).parents('td').outerWidth()*$(this).data("duration")-3);
-});
+	$('.project').each(function(index){
+		$(this).outerWidth($(this).parents('td').outerWidth()*$(this).data("duration")-3);
+	});
 $( ".project" ).contextmenu(function() {
 	$(this).popover('show')
 	return false;

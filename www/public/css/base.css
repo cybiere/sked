@@ -106,7 +106,10 @@ th.schedUser{
 .popover ul{
 	padding-left:1em;
 }
-.action {
+.actions {
+	text-align:right;
+}
+.popupaction {
 	text-align:center;
 }
 .billable {

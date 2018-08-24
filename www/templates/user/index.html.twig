@@ -12,7 +12,7 @@
 
 <h2>Utilisateurs existants</h2>
 <table class="table table-sm table-hover">
-	<tr><th>id</th><th>Nom complet</th><th>Nom d'utilisateur</th><th>Ressource</th><th>Admin</th><th>Actions</th></tr>
+	<tr><th>id</th><th>Nom complet</th><th>Nom d'utilisateur</th><th>Ressource</th><th>Admin</th><th class="actions">Actions</th></tr>
 	{% for user in users %}
 	<tr {% if user.id == app.session.get('user').id %}class="table-info"{% endif %}>
 		<td>{{user.id}}</td>
@@ -28,7 +28,7 @@
 				<span class="badge badge-warning">Admin</span>
 			{% endif %}
 		</td>
-		<td>
+		<td class="actions">
 			<a href="{{ path("user_toggleResource",{'userid':user.id}) }}"><i class='fas fa-user-circle'></i></a>
 			<a href="{{ path("user_toggleAdmin",{'userid':user.id}) }}"><i class='fas fa-chess-king'></i></a>
 			<a href="{{ path("user_del",{'username':user.username}) }}"><i class='fas fa-trash'</a>
