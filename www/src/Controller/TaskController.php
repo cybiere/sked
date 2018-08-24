@@ -164,7 +164,7 @@ class TaskController extends Controller
 	}
 
 	/**
-	 * @Route("/byproject/{projectId}",name="tasks_byproject")
+	 * @Route("/byproject/{projectId}",name="task_byproject")
 	 */
 	public function resize(Request $request,$projectId){
 		if(!$this->get('session')->get('user')->isAdmin()){

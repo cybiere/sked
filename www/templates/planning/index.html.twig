@@ -98,6 +98,13 @@
 								{% endfor %}
 							</select>
 						</dd>
+					<dt class="col-sm-5">Tâche :</dt>
+						<dd class="col-sm-7">
+							<select id="addForm_taskId" disabled="disabled">
+								<option value="0" id="nullTask"></option>
+							</select>
+						</dd>
+
 				</dl>
 			</div>
 			<div class="modal-footer">
@@ -347,7 +354,30 @@ function addPlanning(){
 
 $('#addForm_projectId').change(function(){
 	if($(this).val() != 0){
-		alert('change');
+		$('#addForm_taskId').prop("disabled",true);
+		$('#addForm_taskId').val(0).change();
+		$('#addForm_taskId').find('option').not('#nullTask').remove();
+		url= "{{ path("task_byproject",{"projectId":"idPlaceHold"}) }}";
+		url = url.replace("idPlaceHold",$(this).val());
+		$.ajax(url,{
+			async:false,
+			error:function(xhr,status,error){
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			},
+			success:function(data, status, xhr){
+				if(data.success){
+					data.tasks.forEach(function(e){
+						$('#addForm_taskId').append('<option value="' + e.id + '">' + e.name + '</option>');
+						$('#addForm_taskId').prop("disabled",false);
+					});
+				}else{
+					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+					$('#flashMessages').append(message);
+				}
+			}
+		});
+
 	}
 });
 
