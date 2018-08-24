@@ -53,6 +53,13 @@ class Planning
      */
 	private $user;
 
+	/**
+	 * @ORM\ManyToOne(targetEntity="App\Entity\Task", inversedBy="plannings")
+	 * @ORM\JoinColumn(nullable=true)
+     */
+	private $task;
+
+
 	public function getId(){
 		return $this->id;
 	}
@@ -118,4 +125,13 @@ class Planning
 	public function setUser($user){
 		$this->user = $user;
 	}
+
+	public function getTask(){
+		return $this->task;
+	}
+
+	public function setTask($task){
+		$this->task = $task;
+	}
+
 }

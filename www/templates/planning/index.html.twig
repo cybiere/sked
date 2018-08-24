@@ -344,6 +344,7 @@ function addPlanning(){
 	$('#planning_meeting').prop('checked',$('#addForm_meeting').prop('checked'));
 	$('#planning_confirmed').prop('checked',$('#addForm_confirmed').prop('checked'));
 	$('#planning_project').val($('#addForm_projectId').val());
+	$('#planning_task').val($('#addForm_taskId').val());
 	if(projectsRemaining[$('#addForm_projectId').val()] != null && $('#planning_nbSlices').val() > projectsRemaining[$('#addForm_projectId').val()]){
 		$('#addPlanning_Modal').modal('hide');
 		$('#overrun_Modal').modal();

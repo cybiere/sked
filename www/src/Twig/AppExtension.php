@@ -104,10 +104,13 @@ class AppExtension extends AbstractExtension
 		data-planningId="<?php echo htmlspecialchars($planning->getId()); ?>"
 		data-toggle="popover"
 		data-html="true"
-		title="<?php echo $planning->getProject() == NULL?"Absence":"<a href='".$this->router->generate('project_view',array("projectId"=>$planning->getProject()->getId()))."'>".htmlspecialchars($planning->getProject()->getName())."</a>"; ?>"
+		title="<?php if($planning->getTask() != NULL){if($planning->getTask()->getComments()){ echo "<a href='#' data-toggle='tooltip' title='".htmlspecialchars($planning->getTask()->getComments())."'>".htmlspecialchars($planning->getTask()->getName())."</a>";}else{echo htmlspecialchars($planning->getTask()->getName());}}else echo $planning->getProject() == NULL?"Absence":"<a href='".$this->router->generate('project_view',array("projectId"=>$planning->getProject()->getId()))."'>".htmlspecialchars($planning->getProject()->getName())."</a>"; ?>"
 		data-content="
 			<div class='row'>
 <?php if($planning->getProject() != NULL){ ?>
+<?php if($planning->getTask() != NULL){ ?>
+			<dt class='col-md-6'>Projet</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getName()); ?></dd>
+<?php } ?>
 			<dt class='col-md-6'>Code projet</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getReference()); ?></dd>
 			<dt class='col-md-6'>Client</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getClient()); ?></dd>
 			<dt class='col-md-6'>Responsable projet</dt><dd class='col-md-6'><?php if($planning->getProject()->getProjectManager()) echo htmlspecialchars($planning->getProject()->getProjectManager()->getFullname()); ?></dd>

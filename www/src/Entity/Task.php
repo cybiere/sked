@@ -4,17 +4,19 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TaskRepository")
  */
 class Task
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+	/**
+	 * @ORM\Id
+	 * @ORM\GeneratedValue
+	 * @ORM\Column(type="integer")
+	 */
+	private $id;
 
 	/**
 	 * @ORM\Column(type="string")
@@ -24,35 +26,43 @@ class Task
 	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="tasks")
 	 * @ORM\JoinColumn(nullable=true)
-     */
+	 */
 	private $project;
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="tasks")
 	 * @ORM\JoinColumn(nullable=true)
-     */
+	 */
 	private $assignedTo;
 
 	/**
-     * @ORM\Column(type="boolean")
-     */
+	 * @ORM\Column(type="boolean")
+	 */
 	private $done=false;
 
 	/**
-     * @ORM\Column(type="boolean")
-     */
+	 * @ORM\Column(type="boolean")
+	 */
 	private $closed=false;
 
 	/**
-     * @ORM\Column(type="string", length=1000, nullable=true)
-     */
+	 * @ORM\Column(type="string", length=1000, nullable=true)
+	 */
 	private $comments;
 
 	/**
-     * @ORM\Column(type="decimal", precision=7, scale=2, nullable=true)
-     */
+	 * @ORM\Column(type="decimal", precision=7, scale=2, nullable=true)
+	 */
 	private $nbDays;
 
+	/**
+	 * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="task", orphanRemoval=true)
+	 */
+	private $plannings;
+
+	public function __construct() {
+		$this->plannings = new ArrayCollection();
+	}
 
 	public function getId(){
 		return $this->id;
@@ -115,4 +125,15 @@ class Task
 		$this->nbDays = $nbDays;
 	}
 
+	/**
+	 * @return Collection|Planning[]
+	 */
+	public function getPlannings()
+	{
+		return $this->plannings;
+	}
+
+	public function __toString(){
+		return $this->name;
+	}
 }
