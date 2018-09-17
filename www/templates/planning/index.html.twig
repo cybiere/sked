@@ -122,8 +122,8 @@
 {% set nbMonths = 3 %}
 {% for i in range(0,nbMonths-1) %}
 
-{% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
-{% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
+{% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month")|date_modify("+5 hours") %}
+{% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month")|date_modify("+5 hours") %}
 {% set nbSlices = 0 %}
 <table class="table table-sm table-hover schedule">
 	<thead>
