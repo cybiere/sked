@@ -154,7 +154,7 @@
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
-					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
+					{% if planning.startDate|date('U') == x|date_modify('midnight')|date('U') and planning.startHour == "am" %}
 					{{ printPlanning(planning,app.session.get('user').admin) }}
 					{% endif %}
 					{% endfor %}
@@ -164,7 +164,7 @@
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
-					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
+					{% if planning.startDate|date('U') == x|date_modify('midnight')|date('U') and planning.startHour == "pm" %}
 					{{ printPlanning(planning,app.session.get('user').admin) }}
 					{% endif %}
 					{% endfor %}
