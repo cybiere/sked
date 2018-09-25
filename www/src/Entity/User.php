@@ -60,12 +60,18 @@ class User
 	 */
 	private $tasks;
 
+	/**
+     * @ORM\ManyToMany(targetEntity="Team", inversedBy="users")
+     * @ORM\JoinTable(name="users_teams")
+     */
+    private $teams;
 
     public function __construct()
     {
         $this->managedProjects = new ArrayCollection();
         $this->plannings = new ArrayCollection();
         $this->tasks = new ArrayCollection();
+        $this->teams = new ArrayCollection();
     }
 
 	public function __toString(){
