@@ -41,9 +41,15 @@ class Team
      */
 	private $parent;
 
+	/**
+     * @ORM\OneToMany(targetEntity="Project", mappedBy="team")
+	 */
+	private $projects;
+
 	public function __construct() {
         $this->users = new ArrayCollection();
         $this->children = new ArrayCollection();
+        $this->projects = new ArrayCollection();
     }
 
     public function getId()
@@ -103,6 +109,10 @@ class Team
 			return 0;
 		}
 		return $this->parent->getLevel() + 1;
+	}
+
+	public function getProjects(){
+		return $this->projects;
 	}
 
 	public function __toString(){

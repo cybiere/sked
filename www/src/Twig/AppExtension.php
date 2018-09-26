@@ -40,6 +40,7 @@ class AppExtension extends AbstractExtension
 			<div class="card-body">
 				<ul class="list-unstyled">
 					<li> <a href="<?php echo $this->router->generate('project_view',array("projectId"=>$project->getId())); ?>">Détails</a></li>
+					<?php if($project->getTeam()){ echo "<li> Équipe : ".htmlspecialchars($project->getTeam()->getName())."</li>"; } ?>
 					<li> Code projet : <?php echo htmlspecialchars($project->getReference()); ?></li>
 					<li> Nom : <?php echo htmlspecialchars($project->getName()); ?></li>
 					<li> Client : <?php echo htmlspecialchars($project->getClient()); ?></li>

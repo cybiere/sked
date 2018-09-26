@@ -17,6 +17,7 @@ class ProjectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('team',null,array('label'=>'Équipe','required'=>true))
             ->add('reference',null,array('label'=>'Code projet','attr' => array('maxlength' => 10)))
             ->add('name',null,array('label'=>'Nom du projet'))
             ->add('client',null,array('label'=>'Client'))

@@ -76,6 +76,11 @@ class Project
      */
 	private $projectManager;
 
+	/**
+	 * @ORM\ManyToOne(targetEntity="Team", inversedBy="projects")
+     */
+	private $team;
+
 
     public function __construct()
     {
@@ -183,6 +188,14 @@ class Project
 
 	public function setProjectManager($projectManager){
 		$this->projectManager = $projectManager;
+	}
+
+	public function getTeam(){
+		return $this->team;
+	}
+
+	public function setTeam($team){
+		$this->team = $team;
 	}
 
 	public function __toString(){
