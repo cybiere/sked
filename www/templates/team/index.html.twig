@@ -1,20 +1,40 @@
-{% extends 'base.html.twig' %}
+{% extends "base.html.twig" %}
 
-{% block title %}Hello {{ controller_name }}!{% endblock %}
+{% block pageTitle %}Equipes{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<h1>Gestion des équipes</h1>
+<h2>Ajouter une équipe</h2>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'src/Controller/TeamController.php'|file_link(0) }}">src/Controller/TeamController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'templates/team/index.html.twig'|file_link(0) }}">templates/team/index.html.twig</a></code></li>
-    </ul>
-</div>
+<h2>Équipes existantes</h2>
+<table class="table table-sm table-hover">
+	<tr><th>Nom</th><th>Nombre de membres</th></tr>
+	{% for team in teams %}
+	<tr>
+		<td>{{team.name}}</td>
+		<td>{{team.users|length}}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+{% endblock %}
+
+{% block helpContent %}
+<ul>
+	<li>Ressource : afficher l'utilisateur dans le tableau de planning</li>
+	<li>Admin : droit de modification et de suppression sur tous les éléments</li>
+	<li>Il n'est pas possible de supprimer un utilisateur administrateur</li>
+	<li>Il n'est pas possible de se retirer les droits utilisateurs</li>
+	<li>Actions d'administration
+		<ul>
+			<li><i class='fas fa-user-circle'></i>Donner/retirer le statut ressource</li>
+			<li><i class='fas fa-chess-king'></i>Donner/retirer le statut admin</li>
+			<li><i class='fas fa-trash'></i>Supprimer l'utilisateur</li>
+		</ul>
+	</li>
+</ul>
 {% endblock %}

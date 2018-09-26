@@ -51,6 +51,9 @@
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_index"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('user_index') }}">Utilisateurs</a>
 					</li>
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["team_index"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('team_index') }}">Équipes</a>
+					</li>
 					{% endif %}
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_view"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('user_view') }}">Mon profil</a>

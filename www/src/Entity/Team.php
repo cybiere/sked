@@ -24,6 +24,15 @@ class Team
      */
     private $name;
 
+	/**
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="teams")
+     */
+    private $users;
+
+	public function __construct() {
+        $this->users = new ArrayCollection();
+    }
+
     public function getId()
     {
         return $this->id;
@@ -41,12 +50,11 @@ class Team
         return $this;
 	}
 
-	/**
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="teams")
-     */
-    private $users;
+	public function getUsers(){
+		return $this->users;
+	}
 
-	public function __construct() {
-        $this->users = new ArrayCollection();
-    }
+	public function addUser(User $user){
+		$this->users[] = $user;
+	}
 }
