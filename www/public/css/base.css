@@ -164,4 +164,9 @@ th.schedUser{
 	width : 70px;
 	text-align:center;
 }
-
+.managerList:after{
+	content:", "
+}
+.managerList:last-child:after{
+	content:""
+}

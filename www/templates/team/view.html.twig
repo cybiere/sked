@@ -9,7 +9,7 @@
 <h1>Equipe {{ team.name }} 
 	<a class="btn btn-outline-dark float-right" href="{{ path('team_index')}}">Retour</a>
 	{% if app.session.get('user').admin %}
-	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('team_view',{'teamId':team.id})}}">Modifier</a>
+	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('team_index',{'teamId':team.id})}}">Modifier</a>
 	{% endif %}
 </h1>
 
@@ -43,6 +43,31 @@
 		</table>
 	</div>
 	<div class="col">
+		<table class="table">
+			<tr><th>Managers de l'équipe</th><th class="actions"></tr>
+			<tbody id="managers">
+			{% for user in team.managers %}
+			<tr>
+				<td>
+					{{ user.fullname }}
+				</td><td class="actions">
+					<a class="text-danger" href='{{ path('team_delManager',{"teamId":team.id,"userId":user.id}) }}'><i title="Supprimer" class="fas fa-trash"></i></a>
+				</td>
+			</tr>
+			{% endfor %}
+			</tbody>
+			<tr>
+				<td colspan="2">
+					<select id="addManagerId">
+						<option value="0"></option>
+						{% for user in users if user not in team.managers %}
+						<option value="{{ user.id }}">{{ user.fullname }}</option>
+						{% endfor %}
+					</select>
+					<button class="btn btn-sm btn-primary" id="addManager"><span class="fa fa-plus-circle"></span></button>
+				</td>
+			</tr>
+		</table>
 	</div>
 </div>
 {#
@@ -133,6 +158,32 @@ $('#addMember').click(function(e){
 					url = url.replace("idPlaceHold",newId);
 					$('#members').append('<tr><td> ' + $('#addMemberId option:selected').text() + '</td><td class="actions"><a class="text-danger" href="' + url + '"><i title="Supprimer" class="fas fa-trash"></i></a></td></tr>');
 					$("#addMemberId option[value='" + newId + "']").remove();
+				}else{
+					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+					$('#flashMessages').append(message);
+				}
+			}
+		});
+
+	}
+});
+$('#addManager').click(function(e){
+	newId = $('#addManagerId').val()
+	if(newId != 0){
+		url= "{{ path("team_addManager",{"teamId":team.id,"userId":"idPlaceHold"}) }}";
+		url = url.replace("idPlaceHold",newId);
+		$.ajax(url,{
+			async:false,
+			error:function(xhr,status,error){
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			},
+			success:function(data, status, xhr){
+				if(data.success){
+					url = "{{ path('team_delManager',{'teamId':team.id,'userId':'idPlaceHold'}) }}"
+					url = url.replace("idPlaceHold",newId);
+					$('#managers').append('<tr><td> ' + $('#addManagerId option:selected').text() + '</td><td class="actions"><a class="text-danger" href="' + url + '"><i title="Supprimer" class="fas fa-trash"></i></a></td></tr>');
+					$("#addManagerId option[value='" + newId + "']").remove();
 				}else{
 					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 					$('#flashMessages').append(message);

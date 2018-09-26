@@ -154,7 +154,7 @@ class AppExtension extends AbstractExtension
 		?>
 		</td>
 		<td><?php echo count($team->getUsers()); ?></td>
-		<td><?php echo "WIP"; ?></td>
+		<td><?php foreach($team->getManagers() as $user){ echo "<span class='managerList'>".htmlspecialchars($user->getFullname())."</span>";} ?></td>
 		<td class="actions">
 			<a href='<?php echo $this->router->generate('team_view',array("teamId"=>$team->getId())); ?>'><i title='Détails' class='fa fa-search'></i></a>
 			<a href='<?php echo $this->router->generate('team_index',array("teamId"=>$team->getId())); ?>'><i title='Modifier' class='fas fa-edit'></i></a>

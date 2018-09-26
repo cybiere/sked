@@ -65,6 +65,11 @@ class User
      */
     private $teams;
 
+	/**
+     * @ORM\ManyToMany(targetEntity="Team", mappedBy="managers")
+     */
+    private $managedTeams;
+
     public function __construct()
     {
         $this->managedProjects = new ArrayCollection();
@@ -151,5 +156,13 @@ class User
     public function getTeams()
     {
 		return $this->teams;
+	}
+
+	/**
+     * @return Collection|Team[]
+     */
+    public function getManagedTeams()
+    {
+		return $this->managedTeams;
 	}
 }

@@ -31,6 +31,12 @@ class Team
     private $users;
 
 	/**
+     * @ORM\ManyToMany(targetEntity="User", inversedBy="managedTeams")
+     * @ORM\JoinTable(name="managers_teams")
+     */
+    private $managers;
+
+	/**
      * @ORM\OneToMany(targetEntity="Team", mappedBy="parent", orphanRemoval=false)
 	 */
 	private $children;
@@ -83,6 +89,23 @@ class Team
             return $this;
         }
         $this->users->removeElement($user);
+		return $this;
+	}
+
+	public function getManagers(){
+		return $this->managers;
+	}
+
+	public function addManager(User $manager){
+		$this->managers[] = $manager;
+		return $this;
+	}
+
+	public function removeManager(User $manager){
+		if (!$this->managers->contains($manager)) {
+            return $this;
+        }
+        $this->managers->removeElement($manager);
 		return $this;
 	}
 
