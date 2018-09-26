@@ -93,7 +93,7 @@ class TeamController extends Controller
 	/**
 	 * @Route("/addMember/{teamId}/{userId}",name="team_addMember")
 	 */
-	public function move(Request $request,$teamId,$userId){
+	public function addMember(Request $request,$teamId,$userId){
 		if(!$this->get('session')->get('user')->isAdmin()){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
@@ -113,4 +113,26 @@ class TeamController extends Controller
 		return new JsonResponse($arrData);
 	}
 
+	/**
+	 * @Route("/delMember/{teamId}/{userId}",name="team_delMember")
+	 */
+	public function delMember(Request $request,$teamId,$userId){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		$em = $this->getDoctrine()->getManager();
+		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+
+		if(!($team = $teamRepository->find($teamId))){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}elseif(!($user = $userRepository->find($userId))){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}else{
+			$team->removeUser($user);
+			$em->flush();
+		}
+		$referer = $request->headers->get('referer');
+		return $this->redirect($referer);
+	}
 }

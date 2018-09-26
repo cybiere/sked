@@ -72,6 +72,14 @@ class Team
 		return $this;
 	}
 
+	public function removeUser(User $user){
+		if (!$this->users->contains($user)) {
+            return $this;
+        }
+        $this->users->removeElement($user);
+		return $this;
+	}
+
 	public function getChildren(){
 		return $this->children;
 	}

@@ -144,4 +144,12 @@ class User
     {
         return $this->tasks;
     }
+
+	/**
+     * @return Collection|Team[]
+     */
+    public function getTeams()
+    {
+		return $this->teams;
+	}
 }

@@ -20,7 +20,13 @@
 			<tr><th>Membres de l'équipe</th><th class="actions"></tr>
 			<tbody id="members">
 			{% for user in team.users %}
-			<tr><td>{{ user.fullname }}</td><td></td></tr>
+			<tr>
+				<td>
+					{{ user.fullname }}
+				</td><td class="actions">
+					<a class="text-danger" href='{{ path('team_delMember',{"teamId":team.id,"userId":user.id}) }}'><i title="Supprimer" class="fas fa-trash"></i></a>
+				</td>
+			</tr>
 			{% endfor %}
 			</tbody>
 			<tr>
@@ -123,7 +129,9 @@ $('#addMember').click(function(e){
 			},
 			success:function(data, status, xhr){
 				if(data.success){
-					$('#members').append('<tr><td> ' + $('#addMemberId option:selected').text() + '</td></tr>');
+					url = "{{ path('team_delMember',{'teamId':team.id,'userId':'idPlaceHold'}) }}"
+					url = url.replace("idPlaceHold",newId);
+					$('#members').append('<tr><td> ' + $('#addMemberId option:selected').text() + '</td><td class="actions"><a class="text-danger" href="' + url + '"><i title="Supprimer" class="fas fa-trash"></i></a></td></tr>');
 					$("#addMemberId option[value='" + newId + "']").remove();
 				}else{
 					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
