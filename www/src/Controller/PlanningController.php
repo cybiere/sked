@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Team;
 use App\Entity\Project;
 use App\Entity\Planning;
 use App\Form\PlanningType;
@@ -22,6 +23,7 @@ class PlanningController extends Controller
 	{
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
 		$planning = new Planning();
@@ -40,7 +42,23 @@ class PlanningController extends Controller
 		}
 
 
-		$users = $userRepository->findBy(array("isResource"=>true));
+		$teams = $teamRepository->findAll();
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if($this->get('session')->get('user')->isAdmin() || count($teams) == 0){
+			$users = $userRepository->findBy(array("isResource"=>true));
+		}else{
+			$myTeams = $me->getTeams();
+			if(count($myTeams) ==0){
+				$users = [$me];
+			}else{
+				$users = [];
+				foreach($myTeams as $team){
+					$users = array_merge($users,$team->getUsers()->toArray());
+				}
+				$users = array_unique($users);
+			}
+		}	
 		$projects = $projectRepository->findAll();
 
 		try {
@@ -48,7 +66,7 @@ class PlanningController extends Controller
 		} catch (\Exception $e) {
 			$startDate = "now";
 			$startDateObj = new \DateTime("now");
-	    }
+		}
 		$baseYear = intval($startDateObj->format('Y'));
 		$holidays = array();
 		for($i=-1;$i<=1;$i++){
@@ -58,7 +76,7 @@ class PlanningController extends Controller
 			$easterMonth = date('n', $easterDate);
 			$easterYear  = date('Y', $easterDate);
 
-				// Dates fixes
+			// Dates fixes
 			$holidays[] = mktime(0, 0, 0, 1,  1,  $year);  // 1er janvier
 			$holidays[] = mktime(0, 0, 0, 5,  1,  $year);  // Fête du travail
 			$holidays[] = mktime(0, 0, 0, 5,  8,  $year);  // Victoire des alliés
@@ -68,7 +86,7 @@ class PlanningController extends Controller
 			$holidays[] = mktime(0, 0, 0, 11, 11, $year);  // Armistice
 			$holidays[] = mktime(0, 0, 0, 12, 25, $year);  // Noel
 
-				// Dates variables
+			// Dates variables
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 1,  $easterYear);
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 39, $easterYear);
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 50, $easterYear);
