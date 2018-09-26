@@ -57,6 +57,11 @@ class PlanningController extends Controller
 					$users = array_merge($users,$team->getUsers()->toArray());
 				}
 				$users = array_unique($users);
+				foreach($users as $key=>$user){
+					if(!$user->isResource()){
+						unset($users[$key]);
+					}
+				}
 			}
 		}	
 		$projects = $projectRepository->findAll();
