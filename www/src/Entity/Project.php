@@ -83,10 +83,6 @@ class Project
         $this->tasks = new ArrayCollection();
     }
 
-	public function __toString(){
-		return $this->client.' - '.$this->name;
-	}
-
 	public function getId(){
 		return $this->id;
 	}
@@ -189,4 +185,7 @@ class Project
 		$this->projectManager = $projectManager;
 	}
 
+	public function __toString(){
+		return $this->client.' - '.$this->name;
+	}
 }

@@ -7,6 +7,7 @@ use Twig\TwigFunction;
 use App\Entity\Project;
 use App\Entity\Planning;
 use App\Entity\User;
+use App\Entity\Team;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AppExtension extends AbstractExtension
@@ -23,6 +24,7 @@ class AppExtension extends AbstractExtension
 		return array(
 			new TwigFunction('kanproject',array($this,'kanprojectFunction')),
 			new TwigFunction('printPlanning',array($this,'printPlanningFunction')),
+			new TwigFunction('printTeam',array($this,'printTeamFunction')),
 		);
 	}
 
@@ -136,4 +138,31 @@ class AppExtension extends AbstractExtension
 <?php
 	}
 
+	public function printTeamFunction($team){
+?>
+	<tr>
+		<td>
+		<?php 
+			$i=1;
+			while($team->getLevel() >= $i){
+				echo "&emsp;";
+				$i++;
+			}
+			if($team->getLevel() != 0) echo "↳ ";
+			echo htmlspecialchars($team->getName());
+		?>
+		</td>
+		<td><?php echo count($team->getUsers()); ?></td>
+		<td><?php echo "WIP"; ?></td>
+		<td class="actions">
+			<a href='<?php echo $this->router->generate('team_view',array("teamId"=>$team->getId())); ?>'><i title='Détails' class='fa fa-search'></i></a>
+			<a href='<?php echo $this->router->generate('team_index',array("teamId"=>$team->getId())); ?>'><i title='Modifier' class='fas fa-edit'></i></a>
+			<a class="text-danger" href='<?php echo $this->router->generate('team_del',array("teamId"=>$team->getId())); ?>'><i title="Supprimer" class="fas fa-trash"></i></a>
+		</td>
+	</tr>
+<?php
+	foreach($team->getChildren() as $child){
+		$this->printTeamFunction($child);
+	}
+	}
 }

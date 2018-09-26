@@ -25,12 +25,25 @@ class Team
     private $name;
 
 	/**
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="teams")
+     * @ORM\ManyToMany(targetEntity="User", inversedBy="teams")
+     * @ORM\JoinTable(name="users_teams")
      */
     private $users;
 
+	/**
+     * @ORM\OneToMany(targetEntity="Team", mappedBy="parent", orphanRemoval=false)
+	 */
+	private $children;
+
+	/**
+	 * @ORM\ManyToOne(targetEntity="Team", inversedBy="children")
+	 * @ORM\JoinColumn(nullable=true,onDelete="SET NULL")
+     */
+	private $parent;
+
 	public function __construct() {
         $this->users = new ArrayCollection();
+        $this->children = new ArrayCollection();
     }
 
     public function getId()
@@ -56,5 +69,35 @@ class Team
 
 	public function addUser(User $user){
 		$this->users[] = $user;
+		return $this;
+	}
+
+	public function getChildren(){
+		return $this->children;
+	}
+
+	public function addChild($child){
+		$this->children[] = $child;
+		return $this;
+	}
+
+	public function getParent(){
+		return $this->parent;
+	}
+
+	public function setParent(Team $parent){
+		$this->parent = $parent;
+		return $this;
+	}
+
+	public function getLevel(){
+		if($this->parent == NULL){
+			return 0;
+		}
+		return $this->parent->getLevel() + 1;
+	}
+
+	public function __toString(){
+		return $this->name;
 	}
 }

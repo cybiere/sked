@@ -61,8 +61,7 @@ class User
 	private $tasks;
 
 	/**
-     * @ORM\ManyToMany(targetEntity="Team", inversedBy="users")
-     * @ORM\JoinTable(name="users_teams")
+     * @ORM\ManyToMany(targetEntity="Team", mappedBy="users")
      */
     private $teams;
 

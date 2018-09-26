@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block pageTitle %}Equipe {{ team.name }}{% endblock %}
+
+{% block body %}
+{% set days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'] %}
+{% set months = ['','Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'] %}
+
+<h1>Equipe {{ team.name }} 
+	<a class="btn btn-outline-dark float-right" href="{{ path('team_index')}}">Retour</a>
+	{% if app.session.get('user').admin %}
+	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('team_view',{'teamId':team.id})}}">Modifier</a>
+	{% endif %}
+</h1>
+
+<h2>Informations</h2>
+<div class="row">
+	<div class="col">
+		<table class="table">
+			<tr><th>Membres de l'équipe</th><th class="actions"></tr>
+			<tbody id="members">
+			{% for user in team.users %}
+			<tr><td>{{ user.fullname }}</td><td></td></tr>
+			{% endfor %}
+			</tbody>
+			<tr>
+				<td colspan="2">
+					<select id="addMemberId">
+						<option value="0"></option>
+						{% for user in users if user not in team.users %}
+						<option value="{{ user.id }}">{{ user.fullname }}</option>
+						{% endfor %}
+					</select>
+					<button class="btn btn-sm btn-primary" id="addMember"><span class="fa fa-plus-circle"></span></button>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="col">
+	</div>
+</div>
+{#
+<div class="projectPlannings">
+<h2>Planning du projet</h2>
+{% if plannings is empty %}
+<span class="noPlannings">Aucun planning n'a été saisi pour ce projet</span>
+{% else %}
+{% set planningStart = plannings[0].startDate|date_modify('first day of this month') %}
+{% set baseDate = planningStart|date('d-m-Y') %}
+{% set difference = date(plannings|last.startDate).diff(date(planningStart)) %}
+{% set nbMonths = difference.m+1 %}
+{% set today = "now"|date('d-m-Y')|date_modify('midnight') %}
+
+{% for i in range(0,nbMonths-1) %}
+
+{% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
+{% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
+{% set nbSlices = 0 %}
+<table class="table table-sm table-hover schedule">
+	<thead>
+		<tr>
+			<th class="schedUser schedDate">{{ months[startDate|date('n')] ~ ' ' ~ startDate|date('Y') }}</th>
+			{% for i in range(0,(startDate|date('t')|number_format)-1) %}
+            {% set x = startDate|date_modify('+'~ i ~' days')|date_modify('midnight') %}
+			{% if x|date('N') < 6 %}
+			{% set nbSlices = nbSlices+2 %}
+			<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">{{ days[x|date('w')] ~ ' ' ~ x|date('d') }}</th>
+			{% endif %}
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for user in users %}
+		<tr>
+			{% set slicesShown = 0 %}
+			<th class="schedUser">{{ user.username }}</th>
+			{% for i in range(0,(startDate|date('t')|number_format)-1) %}
+            {% set x = startDate|date_modify('+'~ i ~' days') %}
+			{% if x|date('N') < 6 %}
+			<td class="schedHour{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+				{% set slicesShown = slicesShown+1 %}
+				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+					{% for planning in user.plannings %}
+					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
+					{{ printPlanning(planning,app.session.get('user').admin,project.id) }}
+					{% endif %}
+					{% endfor %}
+				</div>
+			</td>
+			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+				{% set slicesShown = slicesShown+1 %}
+				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+					{% for planning in user.plannings %}
+					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
+					{{ printPlanning(planning,app.session.get('user').admin,project.id) }}
+					{% endif %}
+					{% endfor %}
+				</div></td>
+				{% endif %}
+				{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endfor %}
+{% endif %}
+</div>#}
+
+{% endblock %}
+
+{% block extraJs %}
+<script>
+$('#addMember').click(function(e){
+	newId = $('#addMemberId').val()
+	if(newId != 0){
+		url= "{{ path("team_addMember",{"teamId":team.id,"userId":"idPlaceHold"}) }}";
+		url = url.replace("idPlaceHold",newId);
+		$.ajax(url,{
+			async:false,
+			error:function(xhr,status,error){
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			},
+			success:function(data, status, xhr){
+				if(data.success){
+					$('#members').append('<tr><td> ' + $('#addMemberId option:selected').text() + '</td></tr>');
+					$("#addMemberId option[value='" + newId + "']").remove();
+				}else{
+					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+					$('#flashMessages').append(message);
+				}
+			}
+		});
+
+	}
+});
+</script>
+{% endblock %}
+

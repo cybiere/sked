@@ -14,7 +14,7 @@ class TeamType extends AbstractType
     {
         $builder
             ->add('name',null,array('label'=>"Nom de l'équipe"))
-            //->add('user',null,array('label'=>'Ressource'))
+            ->add('parent',null,array('label'=>'Parent'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
         ;
     }
