@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Project;
+use App\Entity\User;
 use App\Entity\Planning;
 use App\Form\ProjectType;
 use App\Entity\Task;
@@ -25,6 +26,7 @@ class ProjectController extends Controller
 	{
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
 
 		$project = new Project();
 		$form = $this->createForm(ProjectType::class,$project);
@@ -40,7 +42,16 @@ class ProjectController extends Controller
 			$this->addFlash('success','Projet ajouté');
 		}
 
-		$projects = $projectRepository->findAll();
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+		if($this->get('session')->get('user')->isAdmin()){
+			$projects = $projectRepository->findAll();
+		}else{
+			$myTeams = $me->getTeams();
+			$projects = [];
+			foreach($myTeams as $team){
+				$projects = array_merge($projects,$projectRepository->findByTeam($team));
+			}
+		}
 		$sortedProjects = array(array(),array(),array(),array(),array(),array(),array());
 		$internalProjects = array();
 		$archivedProjects = array();
