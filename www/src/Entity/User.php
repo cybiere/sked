@@ -175,8 +175,14 @@ class User
 			return $this->canAdmin($team);
 		}
 		if(is_a($target,Planning::class)){
-			//TODO
-			return true;
+			return $target->getProject()->canAdmin($this);
+		}
+		if(is_a($target,User::class)){
+			if($target == $this) return true;
+			foreach($target->getTeams() as $team){
+				if($team->canAdmin($this)) return true;
+			}
+			return false;
 		}
 		if(is_a($target,Team::class)){
 			return $target->canAdmin($this);

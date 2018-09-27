@@ -104,6 +104,7 @@ class PlanningController extends Controller
 			'users' => $users,
 			'projects' => $projects,
 			'form' => $form->createView(),
+			'me' => $me,
 		]);
 
 	}
