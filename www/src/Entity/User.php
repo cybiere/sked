@@ -165,4 +165,22 @@ class User
     {
 		return $this->managedTeams;
 	}
+
+	public function canAdmin($target){
+		if($this->isAdmin){ return true; }
+		if(is_a($target,Project::class)){
+			if(($team = $target->getTeam()) == NULL){
+				return false;
+			}
+			return $this->canAdmin($team);
+		}
+		if(is_a($target,Planning::class)){
+			//TODO
+			return true;
+		}
+		if(is_a($target,Team::class)){
+			return $target->canAdmin($this);
+		}
+		return false;
+	}
 }

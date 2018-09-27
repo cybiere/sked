@@ -141,4 +141,11 @@ class Team
 	public function __toString(){
 		return $this->name;
 	}
+
+	public function canAdmin(User $user){
+		if(in_array($user,$this->managers->toArray()))
+			return true;
+		if($this->parent == NULL) return false;
+		return $this->parent->canAdmin($user);
+	}
 }
