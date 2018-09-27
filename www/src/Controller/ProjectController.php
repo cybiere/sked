@@ -46,7 +46,7 @@ class ProjectController extends Controller
 		if($this->get('session')->get('user')->isAdmin()){
 			$projects = $projectRepository->findAll();
 		}else{
-			$myTeams = $me->getTeams();
+			$myTeams = array_unique(array_merge($me->getTeams()->toArray(),$me->getManagedTeams()->toArray()));
 			$projects = [];
 			foreach($myTeams as $team){
 				$projects = array_merge($projects,$projectRepository->findByTeam($team));
