@@ -113,6 +113,15 @@ class Team
 		return $this->children;
 	}
 
+	public function getRecurChildren(){
+		$children = [];
+		foreach($this->children as $child){
+			$children[] = $child;
+			$children = array_merge($children,$child->getRecurChildren());
+		}
+		return array_unique($children);
+	}
+
 	public function addChild($child){
 		$this->children[] = $child;
 		return $this;

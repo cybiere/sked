@@ -162,8 +162,13 @@ class User
      * @return Collection|Team[]
      */
     public function getManagedTeams()
-    {
-		return $this->managedTeams;
+	{
+		$managed = [];
+		foreach($this->managedTeams as $team){
+			$managed[] = $team;
+			$managed = array_merge($managed,$team->getRecurChildren());
+		}
+		return array_unique($managed);
 	}
 
 	public function canAdmin($target){

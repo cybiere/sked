@@ -28,9 +28,10 @@ class AppExtension extends AbstractExtension
 		);
 	}
 
-	public function kanprojectFunction($project,$isAdmin){
+	public function kanprojectFunction($project,$me){
+		$isAdmin = $me->canAdmin($project);
 ?>
-	<div class='card kanProject' data-projectid="<?php echo htmlspecialchars($project->getId()); ?>">
+	<div class='card kanProject<?php if($isAdmin){ echo " hasAdmin"; }?>' data-projectid="<?php echo htmlspecialchars($project->getId()); ?>">
 		<h4 class="card-header text-center">
 			<a class="text-dark" data-toggle="collapse" href="#kanDetails-<?php echo htmlspecialchars($project->getId()); ?>" aria-expanded="false">
 				<?php echo htmlspecialchars($project->getClient()); ?> <?php echo htmlspecialchars($project->getName()); ?>

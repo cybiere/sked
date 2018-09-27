@@ -17,7 +17,7 @@ class ProjectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('team',null,array('label'=>'Équipe','required'=>true))
+            ->add('team',null,array('label'=>'Équipe','choices'=>$options['teams'],'required'=>!empty($options['teams'])))
             ->add('reference',null,array('label'=>'Code projet','attr' => array('maxlength' => 10)))
             ->add('name',null,array('label'=>'Nom du projet'))
             ->add('client',null,array('label'=>'Client'))
@@ -43,7 +43,8 @@ class ProjectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
 		$resolver->setDefaults([
-			"data_class" => Project::class
+			"data_class" => Project::class,
+			"teams"=>[]
         ]);
     }
 }

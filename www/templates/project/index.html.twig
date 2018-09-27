@@ -4,13 +4,13 @@
 
 {% block body %}
 <h1>Projets en cours
-	{% if app.session.get('user').admin %}
+	{% if me.isAdmin or me.managedTeams is not empty %}
 	<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addProject" role="button" aria-expanded="false" aria-controls="addButton">
 		Ajouter un projet
 	</a>
 	{% endif %}
 </h1>
-{% if app.session.get('user').admin %}
+{% if me.isAdmin or me.managedTeams is not empty %}
 <div class="collapse" id="addProject">
 	<div class="card bg-light">
 		<h2 class="card-header">Ajouter un projet</h2>
@@ -28,49 +28,49 @@
 		<h3>Non validé</h3>
 
 		{% for project in projects[0] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
+		{{ kanproject(project,me) }}
 		{% endfor %}
 	</div>
 	<div class="col kanCol" data-status='1'>
 		<h3>Lancement</h3>
 
 		{% for project in projects[1] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
+		{{ kanproject(project,me) }}
 		{% endfor %}
 	</div>
 	<div class="col kanCol" data-status='2'>
 		<h3>En cours</h3>
 
 		{% for project in projects[2] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
+		{{ kanproject(project,me) }}
 		{% endfor %}
 	</div>
 	<div class="col kanCol" data-status='3'>
 		<h3>Rapport</h3>
 
 		{% for project in projects[3] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
+		{{ kanproject(project,me) }}
 		{% endfor %}
 	</div>
 	<div class="col kanCol" data-status='4'>
 		<h3>Relecture</h3>
 
 		{% for project in projects[4] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
+		{{ kanproject(project,me) }}
 		{% endfor %}
 	</div>
 	<div class="col kanCol" data-status='5'>
 		<h3>Restitution</h3>
 
 		{% for project in projects[5] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
+		{{ kanproject(project,me) }}
 		{% endfor %}
 	</div>
 	<div class="col kanCol" data-status='6'>
 		<h3>Facturation</h3>
 
 		{% for project in projects[6] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
+		{{ kanproject(project,me) }}
 		{% endfor %}
 	</div>
 </div>
@@ -93,7 +93,7 @@
 		<tr>
 			<td>{{ project.name }}</td>
 			<td>{% if project.projectManager %}
-				{% if app.session.get('user').admin %}
+				{% if me.canAdmin(user) %}
 					<a href="{{ path("user_view",{"userId":project.projectManager.id}) }}">
 					{{ project.projectManager.fullname }}
 					</a>
@@ -105,7 +105,7 @@
 			<td>{{ project.plannedDays }}</td>
 			<td class="actions">
 				<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
-				{% if app.session.get('user').admin %}
+				{% if me.canAdmin(project) %}
 				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
 				<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-down"></i></a>
 				{% endif %}
@@ -136,7 +136,7 @@
 			<td>{{ project.client }}</td>
 			<td class="actions">
 				<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
-				{% if app.session.get('user').admin %}
+				{% if me.canAdmin(project) %}
 				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
 				<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Désarchiver" class="fas fa-caret-square-up"></i></a>
 				<a class="text-danger" href='{{ path('project_del',{"projectId":project.id})}}'><i title="Supprimer" class="fas fa-trash"></i></a>
@@ -149,10 +149,9 @@
 {% endblock %}
 
 {% block extraJs %}
-{% if app.session.get('user').admin %}
 <script>
 	$(function(){
-		$('.kanProject').draggable({
+		$('.hasAdmin').draggable({
 			containment : '#kanban',
 			revert : true,
 			revertDuration: 0,
@@ -195,11 +194,9 @@
 		});
 	});
 </script>
-{% endif %}
 {% endblock %}
 
 {% block helpContent %}
-{% if app.session.get('user').admin %}
 <ul>
 	<li>Seuls les projets archivés peuvent être supprimés</li>
 	<li>Actions d'administration
@@ -212,5 +209,4 @@
 		</ul>
 	</li>
 </ul>
-{% endif %}
 {% endblock %}
