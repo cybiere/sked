@@ -21,7 +21,7 @@ class ProjectType extends AbstractType
             ->add('reference',null,array('label'=>'Code projet','attr' => array('maxlength' => 10)))
             ->add('name',null,array('label'=>'Nom du projet'))
             ->add('client',null,array('label'=>'Client'))
-            ->add('projectManager',null,array('label'=>'Responsable projet'))
+            ->add('projectManager',null,array('label'=>'Responsable projet','choices'=>$options['users']))
 			->add('status',ChoiceType::class,array('label'=>'Statut',
 												   'choices'=>array(
 														'Non validé'=>0,
@@ -44,7 +44,8 @@ class ProjectType extends AbstractType
     {
 		$resolver->setDefaults([
 			"data_class" => Project::class,
-			"teams"=>[]
+			"teams"=>[],
+			"users"=>[]
         ]);
     }
 }

@@ -174,13 +174,17 @@ class User
 	public function canAdmin($target){
 		if($this->isAdmin){ return true; }
 		if(is_a($target,Project::class)){
+			$pm = $target->getProjectManager();
+			if($pm != NULL && $pm == $this){ 
+				return true; 
+			}
 			if(($team = $target->getTeam()) == NULL){
 				return false;
 			}
 			return $this->canAdmin($team);
 		}
 		if(is_a($target,Planning::class)){
-			return $target->getProject()->canAdmin($this);
+			return $this->canAdmin($target->getProject());
 		}
 		if(is_a($target,User::class)){
 			if($target == $this) return true;
@@ -191,6 +195,10 @@ class User
 		}
 		if(is_a($target,Team::class)){
 			return $target->canAdmin($this);
+		}
+		if(is_a($target,Task::class)){
+			if(($project = $target->getProject()) == NULL){ return false; }
+			return $this->canAdmin($project);
 		}
 		return false;
 	}

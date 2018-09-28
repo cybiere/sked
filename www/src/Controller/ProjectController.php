@@ -35,9 +35,17 @@ class ProjectController extends Controller
 		}else{
 			$managedTeams = $me->getManagedTeams();
 		}
+		$managedUsers = $userRepository->findAll();
+		if(!$me->isAdmin()){
+			foreach($managedUsers as $key => $user){
+				if(!$me->canAdmin($user)){
+					unset($managedUsers[$key]);
+				}
+			}
+		}
 
 		$project = new Project();
-		$form = $this->createForm(ProjectType::class,$project,['teams'=>$managedTeams]);
+		$form = $this->createForm(ProjectType::class,$project,['teams'=>$managedTeams,'users'=>$managedUsers]);
 
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
@@ -83,6 +91,8 @@ class ProjectController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Erreur : projet non trouvé');
@@ -90,11 +100,19 @@ class ProjectController extends Controller
 			return $this->redirect($referer);
 		}
 
+		$managedUsers = $userRepository->findAll();
+		if(!$me->isAdmin()){
+			foreach($managedUsers as $key => $user){
+				if(!$me->canAdmin($user)){
+					unset($managedUsers[$key]);
+				}
+			}
+		}
 		$task = new Task();
-		$form = $this->createForm(TaskType::class,$task,["project"=>$project]);
+		$form = $this->createForm(TaskType::class,$task,["project"=>$project,"users"=>$managedUsers]);
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
-			if($this->get('session')->get('user')->isAdmin() || ($project->getProjectManager() != null && $project->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
+			if($me->canAdmin($project)){
 				$task->setProject($project);
 				$em->persist($task);
 				$em->flush();
@@ -149,7 +167,7 @@ class ProjectController extends Controller
 		}
 		sort($holidays);
 
-		return $this->render('project/view.html.twig',array('project'=>$project,'plannings'=>$plannings,'users'=>$users,'holidays'=>$holidays,'form'=>$form->createView()));
+		return $this->render('project/view.html.twig',array('project'=>$project,'plannings'=>$plannings,'users'=>$users,'holidays'=>$holidays,'form'=>$form->createView(),'me'=>$me));
 	}
 
 
