@@ -102,7 +102,10 @@ class AppExtension extends AbstractExtension
 			}else{
 				echo "non-billable"; 
 			}
-		?> "
+		if($project == 0 && $isAdmin){
+			echo " hasAdmin";
+		}
+		?>"
 		tabindex="0" 
 		data-duration="<?php echo htmlspecialchars($planning->getNbSlices()); ?>" 
 		data-planningId="<?php echo htmlspecialchars($planning->getId()); ?>"
@@ -113,7 +116,7 @@ class AppExtension extends AbstractExtension
 			<div class='row'>
 <?php if($planning->getProject() != NULL){ ?>
 <?php if($planning->getTask() != NULL){ ?>
-			<dt class='col-md-6'>Projet</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getName()); ?></dd>
+			<dt class='col-md-6'>Projet</dt><dd class='col-md-6'><a href='<?php echo $this->router->generate('project_view',array("projectId"=>$planning->getProject()->getId()))."'>".htmlspecialchars($planning->getProject()->getName()); ?></a></dd>
 <?php } ?>
 			<dt class='col-md-6'>Code projet</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getReference()); ?></dd>
 			<dt class='col-md-6'>Client</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getClient()); ?></dd>

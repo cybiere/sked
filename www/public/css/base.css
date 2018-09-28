@@ -31,7 +31,7 @@ nav img{
 	background-color:lightblue;
 }
 .hasAdmin{
-	border: 2px #1a1 solid;
+	border: 2px #1a1 solid !important;
 }
 .schedule{
 	table-layout: fixed;

@@ -6,14 +6,14 @@
 {% set days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'] %}
 {% set months = ['','Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'] %}
 <h1>Planning
-					{% if app.session.get('user').admin %}
+					{% if hasAdmin %}
 	<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addPlanning" role="button" aria-expanded="false" aria-controls="addButton">
 		Ajouter une entrée de planning
 	</a>
 					{% endif %}
 </h1>
 
-					{% if app.session.get('user').admin %}
+					{% if hasAdmin %}
 <div class="collapse" id="addPlanning">
 	<div class="card bg-light">
 		<h2 class="card-header">Ajouter une entrée de planning</h2>
@@ -35,7 +35,7 @@
 
 <hr />
 
-{% if app.session.get('user').admin %}
+{% if hasAdmin %}
 <div class="modal fade" id="overrun_Modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -93,7 +93,7 @@
 							<select id="addForm_projectId">
 								<option value="0">Absence</option>
 								{% for project in projects %}
-									{% if not project.archived %}
+									{% if not project.archived and me.canAdmin(project) %}
 									<option value="{{ project.id }}">{{ project.client }} - {{ project.name }}{% if project.nbDays is not null and project.nbDays != 0%} ({{ project.nbDays - project.plannedDays }}jh rest.){% endif %}</option>
 									{% endif %}
 								{% endfor %}
@@ -154,20 +154,20 @@
 			{% if x|date('N') < 6 %}
 			<td class="schedHour{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
 				{% set slicesShown = slicesShown+1 %}
-				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
-					{{ printPlanning(planning,app.session.get('user').admin) }}
+					{{ printPlanning(planning,me.canAdmin(planning)) }}
 					{% endif %}
 					{% endfor %}
 				</div>
 			</td>
 			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
 				{% set slicesShown = slicesShown+1 %}
-				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
-					{{ printPlanning(planning,app.session.get('user').admin) }}
+					{{ printPlanning(planning,me.canAdmin(planning)) }}
 					{% endif %}
 					{% endfor %}
 				</div></td>
@@ -191,8 +191,8 @@ $( ".project" ).contextmenu(function() {
 $( ".project" ).on('blur',function() {
 	$(this).popover('hide')
 });
-					{% if app.session.get('user').admin %}
-$(".project").resizable({
+{% if hasAdmin %}
+$(".hasAdmin").resizable({
 	handles: "e",
 	containment: ".schedule",
 	resize: function(e,ui){
@@ -231,14 +231,14 @@ $(".project").resizable({
 $('.project').on('mousedown',function(e){
 	e.stopPropagation();
 });
-$('.project').draggable({
+$('.hasAdmin').draggable({
 	revert : true,
 	revertDuration: 0,
 	cursor: "grab",
 	cursorAt: { left:5 }
 }); 
 
-$('.projectContainer').droppable({
+$('.projectContainerAdmin').droppable({
 	classes: {
 		"ui-droppable-hover":"activeDrop",
 	},
@@ -299,7 +299,7 @@ add_startDate=null;
 add_startHour=null;
 add_userId=null;
 gridWidth=0;
-$('.projectContainer').mousedown(function(e){
+$('.projectContainerAdmin').mousedown(function(e){
 	if(e.which != 1) return;
 	$("<div class='projectGhost'>Nouveau projet</div>").appendTo(this);
 	add_startDate=$(this).data('date');
@@ -404,7 +404,7 @@ $('#addForm_projectId').change(function(){
 			<li><span class='legend billable-unconfirmed'>Hachuré</span> Date non confirmée</li>
 		</ul>
 	</li>
-	{% if app.session.get('user').admin %}
+	{% if hasAdmin %}
 	<li>Actions d'administration (dans le détail projet)
 		<ul>
 			<li><span class='btn btn-sm btn-outline-success'><i class='far fa-check-circle'></i></span>Confirmer l'élément de planning</li>

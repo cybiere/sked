@@ -184,6 +184,7 @@ class User
 			return $this->canAdmin($team);
 		}
 		if(is_a($target,Planning::class)){
+			if($target->getProject() == NULL) return $this->canAdmin($target->getUser());
 			return $this->canAdmin($target->getProject());
 		}
 		if(is_a($target,User::class)){

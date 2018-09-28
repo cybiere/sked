@@ -22,28 +22,12 @@ class PlanningController extends Controller
 	public function index(Request $request, $startDate="now")
 	{
 		$em = $this->getDoctrine()->getManager();
-		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
-
-		$planning = new Planning();
-		$form = $this->createForm(PlanningType::class,$planning);
-
-		$form->handleRequest($request);
-		if ($form->isSubmitted() && $form->isValid()) {
-			if(!$this->get('session')->get('user')->isAdmin()){
-				throw $this->createNotFoundException("Cette page n'existe pas");
-			}
-			$planning = $form->getData();
-			if(!is_object($planning) && $planning->getProject() == 0) $planning->setProject(NULL);
-			$em->persist($planning);
-			$em->flush();
-			$this->addFlash('success','Planning ajouté');
-		}
-
-
-		$teams = $teamRepository->findAll();
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
+		$teams = $teamRepository->findAll();
+
 
 		if($this->get('session')->get('user')->isAdmin() || count($teams) == 0){
 			$users = $userRepository->findBy(array("isResource"=>true));
@@ -64,7 +48,53 @@ class PlanningController extends Controller
 				}
 			}
 		}	
+
 		$projects = $projectRepository->findAll();
+
+		$managedProjects = [];
+		$managedUsers = [];
+		if($me->isAdmin()){
+			$managedProjects = $projects;
+			$managedUsers = $userRepository->findBy(array("isResource"=>true));
+		}else{
+			foreach($projects as $project){
+				if($me->canAdmin($project)){
+					$managedProjects[] = $project;
+				}
+			}
+			foreach($users as $user){
+				if($me->canAdmin($user)){
+					$managedUsers[] = $user;
+				}
+			}
+		}
+
+		$planning = new Planning();
+		$form = $this->createForm(PlanningType::class,$planning,
+			[
+				'projects'=>$managedProjects,
+				'users'=>$managedUsers
+			]);
+
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$planning = $form->getData();
+			if(!$me->canAdmin($planning)){
+				$this->addFlash('danger',"Vous n'avez pas le droit de modifier ce planning.");
+			}else{
+				if(!is_object($planning) && $planning->getProject() == 0) $planning->setProject(NULL);
+				$em->persist($planning);
+				$em->flush();
+				$this->addFlash('success','Planning ajouté');
+			}
+		}
+
+
+		$hasAdmin = $me->isAdmin();
+		foreach($users as $user){
+			if($hasAdmin) break;
+			$hasAdmin = $user != $me && $me->canAdmin($user);
+		}
 
 		try {
 			$startDateObj = new \DateTime($startDate);
@@ -105,6 +135,7 @@ class PlanningController extends Controller
 			'projects' => $projects,
 			'form' => $form->createView(),
 			'me' => $me,
+			'hasAdmin' => $hasAdmin,
 		]);
 
 	}
@@ -113,20 +144,23 @@ class PlanningController extends Controller
 	 * @Route("/resize/{planningId}/{newSize}",name="planning_resize")
 	 */
 	public function resize(Request $request,$planningId,$newSize){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
-		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($planning = $planningRepository->find($planningId))){
 			$arrData = ['success' => false, 'errormsg' => 'Elément de planning non trouvé'];
-		}else{
-			if($newSize < 1) $newSize = 1;
-			$planning->setNbSlices($newSize);
-			$em->flush();
-			$arrData = ['success' => true];
+			return new JsonResponse($arrData);
 		}
+		if(!$me->canAdmin($planning)){
+			$arrData = ['success' => false, 'errormsg' => "Vous n'avez pas le droit de modifier ce planning"];
+			return new JsonResponse($arrData);
+		}
+		$em = $this->getDoctrine()->getManager();
+		if($newSize < 1) $newSize = 1;
+		$planning->setNbSlices($newSize);
+		$em->flush();
+		$arrData = ['success' => true];
 		return new JsonResponse($arrData);
 	}
 
@@ -134,27 +168,31 @@ class PlanningController extends Controller
 	 * @Route("/move/{planningId}/{newStart}/{newHour}/{newUser}/{newSize}",name="planning_move")
 	 */
 	public function move(Request $request,$planningId,$newStart,$newHour,$newUser,$newSize){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
 		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($planning = $planningRepository->find($planningId))){
 			$arrData = ['success' => false, 'errormsg' => 'Projet non trouvé'];
+			return new JsonResponse($arrData);
 		}elseif(!($user = $userRepository->find($newUser))){
 			$arrData = ['success' => false, 'errormsg' => 'Utilisateur non trouvé'];
-		}else{
-			if($newHour != "pm") $newHour = "am";
-			if($newSize < 1) $newSize = 1;
-			$planning->setStartDate(new \DateTime($newStart));
-			$planning->setStartHour($newHour);
-			$planning->setNbSlices($newSize);
-			$planning->setUser($user);
-			$em->flush();
-			$arrData = ['success' => true];
+			return new JsonResponse($arrData);
 		}
+
+		if(!$me->canAdmin($planning)){
+			$arrData = ['success' => false, 'errormsg' => "Vous n'avez pas le droit de modifier ce planning"];
+			return new JsonResponse($arrData);
+		}
+		if($newHour != "pm") $newHour = "am";
+		if($newSize < 1) $newSize = 1;
+		$planning->setStartDate(new \DateTime($newStart));
+		$planning->setStartHour($newHour);
+		$planning->setNbSlices($newSize);
+		$planning->setUser($user);
+		$em->flush();
+		$arrData = ['success' => true];
 		return new JsonResponse($arrData);
 	}
 
@@ -162,19 +200,23 @@ class PlanningController extends Controller
 	 * @Route("/del/{planningId}",name="planning_del")
 	 */
 	public function del(Request $request,$planningId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
 		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
+		$referer = $request->headers->get('referer');
 		if(!($planning = $planningRepository->find($planningId))){
 			$this->addFlash('danger','Erreur : élément de planning non trouvé');
-		}else{
-			$em->remove($planning);
-			$em->flush();
+			return $this->redirect($referer);
 		}
-		$referer = $request->headers->get('referer');
+
+		if(!$me->canAdmin($planning)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$em->remove($planning);
+		$em->flush();
 		return $this->redirect($referer);
 	}
 
@@ -182,22 +224,23 @@ class PlanningController extends Controller
 	 * @Route("/confirm/{planningId}",name="planning_confirm")
 	 */
 	public function confirm(Request $request,$planningId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
 		$em = $this->getDoctrine()->getManager();
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
-
-		if(!($planning = $planningRepository->find($planningId))){
-			$this->addFlash('danger','Erreur : élément de planning non trouvé');
-		}else{
-			$planning->setConfirmed($planning->isConfirmed()?false:true);
-			$em->flush();
-		}
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		$referer = $request->headers->get('referer');
+		if(!($planning = $planningRepository->find($planningId))){
+			$this->addFlash('danger','Erreur : élément de planning non trouvé');
+			return $this->redirect($referer);
+		}
+		if(!$me->canAdmin($planning)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		$planning->setConfirmed($planning->isConfirmed()?false:true);
+		$em->flush();
+
+
 		return $this->redirect($referer);
 	}
-
-
 }
