@@ -48,7 +48,7 @@ class PlanningController extends Controller
 		if($this->get('session')->get('user')->isAdmin() || count($teams) == 0){
 			$users = $userRepository->findBy(array("isResource"=>true));
 		}else{
-			$myTeams = array_unique(array_merge($me->getTeams()->toArray(),$me->getManagedTeams()->toArray()));
+			$myTeams = array_unique(array_merge($me->getTeams()->toArray(),$me->getManagedTeams()));
 			if(count($myTeams) ==0){
 				$users = [$me];
 			}else{
