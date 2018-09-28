@@ -63,7 +63,7 @@
 				<th>Responsable projet</th>
 				<td>
 					{% if project.projectManager %}
-					{% if me.canAdmin(user) %}
+					{% if me.canAdmin(project.projectManager) %}
 					<a href="{{ path('user_view',{'userId':project.projectManager.id}) }}">{{ project.projectManager.fullname }}</a>
 					{% else %}
 						{{ project.projectManager.fullname }}
