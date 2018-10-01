@@ -60,28 +60,14 @@ class ProjectController extends Controller
 		}
 
 		if($this->get('session')->get('user')->isAdmin()){
-			$projects = $projectRepository->findAll();
+			$myTeams = $teamRepository->findAll();
+			$teamlessProjects = $projectRepository->findByTeam(NULL);
 		}else{
 			$myTeams = array_unique(array_merge($me->getTeams()->toArray(),$me->getManagedTeams()));
-			$projects = [];
-			foreach($myTeams as $team){
-				$projects = array_merge($projects,$projectRepository->findByTeam($team));
-			}
-		}
-		$sortedProjects = array(array(),array(),array(),array(),array(),array(),array());
-		$internalProjects = array();
-		$archivedProjects = array();
-		foreach($projects as $project){
-			if($project->isArchived()){
-				$archivedProjects[] = $project;
-			}elseif(!$project->isBillable()){
-				$internalProjects[] = $project;
-			}else{
-				$sortedProjects[$project->getStatus()][] = $project;
-			}
+			$teamlessProjects = [];
 		}
 
-		return $this->render('project/index.html.twig',array('projects'=>$sortedProjects,'internalProjects'=>$internalProjects,'archivedProjects'=>$archivedProjects,'form'=>$form->createView(),'me'=>$me));
+		return $this->render('project/index.html.twig',array('teams'=>$myTeams,'form'=>$form->createView(),'me'=>$me,'teamlessProjects'=>$teamlessProjects));
 	}
 
 	/**
