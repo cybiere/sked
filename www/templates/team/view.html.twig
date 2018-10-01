@@ -69,6 +69,31 @@
 			</tr>
 		</table>
 	</div>
+	<div class="col">
+		<table class="table">
+			<tr><th colspan="2">Etapes des projets</th><th class="actions"></tr>
+			<tbody id="managers">
+			{% for status in team.projectStatuses %}
+			<tr>
+				<td>{{status.statusOrder }}</td>
+				<td>
+					{{ status.name }}
+				</td><td class="actions">
+					{#<a class="text-danger" href='{{ path('team_delManager',{"teamId":team.id,"userId":user.id}) }}'><i title="Supprimer" class="fas fa-trash"></i></a>#}
+				</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td colspan="2">
+					{{ form_start(form) }}
+					{{ form_widget(form) }}
+					{{ form_end(form) }}
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+
 </div>
 {#
 <div class="projectPlannings">

@@ -12,67 +12,73 @@ use Doctrine\Common\Collections\Collection;
  */
 class Team
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $name;
+	/**
+	 * @ORM\Id()
+	 * @ORM\GeneratedValue()
+	 * @ORM\Column(type="integer")
+	 */
+	private $id;
 
 	/**
-     * @ORM\ManyToMany(targetEntity="User", inversedBy="teams")
-     * @ORM\JoinTable(name="users_teams")
-     */
-    private $users;
+	 * @ORM\Column(type="string", length=255)
+	 */
+	private $name;
 
 	/**
-     * @ORM\ManyToMany(targetEntity="User", inversedBy="managedTeams")
-     * @ORM\JoinTable(name="managers_teams")
-     */
-    private $managers;
+	 * @ORM\ManyToMany(targetEntity="User", inversedBy="teams")
+	 * @ORM\JoinTable(name="users_teams")
+	 */
+	private $users;
 
 	/**
-     * @ORM\OneToMany(targetEntity="Team", mappedBy="parent", orphanRemoval=false)
+	 * @ORM\ManyToMany(targetEntity="User", inversedBy="managedTeams")
+	 * @ORM\JoinTable(name="managers_teams")
+	 */
+	private $managers;
+
+	/**
+	 * @ORM\OneToMany(targetEntity="Team", mappedBy="parent", orphanRemoval=false)
 	 */
 	private $children;
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="Team", inversedBy="children")
 	 * @ORM\JoinColumn(nullable=true,onDelete="SET NULL")
-     */
+	 */
 	private $parent;
 
 	/**
-     * @ORM\OneToMany(targetEntity="Project", mappedBy="team")
+	 * @ORM\OneToMany(targetEntity="Project", mappedBy="team")
 	 */
 	private $projects;
 
+	/**
+	 * @ORM\OneToMany(targetEntity="App\Entity\ProjectStatus", mappedBy="team", orphanRemoval=true)
+	 */
+	private $projectStatuses;
+
 	public function __construct() {
-        $this->users = new ArrayCollection();
-        $this->children = new ArrayCollection();
-        $this->projects = new ArrayCollection();
-    }
+		$this->users = new ArrayCollection();
+		$this->children = new ArrayCollection();
+		$this->projects = new ArrayCollection();
+		$this->projectStatuses = new ArrayCollection();
+	}
 
-    public function getId()
-    {
-        return $this->id;
-    }
+	public function getId()
+	{
+		return $this->id;
+	}
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
+	public function getName(): ?string
+	{
+		return $this->name;
+	}
 
-    public function setName(string $name): self
-    {
-        $this->name = $name;
+	public function setName(string $name): self
+	{
+		$this->name = $name;
 
-        return $this;
+		return $this;
 	}
 
 	public function getUsers(){
@@ -86,9 +92,9 @@ class Team
 
 	public function removeUser(User $user){
 		if (!$this->users->contains($user)) {
-            return $this;
-        }
-        $this->users->removeElement($user);
+			return $this;
+		}
+		$this->users->removeElement($user);
 		return $this;
 	}
 
@@ -103,9 +109,9 @@ class Team
 
 	public function removeManager(User $manager){
 		if (!$this->managers->contains($manager)) {
-            return $this;
-        }
-        $this->managers->removeElement($manager);
+			return $this;
+		}
+		$this->managers->removeElement($manager);
 		return $this;
 	}
 
@@ -156,5 +162,34 @@ class Team
 			return true;
 		if($this->parent == NULL) return false;
 		return $this->parent->canAdmin($user);
+	}
+
+	/**
+	 * @return Collection|ProjectStatus[]
+	 */
+	public function getProjectStatuses(): Collection
+	{
+		return $this->projectStatuses;
+	}
+
+	public function addProjectStatus(ProjectStatus $projectStatus): self
+	{
+		if (!$this->projectStatuses->contains($projectStatus)) {
+			$this->projectStatuses[] = $projectStatus;
+			$projectStatus->setTeam($this);
+		}
+		return $this;
+	}
+
+	public function removeProjectStatus(ProjectStatus $projectStatus): self
+	{
+		if ($this->projectStatuses->contains($projectStatus)) {
+			$this->projectStatuses->removeElement($projectStatus);
+			// set the owning side to null (unless already changed)
+			if ($projectStatus->getTeam() === $this) {
+				$projectStatus->setTeam(null);
+			}
+		}
+		return $this;
 	}
 }

@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Team;
 use App\Entity\User;
+use App\Entity\ProjectStatus;
 use App\Form\TeamType;
+use App\Form\ProjectStatusType;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,7 +33,6 @@ class TeamController extends Controller
 		if(!($team = $teamRepository->find($teamId))){
 			$team = new Team();
 		}
-
 
 		$form = $this->createForm(TeamType::class,$team);
 		$form->handleRequest($request);
@@ -79,14 +80,27 @@ class TeamController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$projectStatusRepository = $this->getDoctrine()->getRepository(projectStatus::class);
 
 		if(!($team = $teamRepository->find($teamId))){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
+		$projectStatus = new ProjectStatus();
+		$form = $this->createForm(ProjectStatusType::class,$projectStatus);
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$projectStatus->setTeam($team);
+			$projectStatus->setStatusOrder($projectStatusRepository->findMaxOrder($team)+1);
+			$em->persist($projectStatus);
+			$em->flush();
+			$this->addFlash('success','Statut enregistré');
+		}
+
 		return $this->render('team/view.html.twig', [
 			"team"=>$team,
-			"users"=>$userRepository->findAll()
+			"users"=>$userRepository->findAll(),
+			"form"=>$form->createView()
         ]);
 	}
 
