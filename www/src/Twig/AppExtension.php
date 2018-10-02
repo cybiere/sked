@@ -60,9 +60,9 @@ class AppExtension extends AbstractExtension
 			<div class="card-footer">
 				<div class="row">
 					<div class="col">
-						<?php if($project->getStatus() == 0) echo "<i class='fas fa-chevron-circle-left'></i>"; else { ?>
+						<?php /* if($project->getStatus() == 0) echo "<i class='fas fa-chevron-circle-left'></i>"; else { ?>
 							<a href='<?php echo $this->router->generate('project_movelink',array("projectId"=>$project->getId(),"way"=>"dec")); ?>'><i class='fas fa-chevron-circle-left'></i></a>
-						<?php } ?>
+						<?php } */?>
 					</div>
 					<div class="col">
 						<a href='<?php echo $this->router->generate('project_edit',array("projectId"=>$project->getId())); ?>'><i title='Modifier' class='fas fa-edit'></i></a>
@@ -71,9 +71,9 @@ class AppExtension extends AbstractExtension
 						<a href='<?php echo $this->router->generate('project_archive',array("projectId"=>$project->getId())); ?>'><i title='Archiver' class='fas fa-caret-square-down'></i></a>
 					</div>
 					<div class="col">
-						<?php if($project->getStatus() == 6) echo "<i class='fas fa-chevron-circle-right'></i>"; else { ?>
+						<?php /* if($project->getStatus() == 6) echo "<i class='fas fa-chevron-circle-right'></i>"; else { ?>
 							<a href='<?php echo $this->router->generate('project_movelink',array("projectId"=>$project->getId(),"way"=>"inc")); ?>'><i class='fas fa-chevron-circle-right'></i></a>
-						<?php } ?>
+						<?php } */ ?>
 					</div>
 				</div>
 			</div>

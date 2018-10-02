@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Project;
+use App\Entity\ProjectStatus;
 use App\Entity\User;
 use App\Entity\Team;
 use App\Entity\Planning;
@@ -267,7 +268,7 @@ class ProjectController extends Controller
 	public function move(Request $request,$projectId,$newStatus){
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
-
+		$statusRepository = $this->getDoctrine()->getRepository(ProjectStatus::class);
 
 		if(!($project = $projectRepository->find($projectId))){
 			$arrData = ['success' => false, 'errormsg' => 'Projet non trouvé'];
@@ -279,10 +280,18 @@ class ProjectController extends Controller
 		if(!$me->canAdmin($project)){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
+		if($newStatus == 0){
+			$project->setProjectStatus(NULL);
+		}else{
 
-		if($newStatus < 0) $newStatus = 0;
-		if($newStatus > 6) $newStatus = 6;
-		$project->setStatus($newStatus);
+			$status = $statusRepository->find($newStatus);
+			if($status == NULL || $status->getTeam() != $project->getTeam()){
+				$arrData = ['success' => false, 'errormsg' => 'Statut non trouvé'];
+				return new JsonResponse($arrData);
+			}
+			$project->setProjectStatus($status);
+		}
+
 		$em->flush();
 		$arrData = ['success' => true];
 

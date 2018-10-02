@@ -30,14 +30,18 @@
 	</a>
 	<div class="card-body collapse show" id="kan{{team.name}}">
 		<div class="row" id="kanban">
-			{% for status in team.projectStatuses %}
+			<div class="col kanCol" data-status='0'>
+				<h3>Non confirmé</h3>
+				{% for project in team.projects if project.projectStatus == NULL %}
+				{{ kanproject(project,me) }}
+				{% endfor %}
+			</div>
+		{% for status in team.projectStatuses %}
 			<div class="col kanCol" data-status='{{status.id}}'>
 				<h3>{{status.name}}</h3>
-				{#
 				{% for project in status.projects %}
 				{{ kanproject(project,me) }}
 				{% endfor %}
-				#}
 			</div>
 			{% endfor %}
 		</div>
