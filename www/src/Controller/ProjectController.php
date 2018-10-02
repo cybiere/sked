@@ -62,11 +62,11 @@ class ProjectController extends Controller
 
 		if($this->get('session')->get('user')->isAdmin()){
 			$myTeams = $teamRepository->findAll();
-			$teamlessProjects = $projectRepository->findByTeam(NULL);
 		}else{
 			$myTeams = array_unique(array_merge($me->getTeams()->toArray(),$me->getManagedTeams()));
 			$teamlessProjects = [];
 		}
+		$teamlessProjects = $projectRepository->findByTeam(NULL);
 
 		return $this->render('project/index.html.twig',array('teams'=>$myTeams,'form'=>$form->createView(),'me'=>$me,'teamlessProjects'=>$teamlessProjects));
 	}
