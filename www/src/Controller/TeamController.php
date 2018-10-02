@@ -95,6 +95,9 @@ class TeamController extends Controller
 			$em->persist($projectStatus);
 			$em->flush();
 			$this->addFlash('success','Statut enregistré');
+
+			$projectStatus = new ProjectStatus();
+			$form = $this->createForm(ProjectStatusType::class,$projectStatus);
 		}
 
 		return $this->render('team/view.html.twig', [
