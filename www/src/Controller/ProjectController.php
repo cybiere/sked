@@ -185,7 +185,16 @@ class ProjectController extends Controller
 			$managedTeams = $me->getManagedTeams();
 		}
 
-		$form = $this->createForm(ProjectType::class,$project,['teams'=>$managedTeams]);
+		$managedUsers = $userRepository->findAll();
+		if(!$me->isAdmin()){
+			foreach($managedUsers as $key => $user){
+				if(!$me->canAdmin($user)){
+					unset($managedUsers[$key]);
+				}
+			}
+		}
+
+		$form = $this->createForm(ProjectType::class,$project,['teams'=>$managedTeams,'users'=>$managedUsers]);
 
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {

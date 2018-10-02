@@ -16,13 +16,17 @@ class ProjectType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+		if(!empty($options['statuses'])){
+			$builder->add('team',null,array('label'=>'Équipe','choices'=>$options['teams'],'required'=>!empty($options['teams'])));
+		}
         $builder
-            ->add('team',null,array('label'=>'Équipe','choices'=>$options['teams'],'required'=>!empty($options['teams'])))
             ->add('reference',null,array('label'=>'Code projet','attr' => array('maxlength' => 10)))
             ->add('name',null,array('label'=>'Nom du projet'))
-            ->add('client',null,array('label'=>'Client'))
-			->add('projectManager',null,array('label'=>'Responsable projet','choices'=>$options['users']));
-
+            ->add('client',null,array('label'=>'Client'));
+		if(!empty($options['statuses'])){
+			$builder->add('projectManager',null,array('label'=>'Responsable projet','choices'=>$options['users']));
+		}
+			
 		if(!empty($options['statuses'])){
 			$builder->add('projectStatus',null,array('label'=>'Statut','choices'=>$options['statuses']));
 		}

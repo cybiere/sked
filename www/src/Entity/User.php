@@ -188,7 +188,6 @@ class User
 			return $this->canAdmin($target->getProject());
 		}
 		if(is_a($target,User::class)){
-			if($target == $this) return true;
 			foreach($target->getTeams() as $team){
 				if($team->canAdmin($this)) return true;
 			}
