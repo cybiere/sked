@@ -173,3 +173,6 @@ th.schedUser{
 .managerList:last-child:after{
 	content:""
 }
+.card-footer{
+	text-align:center;
+}

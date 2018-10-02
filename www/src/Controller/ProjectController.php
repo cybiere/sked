@@ -238,6 +238,7 @@ class ProjectController extends Controller
 	public function moveLink(Request $request,$projectId,$way){
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+		$statusRepository = $this->getDoctrine()->getRepository(ProjectStatus::class);
 
 		$referer = $request->headers->get('referer');
 
@@ -252,10 +253,21 @@ class ProjectController extends Controller
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
-		if($way == "inc" && $project->getStatus() < 6){
-			$project->setStatus($project->getStatus()+1);
-		}elseif($way == "dec" && $project->getStatus() > 0){
-			$project->setStatus($project->getStatus()-1);
+		if($way == "inc"){
+			if($project->getProjectStatus() == NULL){
+				$nextOrder = 1;
+			}else{
+				$nextOrder = $project->getProjectStatus()->getStatusOrder()+1;
+			}
+			$project->setProjectStatus($statusRepository->findInTeamByOrder($project->getTeam(),$nextOrder));
+		}elseif($way == "dec"){
+			if($project->getProjectStatus() != NULL){
+				if($project->getProjectStatus()->getStatusOrder() == 1){
+					$project->setProjectStatus(NULL);
+				}else{
+					$project->setProjectStatus($project->getProjectStatus()->getStatusOrder()-1);
+				}
+			}
 		}
 		$em->flush();
 
