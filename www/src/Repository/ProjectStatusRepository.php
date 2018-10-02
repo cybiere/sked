@@ -36,9 +36,11 @@ class ProjectStatusRepository extends ServiceEntityRepository
     }
 	 */
 
-	public function findAll()
+	public function findByTeam($team)
     {
         return $this->createQueryBuilder('p')
+            ->andWhere('p.team = :val')
+            ->setParameter('val', $team)
             ->orderBy('p.statusOrder', 'ASC')
             ->getQuery()
             ->getResult()
@@ -60,7 +62,20 @@ class ProjectStatusRepository extends ServiceEntityRepository
 		}
 
 		return $result[0]['max_order'];
+	}
+
+    public function findInTeamByOrder($team,$order)
+	{
+		$result = $this->createQueryBuilder('p')
+            ->andWhere('p.team = :team')
+            ->andWhere('p.statusOrder = :order')
+            ->setParameter('team', $team)
+            ->setParameter('order', $order)
+            ->getQuery()
+            ->getResult();
+		return $result == NULL?NULL:$result[0];
     }
+
 	
     /*
     public function findOneBySomeField($value): ?ProjectStatus

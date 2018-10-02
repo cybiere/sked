@@ -100,7 +100,8 @@ class TeamController extends Controller
 		return $this->render('team/view.html.twig', [
 			"team"=>$team,
 			"users"=>$userRepository->findAll(),
-			"form"=>$form->createView()
+			"form"=>$form->createView(),
+			"statuses" => $projectStatusRepository->findByTeam($team)
         ]);
 	}
 
@@ -196,4 +197,68 @@ class TeamController extends Controller
 		return $this->redirect($referer);
 	}
 
+	/**
+	 * @Route("/orderStatus/{statusId}/{way}",name="team_changeStatusOrder")
+	 */
+	public function changeStatusOrder(Request $request,$statusId,$way){
+		$em = $this->getDoctrine()->getManager();
+		$statusRepository = $this->getDoctrine()->getRepository(ProjectStatus::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if(!($status = $statusRepository->find($statusId))){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}elseif(!$me->canAdmin($status->getTeam())){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		if($way == "dec"){
+			$switchWith = $statusRepository->findInTeamByOrder($status->getTeam(),$status->getStatusOrder()+1);
+			if($switchWith != NULL){
+				$newOrder = $switchWith->getStatusOrder();
+				$switchWith->setStatusOrder($status->getStatusOrder());
+				$status->setStatusOrder($newOrder);
+			}
+		}else{
+			if($status->getStatusOrder() > 1){
+				$switchWith = $statusRepository->findInTeamByOrder($status->getTeam(),$status->getStatusOrder()-1);
+				if($switchWith != NULL){
+					$newOrder = $switchWith->getStatusOrder();
+					$switchWith->setStatusOrder($status->getStatusOrder());
+					$status->setStatusOrder($newOrder);
+			}
+
+			}
+		}
+		$em->flush();
+
+		$referer = $request->headers->get('referer');
+		return $this->redirect($referer);
+	}
+
+	/**
+	 * @Route("/delStatus/{statusId}",name="team_delStatus")
+	 */
+	public function delStatus(Request $request, $statusId){
+		$em = $this->getDoctrine()->getManager();
+		$statusRepository = $this->getDoctrine()->getRepository(ProjectStatus::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if(!($status = $statusRepository->find($statusId))){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}elseif(!$me->canAdmin($status->getTeam())){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		$i=1;
+		while(($nextStatus = $statusRepository->findInTeamByOrder($status->getTeam(),$status->getStatusOrder()+$i)) != NULL){
+			$nextStatus->setStatusOrder($nextStatus->getStatusOrder()-1);
+			$i++;
+		}
+
+		$em->remove($status);
+		$em->flush();
+
+		$referer = $request->headers->get('referer');
+		return $this->redirect($referer);
+	}
 }

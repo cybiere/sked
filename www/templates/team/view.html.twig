@@ -73,13 +73,15 @@
 		<table class="table">
 			<tr><th colspan="2">Etapes des projets</th><th class="actions"></tr>
 			<tbody id="managers">
-			{% for status in team.projectStatuses %}
+			{% for status in statuses %}
 			<tr>
 				<td>{{status.statusOrder }}</td>
 				<td>
 					{{ status.name }}
 				</td><td class="actions">
-					{#<a class="text-danger" href='{{ path('team_delManager',{"teamId":team.id,"userId":user.id}) }}'><i title="Supprimer" class="fas fa-trash"></i></a>#}
+					<a class="text-secondary" href='{{ path('team_changeStatusOrder',{"statusId":status.id,"way":"inc"}) }}'><i title="Monter" class="fas fa-sort-up"></i></a>
+					<a class="text-secondary" href='{{ path('team_changeStatusOrder',{"statusId":status.id,"way":"dec"}) }}'><i title="Descendre" class="fas fa-caret-down"></i></a>
+					<a class="text-danger" href='{{ path('team_delStatus',{"statusId":status.id}) }}'><i title="Supprimer" class="fas fa-trash"></i></a>
 				</td>
 			</tr>
 			{% endfor %}
