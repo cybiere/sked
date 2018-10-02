@@ -23,64 +23,34 @@
 </div>
 {% endif %}
 <hr />
-{#
-<div class="row" id="kanban">
-	<div class="col kanCol" data-status='0'>
-		<h3>Non validé</h3>
-
-		{% for project in projects[0] %}
-		{{ kanproject(project,me) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='1'>
-		<h3>Lancement</h3>
-
-		{% for project in projects[1] %}
-		{{ kanproject(project,me) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='2'>
-		<h3>En cours</h3>
-
-		{% for project in projects[2] %}
-		{{ kanproject(project,me) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='3'>
-		<h3>Rapport</h3>
-
-		{% for project in projects[3] %}
-		{{ kanproject(project,me) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='4'>
-		<h3>Relecture</h3>
-
-		{% for project in projects[4] %}
-		{{ kanproject(project,me) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='5'>
-		<h3>Restitution</h3>
-
-		{% for project in projects[5] %}
-		{{ kanproject(project,me) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='6'>
-		<h3>Facturation</h3>
-
-		{% for project in projects[6] %}
-		{{ kanproject(project,me) }}
-		{% endfor %}
+{% for team in teams if not team.projectStatuses is empty %}
+<div class="card">
+	<a class="card-header" data-toggle="collapse" href="#kan{{team.name}}" role="button" aria-expanded="false" aria-controls="showMore">
+		Tableau des projets pour l'équipe {{ team.name }}
+	</a>
+	<div class="card-body collapse show" id="kan{{team.name}}">
+		<div class="row" id="kanban">
+			{% for status in team.projectStatuses %}
+			<div class="col kanCol" data-status='{{status.id}}'>
+				<h3>{{status.name}}</h3>
+				{#
+				{% for project in status.projects %}
+				{{ kanproject(project,me) }}
+				{% endfor %}
+				#}
+			</div>
+			{% endfor %}
+		</div>
 	</div>
 </div>
-#}
+<hr />
+{% endfor %}
+
 <div class="card bg-light">
 	<a class="card-header" data-toggle="collapse" href="#billable" role="button" aria-expanded="false" aria-controls="showMore">
 		Projects facturables en cours
 	</a>
-	<div class="card-body collapse" id="billable">
+	<div class="card-body collapse show" id="billable">
 		<table class="table table-hover table-sm">
 			<thead class="thead-light">
 				<tr>
@@ -157,9 +127,9 @@
 
 <hr />
 <div class="card bg-light">
-		<a class="card-header" data-toggle="collapse" href="#non-billable" role="button" aria-expanded="false" aria-controls="showMore">
+	<a class="card-header" data-toggle="collapse" href="#non-billable" role="button" aria-expanded="false" aria-controls="showMore">
 		Projects non-facturables en cours
-		</a>
+	</a>
 	<div class="card-body collapse" id="non-billable">
 		<table class="table table-hover table-sm">
 			<thead class="thead-light">
