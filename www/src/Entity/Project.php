@@ -192,12 +192,12 @@ class Project
 		return $this->client.' - '.$this->name;
 	}
 
-	public function getProjectStatus(): ?ProjectStatus
+	public function getProjectStatus()
 	{
 		return $this->projectStatus;
 	}
 
-	public function setProjectStatus(?ProjectStatus $projectStatus): self
+	public function setProjectStatus(ProjectStatus $projectStatus)
 	{
 		$this->projectStatus = $projectStatus;
 		return $this;
