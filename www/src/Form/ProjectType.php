@@ -16,21 +16,22 @@ class ProjectType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+		if(!empty($options['statuses'])){
+			$builder->add('team',null,array('label'=>'Équipe','choices'=>$options['teams'],'required'=>!empty($options['teams'])));
+		}
         $builder
             ->add('reference',null,array('label'=>'Code projet','attr' => array('maxlength' => 10)))
             ->add('name',null,array('label'=>'Nom du projet'))
-            ->add('client',null,array('label'=>'Client'))
-            ->add('projectManager',null,array('label'=>'Responsable projet'))
-			->add('status',ChoiceType::class,array('label'=>'Statut',
-												   'choices'=>array(
-														'Non validé'=>0,
-														'Lancement'=>1,
-														'En cours'=>2,
-														'Rapport'=>3,
-														'Relecture'=>4,
-														'Restitution'=>5,
-														'Facturation'=>6,
-			)))
+            ->add('client',null,array('label'=>'Client'));
+		if(!empty($options['statuses'])){
+			$builder->add('projectManager',null,array('label'=>'Responsable projet','choices'=>$options['users']));
+		}
+			
+		if(!empty($options['statuses'])){
+			$builder->add('projectStatus',null,array('label'=>'Statut','choices'=>$options['statuses']));
+		}
+
+		$builder
             ->add('billable',null,array('required'=>false,'label'=>'Facturable'))
             ->add('archived',null,array('required'=>false,'label'=>'Archivé'))
             ->add('nbDays',NumberType::class,array('required'=>false,'label'=>'Jours vendus'))
@@ -42,7 +43,10 @@ class ProjectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
 		$resolver->setDefaults([
-			"data_class" => Project::class
+			"data_class" => Project::class,
+			"teams"=>[],
+			"statuses"=>[],
+			"users"=>[]
         ]);
     }
 }

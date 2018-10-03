@@ -7,6 +7,7 @@ use Twig\TwigFunction;
 use App\Entity\Project;
 use App\Entity\Planning;
 use App\Entity\User;
+use App\Entity\Team;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AppExtension extends AbstractExtension
@@ -23,12 +24,14 @@ class AppExtension extends AbstractExtension
 		return array(
 			new TwigFunction('kanproject',array($this,'kanprojectFunction')),
 			new TwigFunction('printPlanning',array($this,'printPlanningFunction')),
+			new TwigFunction('printTeam',array($this,'printTeamFunction')),
 		);
 	}
 
-	public function kanprojectFunction($project,$isAdmin){
+	public function kanprojectFunction($project,$me){
+		$isAdmin = $me->canAdmin($project);
 ?>
-	<div class='card kanProject' data-projectid="<?php echo htmlspecialchars($project->getId()); ?>">
+	<div class='card kanProject<?php if($isAdmin){ echo " hasAdmin"; }?>' data-projectid="<?php echo htmlspecialchars($project->getId()); ?>">
 		<h4 class="card-header text-center">
 			<a class="text-dark" data-toggle="collapse" href="#kanDetails-<?php echo htmlspecialchars($project->getId()); ?>" aria-expanded="false">
 				<?php echo htmlspecialchars($project->getClient()); ?> <?php echo htmlspecialchars($project->getName()); ?>
@@ -38,6 +41,7 @@ class AppExtension extends AbstractExtension
 			<div class="card-body">
 				<ul class="list-unstyled">
 					<li> <a href="<?php echo $this->router->generate('project_view',array("projectId"=>$project->getId())); ?>">Détails</a></li>
+					<?php if($project->getTeam()){ echo "<li> Équipe : ".htmlspecialchars($project->getTeam()->getName())."</li>"; } ?>
 					<li> Code projet : <?php echo htmlspecialchars($project->getReference()); ?></li>
 					<li> Nom : <?php echo htmlspecialchars($project->getName()); ?></li>
 					<li> Client : <?php echo htmlspecialchars($project->getClient()); ?></li>
@@ -56,20 +60,10 @@ class AppExtension extends AbstractExtension
 			<div class="card-footer">
 				<div class="row">
 					<div class="col">
-						<?php if($project->getStatus() == 0) echo "<i class='fas fa-chevron-circle-left'></i>"; else { ?>
-							<a href='<?php echo $this->router->generate('project_movelink',array("projectId"=>$project->getId(),"way"=>"dec")); ?>'><i class='fas fa-chevron-circle-left'></i></a>
-						<?php } ?>
-					</div>
-					<div class="col">
 						<a href='<?php echo $this->router->generate('project_edit',array("projectId"=>$project->getId())); ?>'><i title='Modifier' class='fas fa-edit'></i></a>
 					</div>
 					<div class="col">
 						<a href='<?php echo $this->router->generate('project_archive',array("projectId"=>$project->getId())); ?>'><i title='Archiver' class='fas fa-caret-square-down'></i></a>
-					</div>
-					<div class="col">
-						<?php if($project->getStatus() == 6) echo "<i class='fas fa-chevron-circle-right'></i>"; else { ?>
-							<a href='<?php echo $this->router->generate('project_movelink',array("projectId"=>$project->getId(),"way"=>"inc")); ?>'><i class='fas fa-chevron-circle-right'></i></a>
-						<?php } ?>
 					</div>
 				</div>
 			</div>
@@ -98,7 +92,10 @@ class AppExtension extends AbstractExtension
 			}else{
 				echo "non-billable"; 
 			}
-		?> "
+		if($project == 0 && $isAdmin){
+			echo " hasAdmin";
+		}
+		?>"
 		tabindex="0" 
 		data-duration="<?php echo htmlspecialchars($planning->getNbSlices()); ?>" 
 		data-planningId="<?php echo htmlspecialchars($planning->getId()); ?>"
@@ -109,7 +106,7 @@ class AppExtension extends AbstractExtension
 			<div class='row'>
 <?php if($planning->getProject() != NULL){ ?>
 <?php if($planning->getTask() != NULL){ ?>
-			<dt class='col-md-6'>Projet</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getName()); ?></dd>
+			<dt class='col-md-6'>Projet</dt><dd class='col-md-6'><a href='<?php echo $this->router->generate('project_view',array("projectId"=>$planning->getProject()->getId()))."'>".htmlspecialchars($planning->getProject()->getName()); ?></a></dd>
 <?php } ?>
 			<dt class='col-md-6'>Code projet</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getReference()); ?></dd>
 			<dt class='col-md-6'>Client</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getClient()); ?></dd>
@@ -136,4 +133,31 @@ class AppExtension extends AbstractExtension
 <?php
 	}
 
+	public function printTeamFunction($team){
+?>
+	<tr>
+		<td>
+		<?php 
+			$i=1;
+			while($team->getLevel() >= $i){
+				echo "&emsp;";
+				$i++;
+			}
+			if($team->getLevel() != 0) echo "↳ ";
+			echo htmlspecialchars($team->getName());
+		?>
+		</td>
+		<td><?php echo count($team->getUsers()); ?></td>
+		<td><?php foreach($team->getManagers() as $user){ echo "<span class='managerList'>".htmlspecialchars($user->getFullname())."</span>";} ?></td>
+		<td class="actions">
+			<a href='<?php echo $this->router->generate('team_view',array("teamId"=>$team->getId())); ?>'><i title='Détails' class='fa fa-search'></i></a>
+			<a href='<?php echo $this->router->generate('team_index',array("teamId"=>$team->getId())); ?>'><i title='Modifier' class='fas fa-edit'></i></a>
+			<a class="text-danger" href='<?php echo $this->router->generate('team_del',array("teamId"=>$team->getId())); ?>'><i title="Supprimer" class="fas fa-trash"></i></a>
+		</td>
+	</tr>
+<?php
+	foreach($team->getChildren() as $child){
+		$this->printTeamFunction($child);
+	}
+	}
 }

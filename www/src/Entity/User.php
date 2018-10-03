@@ -60,12 +60,22 @@ class User
 	 */
 	private $tasks;
 
+	/**
+     * @ORM\ManyToMany(targetEntity="Team", mappedBy="users")
+     */
+    private $teams;
+
+	/**
+     * @ORM\ManyToMany(targetEntity="Team", mappedBy="managers")
+     */
+    private $managedTeams;
 
     public function __construct()
     {
         $this->managedProjects = new ArrayCollection();
         $this->plannings = new ArrayCollection();
         $this->tasks = new ArrayCollection();
+        $this->teams = new ArrayCollection();
     }
 
 	public function __toString(){
@@ -139,4 +149,57 @@ class User
     {
         return $this->tasks;
     }
+
+	/**
+     * @return Collection|Team[]
+     */
+    public function getTeams()
+    {
+		return $this->teams;
+	}
+
+	/**
+     * @return Collection|Team[]
+     */
+    public function getManagedTeams()
+	{
+		$managed = [];
+		foreach($this->managedTeams as $team){
+			$managed[] = $team;
+			$managed = array_merge($managed,$team->getRecurChildren());
+		}
+		return array_unique($managed);
+	}
+
+	public function canAdmin($target){
+		if($this->isAdmin){ return true; }
+		if(is_a($target,Project::class)){
+			$pm = $target->getProjectManager();
+			if($pm != NULL && $pm == $this){ 
+				return true; 
+			}
+			if(($team = $target->getTeam()) == NULL){
+				return false;
+			}
+			return $this->canAdmin($team);
+		}
+		if(is_a($target,Planning::class)){
+			if($target->getProject() == NULL) return $this->canAdmin($target->getUser());
+			return $this->canAdmin($target->getProject());
+		}
+		if(is_a($target,User::class)){
+			foreach($target->getTeams() as $team){
+				if($team->canAdmin($this)) return true;
+			}
+			return false;
+		}
+		if(is_a($target,Team::class)){
+			return $target->canAdmin($this);
+		}
+		if(is_a($target,Task::class)){
+			if(($project = $target->getProject()) == NULL){ return false; }
+			return $this->canAdmin($project);
+		}
+		return false;
+	}
 }

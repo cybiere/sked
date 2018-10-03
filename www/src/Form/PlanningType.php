@@ -19,9 +19,9 @@ class PlanningType extends AbstractType
             ->add('nbSlices',null,array('label'=>'Nombre de tranches (0,5jh)'))
             ->add('meeting',null,array('label'=>'Réunion'))
             ->add('confirmed',null,array('label'=>'Confirmé'))
-            ->add('project',null,array('label'=>'Projet'))
+            ->add('project',null,array('label'=>'Projet','choices'=>$options['projects'],'required'=>true))
             ->add('task',null,array('label'=>'Tâche'))
-            ->add('user',null,array('label'=>'Ressource'))
+            ->add('user',null,array('label'=>'Ressource','choices'=>$options['users'],'required'=>true))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
         ;
     }
@@ -29,7 +29,9 @@ class PlanningType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Planning::class,
+			'data_class' => Planning::class,
+			'projects' => [],
+			'users' => [],
         ]);
     }
 }

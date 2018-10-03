@@ -23,7 +23,7 @@ class TaskType extends AbstractType
 		}
         $builder
             ->add('name',null,array('label'=>'Nom de la tâche'))
-            ->add('assignedTo',null,array('label'=>'Assignée à'))
+            ->add('assignedTo',null,array('label'=>'Assignée à','choices'=>$options['users']))
             ->add('nbDays',NumberType::class,array('required'=>false,'label'=>'Jours vendus'))
             ->add('comments',TextareaType::class,array('required'=>false,'label'=>'Commentaires'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
@@ -35,6 +35,7 @@ class TaskType extends AbstractType
         $resolver->setDefaults([
 			'data_class' => Task::class,
 			'project' => null,
+			'users' => [],
         ]);
     }
 }

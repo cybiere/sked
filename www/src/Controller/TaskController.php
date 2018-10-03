@@ -60,12 +60,14 @@ class TaskController extends Controller
 		$referer = $request->headers->get('referer');
 		$em = $this->getDoctrine()->getManager();
 		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($task = $taskRepository->find($taskId))){
 			$this->addFlash('danger','Erreur : tâche non trouvée');
 			return $this->redirect($referer);
 		}
-		if(!$this->get('session')->get('user')->isAdmin() && $task->getAssignedTo()->getId() != $this->get('session')->get('user')->getId() && ($task->getProject() != NULL && $task->getProject()->getProjectManager()->getId() != $this->get('session')->get('user')->getId())){
+		if(!$me->canAdmin($task) && $task->getAssignedTo()->getId() != $this->get('session')->get('user')->getId()){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
@@ -85,12 +87,14 @@ class TaskController extends Controller
 		$referer = $request->headers->get('referer');
 		$em = $this->getDoctrine()->getManager();
 		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($task = $taskRepository->find($taskId))){
 			$this->addFlash('danger','Erreur : tâche non trouvée');
 			return $this->redirect($referer);
 		}
-		if(!$this->get('session')->get('user')->isAdmin() && !($task->getProject() != null && $task->getProject()->getProjectManager() != null && $task->getProject()->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
+		if(!$me->canAdmin($task)){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
@@ -106,6 +110,8 @@ class TaskController extends Controller
 		$referer = $request->headers->get('referer');
 		$em = $this->getDoctrine()->getManager();
 		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($task = $taskRepository->find($taskId))){
 			throw $this->createNotFoundException("Cette page n'existe pas");
@@ -116,11 +122,20 @@ class TaskController extends Controller
 			return $this->redirect($referer);
 		}
 
-		if(!$this->get('session')->get('user')->isAdmin() && !($task->getProject() != null && $task->getProject()->getProjectManager() != null && $task->getProject()->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
+		if(!$me->canAdmin($task)){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
-		$form = $this->createForm(TaskType::class,$task,["project"=>$task->getProject()]);
+		$managedUsers = $userRepository->findAll();
+		if(!$me->isAdmin()){
+			foreach($managedUsers as $key => $user){
+				if(!$me->canAdmin($user)){
+					unset($managedUsers[$key]);
+				}
+			}
+		}
+
+		$form = $this->createForm(TaskType::class,$task,["project"=>$task->getProject(),"users"=>$managedUsers]);
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$em->persist($task);
@@ -143,13 +158,15 @@ class TaskController extends Controller
 		$referer = $request->headers->get('referer');
 		$em = $this->getDoctrine()->getManager();
 		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($task = $taskRepository->find($taskId))){
 			$this->addFlash('danger','Erreur : tâche non trouvée');
 			return $this->redirect($referer);
 		}
 
-		if(!$this->get('session')->get('user')->isAdmin() && !($task->getProject() != null && $task->getProject()->getProjectManager() != null && $task->getProject()->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
+		if(!$me->canAdmin($task)){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
@@ -166,16 +183,22 @@ class TaskController extends Controller
 	/**
 	 * @Route("/byproject/{projectId}",name="task_byproject")
 	 */
-	public function resize(Request $request,$projectId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
+	public function byProject(Request $request,$projectId){
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($project = $projectRepository->find($projectId))){
 			$arrData = ['success' => false, 'errormsg' => 'Projet non trouvé'];
-		}else{
+			return new JsonResponse($arrData);
+		}
+		
+		if(!$me->canAdmin($project)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+			return new JsonResponse($arrData);
+		}
+		else{
 			$taskRepository = $this->getDoctrine()->getRepository(Task::class);
 			$tasks = $taskRepository->findByProject($project);
 			$arrData = ['success' => true,'tasks'=> array()];

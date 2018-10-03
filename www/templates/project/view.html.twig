@@ -7,12 +7,12 @@
 {% set months = ['','Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'] %}
 <h1>Projet {{ project.client }} {{ project.name }} {% if project.archived %}<span class="badge badge-secondary">Archivé</span>{% endif %}
 	<a class="btn btn-outline-dark float-right" href="{{ path('project_index')}}">Retour</a>
-	{% if app.session.get('user').admin %}
+	{% if me.canAdmin(project) %}
 	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('project_edit',{'projectId':project.id})}}">Modifier</a>
 	{% endif %}
 </h1>
 
-{% if app.session.get('user').admin or (project.projectManager and project.projectManager.id == app.session.get('user').id) %}
+{% if me.canAdmin(project) %}
 <div class="modal fade" id="addTask_Modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -63,7 +63,7 @@
 				<th>Responsable projet</th>
 				<td>
 					{% if project.projectManager %}
-					{% if app.session.get('user').admin %}
+					{% if me.canAdmin(project.projectManager) %}
 					<a href="{{ path('user_view',{'userId':project.projectManager.id}) }}">{{ project.projectManager.fullname }}</a>
 					{% else %}
 						{{ project.projectManager.fullname }}
@@ -86,7 +86,7 @@
 				<th>Terminé</th>
 				<th>Clôturé</th>
 				<th class="actions">
-					{% if app.session.get('user').admin or (project.projectManager and project.projectManager.id == app.session.get('user').id) %}
+					{% if me.canAdmin(project) %}
 						<button type="button" class="btn btn-sm btn-outline-success" data-toggle="modal" data-target="#addTask_Modal">
 						Ajouter
 						</button>
@@ -99,7 +99,7 @@
 			<tr{% if task.done %} class="table-secondary"{% endif %}>
 				<td>{% if task.comments %}<a href="#" data-toggle="tooltip" title="{{ task.comments }}">{{ task.name }}</a>{% else %}{{ task.name }}{% endif %}</td>
 				<td>{% if task.assignedTo %}
-					{% if app.session.get('user').admin %}
+					{% if me.canAdmin(task.assignedTo) %}
 					<a href="{{ path('user_view',{'userId':task.assignedTo.id}) }}">{{ task.assignedTo.fullname }}</a>
 					{% else %}
 						{{ task.assignedTo.fullname }}
@@ -110,10 +110,10 @@
 				<td>{% if task.done %}<span class="fas fa-check-circle"></span>{% endif %}</td>
 				<td>{% if task.closed %}<span class="fas fa-lock"></span>{% endif %}</td>
 				<td class="actions">
-					{% if not task.closed and ((task.assignedTo and task.assignedTo.id == app.session.get('user').id) or app.session.get('user').admin or (project.projectManager and project.projectManager.id == app.session.get('user').id)) %}
+					{% if not task.closed and ((task.assignedTo and task.assignedTo.id == app.session.get('user').id) or me.canAdmin(project)) %}
 						<a href="{{ path('task_toggleDone',{'taskId':task.id}) }}"><span class="fas fa-check-circle"></span></a>
 					{% endif %}
-					{% if (project.projectManager and project.projectManager.id == app.session.get('user').id) or app.session.get('user').admin %}
+					{% if me.canAdmin(project) %}
 					{% if not task.closed %}<a href="{{ path('task_edit',{'taskId':task.id}) }}"><span class="fas fa-edit"></span></a>{% endif %}
 					<a href="{{ path('task_toggleClosed',{'taskId':task.id}) }}"><span class="fas fa-lock{% if task.closed %}-open{% endif %}"></span></a>
 					{% if task.closed %}<a href="{{ path('task_del',{'taskId':task.id}) }}" class="text-danger"><span class="fas fa-trash"></span></a>{% endif %}
@@ -175,7 +175,7 @@
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
-					{{ printPlanning(planning,app.session.get('user').admin,project.id) }}
+					{{ printPlanning(planning,me.canAdmin(planning),project.id) }}
 					{% endif %}
 					{% endfor %}
 				</div>
@@ -185,7 +185,7 @@
 				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
-					{{ printPlanning(planning,app.session.get('user').admin,project.id) }}
+					{{ printPlanning(planning,me.canAdmin(planning),project.id) }}
 					{% endif %}
 					{% endfor %}
 				</div></td>
@@ -216,7 +216,7 @@ $( ".project" ).on('blur',function() {
 {% endblock %}
 
 {% block helpContent %}
-{% if app.session.get('user').admin %}
+{% if me.canAdmin(project) %}
 <ul>
 	<li>Seuls les projets archivés peuvent être supprimés</li>
 	<li>Actions d'administration

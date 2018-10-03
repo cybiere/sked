@@ -1,0 +1,21 @@
+{% extends "base.html.twig" %}
+
+{% block pageTitle %}Equipes{% endblock %}
+
+{% block body %}
+<h1>Gestion des équipes</h1>
+<h2>Ajouter une équipe</h2>
+
+{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}
+
+<h2>Équipes existantes</h2>
+<table class="table table-sm table-hover">
+	<tr><th>Nom</th><th>Membres</th><th>Responsables</th><th></th></tr>
+	{% for team in teams if team.level==0%}
+		{{printTeam(team)}}
+	{% endfor %}
+</table>
+
+{% endblock %}

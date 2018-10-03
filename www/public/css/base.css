@@ -30,6 +30,9 @@ nav img{
 .kanActiveCol{
 	background-color:lightblue;
 }
+.hasAdmin{
+	border: 2px #1a1 solid !important;
+}
 .schedule{
 	table-layout: fixed;
 	margin-bottom: 50px;
@@ -164,4 +167,12 @@ th.schedUser{
 	width : 70px;
 	text-align:center;
 }
-
+.managerList:after{
+	content:", "
+}
+.managerList:last-child:after{
+	content:""
+}
+.card-footer{
+	text-align:center;
+}

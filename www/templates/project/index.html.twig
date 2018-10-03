@@ -3,14 +3,14 @@
 {% block pageTitle %}Projets{% endblock %}
 
 {% block body %}
-<h1>Projets en cours
-	{% if app.session.get('user').admin %}
+<h1>Projets
+	{% if me.isAdmin or me.managedTeams is not empty %}
 	<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addProject" role="button" aria-expanded="false" aria-controls="addButton">
 		Ajouter un projet
 	</a>
 	{% endif %}
 </h1>
-{% if app.session.get('user').admin %}
+{% if me.isAdmin or me.managedTeams is not empty %}
 <div class="collapse" id="addProject">
 	<div class="card bg-light">
 		<h2 class="card-header">Ajouter un projet</h2>
@@ -23,149 +23,318 @@
 </div>
 {% endif %}
 <hr />
-<div class="row" id="kanban">
-	<div class="col kanCol" data-status='0'>
-		<h3>Non validé</h3>
-
-		{% for project in projects[0] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='1'>
-		<h3>Lancement</h3>
-
-		{% for project in projects[1] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='2'>
-		<h3>En cours</h3>
-
-		{% for project in projects[2] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='3'>
-		<h3>Rapport</h3>
-
-		{% for project in projects[3] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='4'>
-		<h3>Relecture</h3>
-
-		{% for project in projects[4] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='5'>
-		<h3>Restitution</h3>
-
-		{% for project in projects[5] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
-		{% endfor %}
-	</div>
-	<div class="col kanCol" data-status='6'>
-		<h3>Facturation</h3>
-
-		{% for project in projects[6] %}
-		{{ kanproject(project,app.session.get('user').admin) }}
-		{% endfor %}
+{% for team in teams if not team.projectStatuses is empty %}
+<div class="card">
+	<a class="card-header" data-toggle="collapse" href="#kan{{team.name}}" role="button" aria-expanded="false" aria-controls="showMore">
+		Tableau des projets pour l'équipe {{ team.name }}
+	</a>
+	<div class="card-body collapse show" id="kan{{team.name}}">
+		<div class="row kanban">
+			<div class="col kanCol" data-status='0'>
+				<h3>Non confirmé</h3>
+				{% for project in team.projects if project.projectStatus == NULL %}
+				{{ kanproject(project,me) }}
+				{% endfor %}
+			</div>
+			{% for status in team.projectStatuses %}
+			<div class="col kanCol" data-status='{{status.id}}'>
+				<h3>{{status.name}}</h3>
+				{% for project in status.projects if not project.archived %}
+				{{ kanproject(project,me) }}
+				{% endfor %}
+			</div>
+			{% endfor %}
+		</div>
 	</div>
 </div>
 <hr />
-<h2>
-	Projets non facturables
-</h2>
-<table class="table table-hover table-sm">
-	<thead class="thead-light">
-		<tr>
-			<th>Nom du projet</th>
-			<th>Responsable projet</th>
-			<th>Jours définis</th>
-			<th>Jours planifiés</th>
-			<th class="actions">Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for project in internalProjects %}
-		<tr>
-			<td>{{ project.name }}</td>
-			<td>{% if project.projectManager %}
-				{% if app.session.get('user').admin %}
-					<a href="{{ path("user_view",{"userId":project.projectManager.id}) }}">
-					{{ project.projectManager.fullname }}
-					</a>
-				{% else %}
-					{{ project.projectManager.fullname }}
+{% endfor %}
+
+<div class="card bg-light">
+	<a class="card-header" data-toggle="collapse" href="#billable" role="button" aria-expanded="false" aria-controls="showMore">
+		Projects facturables en cours
+	</a>
+	<div class="card-body collapse show" id="billable">
+		<table class="table table-hover table-sm">
+			<thead class="thead-light">
+				<tr>
+					<th colspan="2">Nom du projet</th>
+					<th>Responsable projet</th>
+					<th>Jours définis</th>
+					<th>Jours planifiés</th>
+					<th class="actions">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for team in teams %}
+				<tr>
+					<td colspan="6" class="teamName">Projets de l'équipe {{ team.name }}</td>
+				</tr>
+				{% for project in team.projects if not project.archived and project.billable %}
+				<tr>
+					<td></td>
+					<td>
+						<a href="{{ path("project_view",{"projectId":project.id}) }}">
+							{{ project.name }}
+						</a>
+					</td>
+					<td>{% if project.projectManager %}
+						{% if me.canAdmin(project.projectManager) %}
+						<a href="{{ path("user_view",{"userId":project.projectManager.id}) }}">
+							{{ project.projectManager.fullname }}
+						</a>
+						{% else %}
+						{{ project.projectManager.fullname }}
+						{% endif %}
+						{% endif %}</td>
+					<td>{{ project.nbDays }}</td>
+					<td>{{ project.plannedDays }}</td>
+					<td class="actions">
+						<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
+						{% if me.canAdmin(project) %}
+						<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
+						<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-down"></i></a>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+				{% endfor %}
+				{% if teamlessProjects %}
+				<tr>
+					<td colspan="6" class="teamName">Projets non assignés à une équipe</td>
+				</tr>
 				{% endif %}
-				{% endif %}</td>
-			<td>{{ project.nbDays }}</td>
-			<td>{{ project.plannedDays }}</td>
-			<td class="actions">
-				<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
-				{% if app.session.get('user').admin %}
-				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
-				<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-down"></i></a>
-				{% endif %}
-			</td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
+				{% for project in teamlessProjects if not project.archived and project.billable %}
+				<tr>
+					<td></td>
+					<td>
+						<a href="{{ path("project_view",{"projectId":project.id}) }}">
+							{{ project.name }}
+						</a>
+					</td>
+					<td>{% if project.projectManager %}
+						{% if me.canAdmin(project.projectManager) %}
+						<a href="{{ path("user_view",{"userId":project.projectManager.id}) }}">
+							{{ project.projectManager.fullname }}
+						</a>
+						{% else %}
+						{{ project.projectManager.fullname }}
+						{% endif %}
+						{% endif %}</td>
+					<td>{{ project.nbDays }}</td>
+					<td>{{ project.plannedDays }}</td>
+					<td class="actions">
+						<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
+						{% if me.canAdmin(project) %}
+						<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
+						<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-down"></i></a>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+
 <hr />
-<h2>
-	<i class="fas fa-archive"></i>
-	Projets archivés
-</h2>
-<table class="table table-hover table-sm">
-	<thead class="thead-light">
-		<tr>
-			<th>Code projet</th>
-			<th>Nom du projet</th>
-			<th>Client</th>
-			<th class="actions">Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for project in archivedProjects %}
-		<tr>
-			<td>{{ project.reference }}</td>
-			<td>{{ project.name }}</td>
-			<td>{{ project.client }}</td>
-			<td class="actions">
-				<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
-				{% if app.session.get('user').admin %}
-				<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
-				<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Désarchiver" class="fas fa-caret-square-up"></i></a>
-				<a class="text-danger" href='{{ path('project_del',{"projectId":project.id})}}'><i title="Supprimer" class="fas fa-trash"></i></a>
+<div class="card bg-light">
+	<a class="card-header" data-toggle="collapse" href="#non-billable" role="button" aria-expanded="false" aria-controls="showMore">
+		Projects non-facturables en cours
+	</a>
+	<div class="card-body collapse" id="non-billable">
+		<table class="table table-hover table-sm">
+			<thead class="thead-light">
+				<tr>
+					<th colspan="2">Nom du projet</th>
+					<th>Responsable projet</th>
+					<th>Jours définis</th>
+					<th>Jours planifiés</th>
+					<th class="actions">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for team in teams %}
+				<tr>
+					<td colspan="6" class="teamName">Projets de l'équipe {{ team.name }}</td>
+				</tr>
+				{% for project in team.projects if not project.archived and not project.billable %}
+				<tr>
+					<td></td>
+					<td>
+						<a href="{{ path("project_view",{"projectId":project.id}) }}">
+							{{ project.name }}
+						</a>
+					</td>
+					<td>{% if project.projectManager %}
+						{% if me.canAdmin(project.projectManager) %}
+						<a href="{{ path("user_view",{"userId":project.projectManager.id}) }}">
+							{{ project.projectManager.fullname }}
+						</a>
+						{% else %}
+						{{ project.projectManager.fullname }}
+						{% endif %}
+						{% endif %}</td>
+					<td>{{ project.nbDays }}</td>
+					<td>{{ project.plannedDays }}</td>
+					<td class="actions">
+						<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
+						{% if me.canAdmin(project) %}
+						<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
+						<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-down"></i></a>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+				{% endfor %}
+				{% if teamlessProjects %}
+				<tr>
+					<td colspan="6" class="teamName">Projets non assignés à une équipe</td>
+				</tr>
 				{% endif %}
-			</td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
+				{% for project in teamlessProjects if not project.archived and not project.billable %}
+				<tr>
+					<td></td>
+					<td>
+						<a href="{{ path("project_view",{"projectId":project.id}) }}">
+							{{ project.name }}
+						</a>
+					</td>
+					<td>{% if project.projectManager %}
+						{% if me.canAdmin(project.projectManager) %}
+						<a href="{{ path("user_view",{"userId":project.projectManager.id}) }}">
+							{{ project.projectManager.fullname }}
+						</a>
+						{% else %}
+						{{ project.projectManager.fullname }}
+						{% endif %}
+						{% endif %}</td>
+					<td>{{ project.nbDays }}</td>
+					<td>{{ project.plannedDays }}</td>
+					<td class="actions">
+						<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
+						{% if me.canAdmin(project) %}
+						<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
+						<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-down"></i></a>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+<hr />
+<div class="card bg-light">
+	<a class="card-header" data-toggle="collapse" href="#archived" role="button" aria-expanded="false" aria-controls="showMore">
+		Projects archivés
+	</a>
+	</h2>
+	<div class="card-body collapse" id="archived">
+		<table class="table table-hover table-sm">
+			<thead class="thead-light">
+				<tr>
+					<th colspan="2">Nom du projet</th>
+					<th>Responsable projet</th>
+					<th>Jours définis</th>
+					<th>Jours planifiés</th>
+					<th class="actions">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for team in teams %}
+				<tr>
+					<td colspan="6" class="teamName">Projets de l'équipe {{ team.name }}</td>
+				</tr>
+				{% for project in team.projects if project.archived %}
+				<tr>
+					<td></td>
+					<td>
+						<a href="{{ path("project_view",{"projectId":project.id}) }}">
+							{{ project.name }}
+						</a>
+					</td>
+					<td>{% if project.projectManager %}
+						{% if me.canAdmin(project.projectManager) %}
+						<a href="{{ path("user_view",{"userId":project.projectManager.id}) }}">
+							{{ project.projectManager.fullname }}
+						</a>
+						{% else %}
+						{{ project.projectManager.fullname }}
+						{% endif %}
+						{% endif %}</td>
+					<td>{{ project.nbDays }}</td>
+					<td>{{ project.plannedDays }}</td>
+					<td class="actions">
+						<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
+						{% if me.canAdmin(project) %}
+						<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
+						<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-up"></i></a>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+				{% endfor %}
+				{% if teamlessProjects %}
+				<tr>
+					<td colspan="6" class="teamName">Projets non assignés à une équipe</td>
+				</tr>
+				{% endif %}
+				{% for project in teamlessProjects if project.archived %}
+				<tr>
+					<td></td>
+					<td>
+						<a href="{{ path("project_view",{"projectId":project.id}) }}">
+							{{ project.name }}
+						</a>
+					</td>
+					<td>{% if project.projectManager %}
+						{% if me.canAdmin(project.projectManager) %}
+						<a href="{{ path("user_view",{"userId":project.projectManager.id}) }}">
+							{{ project.projectManager.fullname }}
+						</a>
+						{% else %}
+						{{ project.projectManager.fullname }}
+						{% endif %}
+						{% endif %}</td>
+					<td>{{ project.nbDays }}</td>
+					<td>{{ project.plannedDays }}</td>
+					<td class="actions">
+						<a href='{{ path('project_view',{"projectId":project.id})}}'><i title='Détails' class='fas fa-search'></i></a>
+						{% if me.canAdmin(project) %}
+						<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
+						<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-up"></i></a>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+<p></p>
 {% endblock %}
 
 {% block extraJs %}
-{% if app.session.get('user').admin %}
 <script>
 	$(function(){
-		$('.kanProject').draggable({
-			containment : '#kanban',
-			revert : true,
-			revertDuration: 0,
-			cursor: "grab",
-			start : function(){
-				$(this).addClass("border-primary");
-				$(this).addClass("kanFloat");
-			},
-			stop : function(){
-				$(this).removeClass("border-primary");
-				$(this).removeClass("kanFloat");
-			}
-		}); // appel du plugin
+		$('.hasAdmin').each(function(){
+			var $el = $(this);
+			$el.draggable({
+				containment:$el.closest('.kanban'),
+				revert : true,
+				revertDuration: 0,
+				cursor: "grab",
+				start : function(){
+					$(this).addClass("border-primary");
+					$(this).addClass("kanFloat");
+				},
+				stop : function(){
+					$(this).removeClass("border-primary");
+					$(this).removeClass("kanFloat");
+				}
+			});
+		});
 		$('.kanCol').droppable({
 			classes: {
 				"ui-droppable-hover":"kanActiveCol",
@@ -182,7 +351,6 @@
 						$('#flashMessages').append(message);
 					},
 					success:function(data, status, xhr){
-						console.log('ajax\n');
 						if(data.success){
 							ui.draggable.detach().appendTo(destCol);
 						}else{
@@ -195,11 +363,9 @@
 		});
 	});
 </script>
-{% endif %}
 {% endblock %}
 
 {% block helpContent %}
-{% if app.session.get('user').admin %}
 <ul>
 	<li>Seuls les projets archivés peuvent être supprimés</li>
 	<li>Actions d'administration
@@ -212,5 +378,4 @@
 		</ul>
 	</li>
 </ul>
-{% endif %}
 {% endblock %}

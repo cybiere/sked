@@ -13,41 +13,36 @@ use Doctrine\Common\Collections\Collection;
  */
 class Project
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+	/**
+	 * @ORM\Id
+	 * @ORM\GeneratedValue
+	 * @ORM\Column(type="integer")
+	 */
+	private $id;
 
 	/**
-     * @ORM\Column(type="string", length=10)
-     */
+	 * @ORM\Column(type="string", length=10)
+	 */
 	private $reference;
 
 	/**
-     * @ORM\Column(type="string", length=200)
-     */
+	 * @ORM\Column(type="string", length=200)
+	 */
 	private $name;
 
 	/**
-     * @ORM\Column(type="string", length=200)
-     */
+	 * @ORM\Column(type="string", length=200)
+	 */
 	private $client;
 
 	/**
-     * @ORM\Column(type="integer")
-     */
-	private $status;
-
-	/**
-     * @ORM\Column(type="decimal", precision=7, scale=2, nullable=true)
-     */
+	 * @ORM\Column(type="decimal", precision=7, scale=2, nullable=true)
+	 */
 	private $nbDays;
 
 	/**
-     * @ORM\Column(type="string", length=1000, nullable=true)
-     */
+	 * @ORM\Column(type="string", length=1000, nullable=true)
+	 */
 	private $comments;
 
 	/**
@@ -61,30 +56,36 @@ class Project
 	private $archived=true;
 
 	/**
-     * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="project", orphanRemoval=true)
+	 * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="project", orphanRemoval=true)
 	 */
 	private $plannings;
 
 	/**
-     * @ORM\OneToMany(targetEntity="App\Entity\Task", mappedBy="project", orphanRemoval=true)
+	 * @ORM\OneToMany(targetEntity="App\Entity\Task", mappedBy="project", orphanRemoval=true)
 	 */
 	private $tasks;
 
 	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="managedProjects")
 	 * @ORM\JoinColumn(nullable=true,onDelete="SET NULL")
-     */
+	 */
 	private $projectManager;
 
+	/**
+	 * @ORM\ManyToOne(targetEntity="Team", inversedBy="projects")
+	 */
+	private $team;
 
-    public function __construct()
-    {
-        $this->plannings = new ArrayCollection();
-        $this->tasks = new ArrayCollection();
-    }
+	/**
+	 * @ORM\ManyToOne(targetEntity="App\Entity\ProjectStatus", inversedBy="projects")
+	 */
+	private $projectStatus;
 
-	public function __toString(){
-		return $this->client.' - '.$this->name;
+
+	public function __construct()
+	{
+		$this->plannings = new ArrayCollection();
+		$this->tasks = new ArrayCollection();
 	}
 
 	public function getId(){
@@ -113,16 +114,6 @@ class Project
 
 	public function setClient($client){
 		$this->client = $client;
-	}
-
-	public function getStatus(){
-		return $this->status;
-	}
-
-	public function setStatus($status){
-		if($status>6) $status = 6;
-		if($status<0) $status = 0;
-		$this->status = $status;
 	}
 
 	public function getNbDays(){
@@ -159,18 +150,18 @@ class Project
 	}
 
 	/**
-     * @return Collection|Planning[]
-     */
-    public function getPlannings()
-    {
-        return $this->plannings;
+	 * @return Collection|Planning[]
+	 */
+	public function getPlannings()
+	{
+		return $this->plannings;
 	}
 
 	/**
-     * @return Collection|Task[]
-     */
-    public function getTasks(){
-        return $this->tasks;
+	 * @return Collection|Task[]
+	 */
+	public function getTasks(){
+		return $this->tasks;
 	}
 
 	public function getPlannedDays(){
@@ -189,4 +180,26 @@ class Project
 		$this->projectManager = $projectManager;
 	}
 
+	public function getTeam(){
+		return $this->team;
+	}
+
+	public function setTeam($team){
+		$this->team = $team;
+	}
+
+	public function __toString(){
+		return $this->client.' - '.$this->name;
+	}
+
+	public function getProjectStatus(): ?ProjectStatus
+	{
+		return $this->projectStatus;
+	}
+
+	public function setProjectStatus(?ProjectStatus $projectStatus): self
+	{
+		$this->projectStatus = $projectStatus;
+		return $this;
+	}
 }

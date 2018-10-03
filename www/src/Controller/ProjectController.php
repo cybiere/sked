@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Project;
+use App\Entity\ProjectStatus;
+use App\Entity\User;
+use App\Entity\Team;
 use App\Entity\Planning;
 use App\Form\ProjectType;
 use App\Entity\Task;
@@ -25,36 +28,47 @@ class ProjectController extends Controller
 	{
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
+		if($me->isAdmin()){
+			$managedTeams = $teamRepository->findAll();
+		}else{
+			$managedTeams = $me->getManagedTeams();
+		}
+		$managedUsers = $userRepository->findAll();
+		if(!$me->isAdmin()){
+			foreach($managedUsers as $key => $user){
+				if(!$me->canAdmin($user)){
+					unset($managedUsers[$key]);
+				}
+			}
+		}
 
 		$project = new Project();
-		$form = $this->createForm(ProjectType::class,$project);
+		$form = $this->createForm(ProjectType::class,$project,['teams'=>$managedTeams,'users'=>$managedUsers]);
 
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
-			if(!$this->get('session')->get('user')->isAdmin()){
+			$project = $form->getData();
+
+			if(!$me->canAdmin($project)){
 				throw $this->createNotFoundException("Cette page n'existe pas");
 			}
-			$project = $form->getData();
 			$em->persist($project);
 			$em->flush();
 			$this->addFlash('success','Projet ajouté');
 		}
 
-		$projects = $projectRepository->findAll();
-		$sortedProjects = array(array(),array(),array(),array(),array(),array(),array());
-		$internalProjects = array();
-		$archivedProjects = array();
-		foreach($projects as $project){
-			if($project->isArchived()){
-				$archivedProjects[] = $project;
-			}elseif(!$project->isBillable()){
-				$internalProjects[] = $project;
-			}else{
-				$sortedProjects[$project->getStatus()][] = $project;
-			}
+		if($this->get('session')->get('user')->isAdmin()){
+			$myTeams = $teamRepository->findAll();
+		}else{
+			$myTeams = array_unique(array_merge($me->getTeams()->toArray(),$me->getManagedTeams()));
+			$teamlessProjects = [];
 		}
+		$teamlessProjects = $projectRepository->findByTeam(NULL);
 
-		return $this->render('project/index.html.twig',array('projects'=>$sortedProjects,'internalProjects'=>$internalProjects,'archivedProjects'=>$archivedProjects,'form'=>$form->createView()));
+		return $this->render('project/index.html.twig',array('teams'=>$myTeams,'form'=>$form->createView(),'me'=>$me,'teamlessProjects'=>$teamlessProjects));
 	}
 
 	/**
@@ -64,6 +78,8 @@ class ProjectController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Erreur : projet non trouvé');
@@ -71,11 +87,19 @@ class ProjectController extends Controller
 			return $this->redirect($referer);
 		}
 
+		$managedUsers = $userRepository->findAll();
+		if(!$me->isAdmin()){
+			foreach($managedUsers as $key => $user){
+				if(!$me->canAdmin($user)){
+					unset($managedUsers[$key]);
+				}
+			}
+		}
 		$task = new Task();
-		$form = $this->createForm(TaskType::class,$task,["project"=>$project]);
+		$form = $this->createForm(TaskType::class,$task,["project"=>$project,"users"=>$managedUsers]);
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
-			if($this->get('session')->get('user')->isAdmin() || ($project->getProjectManager() != null && $project->getProjectManager()->getId() == $this->get('session')->get('user')->getId())){
+			if($me->canAdmin($project)){
 				$task->setProject($project);
 				$em->persist($task);
 				$em->flush();
@@ -130,7 +154,7 @@ class ProjectController extends Controller
 		}
 		sort($holidays);
 
-		return $this->render('project/view.html.twig',array('project'=>$project,'plannings'=>$plannings,'users'=>$users,'holidays'=>$holidays,'form'=>$form->createView()));
+		return $this->render('project/view.html.twig',array('project'=>$project,'plannings'=>$plannings,'users'=>$users,'holidays'=>$holidays,'form'=>$form->createView(),'me'=>$me));
 	}
 
 
@@ -138,10 +162,6 @@ class ProjectController extends Controller
 	 * @Route("/edit/{projectId}",name="project_edit")
 	 */
 	public function edit(Request $request,$projectId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
-
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
@@ -151,11 +171,39 @@ class ProjectController extends Controller
 			return $this->redirect($referer);
 		}
 
-		$form = $this->createForm(ProjectType::class,$project);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if(!$me->canAdmin($project)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
+		if($me->isAdmin()){
+			$managedTeams = $teamRepository->findAll();
+		}else{
+			$managedTeams = $me->getManagedTeams();
+		}
+
+		$managedUsers = $userRepository->findAll();
+		if(!$me->isAdmin()){
+			foreach($managedUsers as $key => $user){
+				if(!$me->canAdmin($user)){
+					unset($managedUsers[$key]);
+				}
+			}
+		}
+
+		$form = $this->createForm(ProjectType::class,$project,['teams'=>$managedTeams,'users'=>$managedUsers]);
 
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$project = $form->getData();
+
+			if(!$me->canAdmin($project)){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
+
 			$em->persist($project);
 			$em->flush();
 			$this->addFlash('success','Projet mis à jour');
@@ -168,10 +216,6 @@ class ProjectController extends Controller
 	 * @Route("/archive/{projectId}",name="project_archive")
 	 */
 	public function archive(Request $request,$projectId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
-
 		$referer = $request->headers->get('referer');
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
@@ -179,6 +223,12 @@ class ProjectController extends Controller
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Erreur : projet non trouvé');
 			return $this->redirect($referer);
+		}
+
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+		if(!$me->canAdmin($project)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
 		$project->setArchived(!$project->isArchived());
@@ -195,23 +245,41 @@ class ProjectController extends Controller
 	 * @Route("/m/{projectId}/{way}", name="project_movelink", defaults={"projectId"=0},requirements={"projectId"="\d+"})
 	 */
 	public function moveLink(Request $request,$projectId,$way){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
-		$project = $projectRepository->find($projectId);
-		if($project){
-			if($way == "inc" && $project->getStatus() < 6){
-				$project->setStatus($project->getStatus()+1);
-			}elseif($way == "dec" && $project->getStatus() > 0){
-				$project->setStatus($project->getStatus()-1);
-			}
-			$em->flush();
-		}else{
-			$this->addFlash('danger','Erreur : projet non trouvé');
-		}
+		$statusRepository = $this->getDoctrine()->getRepository(ProjectStatus::class);
+
 		$referer = $request->headers->get('referer');
+
+		if(!($project = $projectRepository->find($projectId))){
+			$this->addFlash('danger','Erreur : projet non trouvé');
+			return $this->redirect($referer);
+		}
+
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+		if(!$me->canAdmin($project)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		if($way == "inc"){
+			if($project->getProjectStatus() == NULL){
+				$nextOrder = 1;
+			}else{
+				$nextOrder = $project->getProjectStatus()->getStatusOrder()+1;
+			}
+			$project->setProjectStatus($statusRepository->findInTeamByOrder($project->getTeam(),$nextOrder));
+		}elseif($way == "dec"){
+			if($project->getProjectStatus() != NULL){
+				if($project->getProjectStatus()->getStatusOrder() == 1){
+					$project->setProjectStatus(NULL);
+				}else{
+					$project->setProjectStatus($project->getProjectStatus()->getStatusOrder()-1);
+				}
+			}
+		}
+		$em->flush();
+
 		return $this->redirect($referer);
 	}
 
@@ -219,22 +287,35 @@ class ProjectController extends Controller
 	 * @Route("/move/{projectId}/{newStatus}",name="project_move")
 	 */
 	public function move(Request $request,$projectId,$newStatus){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
-
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+		$statusRepository = $this->getDoctrine()->getRepository(ProjectStatus::class);
 
 		if(!($project = $projectRepository->find($projectId))){
 			$arrData = ['success' => false, 'errormsg' => 'Projet non trouvé'];
-		}else{
-			if($newStatus < 0) $newStatus = 0;
-			if($newStatus > 6) $newStatus = 6;
-			$project->setStatus($newStatus);
-			$em->flush();
-			$arrData = ['success' => true];
+			return new JsonResponse($arrData);
 		}
+
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+		if(!$me->canAdmin($project)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		if($newStatus == 0){
+			$project->setProjectStatus(NULL);
+		}else{
+
+			$status = $statusRepository->find($newStatus);
+			if($status == NULL || $status->getTeam() != $project->getTeam()){
+				$arrData = ['success' => false, 'errormsg' => 'Statut non trouvé'];
+				return new JsonResponse($arrData);
+			}
+			$project->setProjectStatus($status);
+		}
+
+		$em->flush();
+		$arrData = ['success' => true];
+
 		return new JsonResponse($arrData);
 	}
 
@@ -242,16 +323,18 @@ class ProjectController extends Controller
 	 * @Route("/del/{projectId}",name="project_del")
 	 */
 	public function del(Request $request,$projectId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
-
 		$em = $this->getDoctrine()->getManager();
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
 		if(!($project = $projectRepository->find($projectId))){
 			$this->addFlash('danger','Projet inexistant');
 		}else{
+			$userRepository = $this->getDoctrine()->getRepository(User::class);
+			$me = $userRepository->find($this->get('session')->get('user')->getId());
+			if(!$me->canAdmin($project)){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
+
 			if($project->isArchived()){
 				$em->remove($project);
 				$em->flush();
