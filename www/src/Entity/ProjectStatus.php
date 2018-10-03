@@ -49,36 +49,36 @@ class ProjectStatus
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName()
     {
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name)
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getTeam(): ?Team
+    public function getTeam()
     {
         return $this->team;
     }
 
-    public function setTeam(?Team $team): self
+    public function setTeam(Team $team)
     {
         $this->team = $team;
 
         return $this;
     }
 
-    public function getStatusOrder(): ?int
+    public function getStatusOrder()
     {
         return $this->statusOrder;
     }
 
-    public function setStatusOrder(int $statusOrder): self
+    public function setStatusOrder(int $statusOrder)
     {
         $this->statusOrder = $statusOrder;
 
@@ -88,12 +88,12 @@ class ProjectStatus
     /**
      * @return Collection|Project[]
      */
-    public function getProjects(): Collection
+    public function getProjects()
     {
         return $this->projects;
     }
 
-    public function addProject(Project $project): self
+    public function addProject(Project $project)
     {
         if (!$this->projects->contains($project)) {
             $this->projects[] = $project;
@@ -103,7 +103,7 @@ class ProjectStatus
         return $this;
     }
 
-    public function removeProject(Project $project): self
+    public function removeProject(Project $project)
     {
         if ($this->projects->contains($project)) {
             $this->projects->removeElement($project);
