@@ -197,7 +197,7 @@ class Project
 		return $this->projectStatus;
 	}
 
-	public function setProjectStatus(ProjectStatus $projectStatus)
+	public function setProjectStatus($projectStatus)
 	{
 		$this->projectStatus = $projectStatus;
 		return $this;
