@@ -66,7 +66,7 @@ class ProjectStatus
         return $this->team;
     }
 
-    public function setTeam(?Team $team)
+    public function setTeam(Team $team)
     {
         $this->team = $team;
 
