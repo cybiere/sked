@@ -69,12 +69,12 @@ class Team
 		return $this->id;
 	}
 
-	public function getName(): ?string
+	public function getName()
 	{
 		return $this->name;
 	}
 
-	public function setName(string $name): self
+	public function setName(string $name)
 	{
 		$this->name = $name;
 
@@ -172,7 +172,7 @@ class Team
 		return $this->projectStatuses;
 	}
 
-	public function addProjectStatus(ProjectStatus $projectStatus): self
+	public function addProjectStatus(ProjectStatus $projectStatus)
 	{
 		if (!$this->projectStatuses->contains($projectStatus)) {
 			$this->projectStatuses[] = $projectStatus;
@@ -181,11 +181,10 @@ class Team
 		return $this;
 	}
 
-	public function removeProjectStatus(ProjectStatus $projectStatus): self
+	public function removeProjectStatus(ProjectStatus $projectStatus)
 	{
 		if ($this->projectStatuses->contains($projectStatus)) {
 			$this->projectStatuses->removeElement($projectStatus);
-			// set the owning side to null (unless already changed)
 			if ($projectStatus->getTeam() === $this) {
 				$projectStatus->setTeam(null);
 			}
