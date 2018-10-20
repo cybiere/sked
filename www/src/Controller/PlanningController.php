@@ -243,4 +243,30 @@ class PlanningController extends Controller
 
 		return $this->redirect($referer);
 	}
+
+	/**
+	 * @Route("/meeting/{planningId}",name="planning_meeting")
+	 */
+	public function meeting(Request $request,$planningId){
+		$em = $this->getDoctrine()->getManager();
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		$referer = $request->headers->get('referer');
+		if(!($planning = $planningRepository->find($planningId))){
+			$this->addFlash('danger','Erreur : élément de planning non trouvé');
+			return $this->redirect($referer);
+		}
+		if(!$me->canAdmin($planning)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		$planning->setMeeting($planning->isMeeting()?false:true);
+		$em->flush();
+
+
+		return $this->redirect($referer);
+	}
+
+
 }

@@ -17,7 +17,7 @@ class PlanningType extends AbstractType
             ->add('startDate',null,array('label'=>'Date de début','data' => new \DateTime(),'widget'=>'single_text'))
 			->add('startHour',ChoiceType::class,array('label'=>'Heure de début','choices'=>array('Matin'=>'am','Midi'=>'pm')))
             ->add('nbSlices',null,array('label'=>'Nombre de tranches (0,5jh)'))
-            ->add('meeting',null,array('label'=>'Réunion'))
+            ->add('meeting',null,array('label'=>'Important'))
             ->add('confirmed',null,array('label'=>'Confirmé'))
             ->add('project',null,array('label'=>'Projet','choices'=>$options['projects'],'required'=>true))
             ->add('task',null,array('label'=>'Tâche'))
