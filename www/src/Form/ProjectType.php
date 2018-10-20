@@ -33,7 +33,7 @@ class ProjectType extends AbstractType
 
 		$builder
             ->add('billable',null,array('required'=>false,'label'=>'Facturable'))
-            ->add('archived',null,array('required'=>false,'label'=>'Archivé'))
+            ->add('archived',null,array('required'=>false,'label'=>'Archivé','data'=>false))
             ->add('nbDays',NumberType::class,array('required'=>false,'label'=>'Jours vendus'))
             ->add('comments',TextareaType::class,array('required'=>false,'label'=>'Commentaires'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
