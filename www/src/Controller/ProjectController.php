@@ -234,9 +234,9 @@ class ProjectController extends Controller
 		$project->setArchived(!$project->isArchived());
 		$em->flush();
 		if($project->isArchived()){
-			$this->addFlash('success','Projet désarchivé');
-		}else{
 			$this->addFlash('success','Projet archivé');
+		}else{
+			$this->addFlash('success','Projet désarchivé');
 		}
 		return $this->redirect($referer);
 	}
