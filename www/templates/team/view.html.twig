@@ -60,7 +60,7 @@
 				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
-					<div class="planningPlaceholder" data-planningid="{{planning.id}}">Planning</div>
+					{{ printPlanning(planning,me.canAdmin(planning)) }}
 					{% endif %}
 					{% endfor %}
 				</div>
@@ -70,7 +70,7 @@
 				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
-					<div class="planningPlaceholder" data-planningid="{{planning.id}}">Planning</div>
+					{{ printPlanning(planning,me.canAdmin(planning)) }}
 					{% endif %}
 					{% endfor %}
 				</div></td>
@@ -89,13 +89,11 @@
 {% endblock %}
 
 {% block extraJs %}
+{% if me.canAdmin(team) %}
 <script>
 var urlDict = {}
 urlDict["planning_info"] = "{{ path("planning_info",{"planningId":"idPlaceHold"}) }}";
 urlDict["project_view"] = "{{ path("project_view",{"projectId":123}) }}";
-</script>
-{% if me.canAdmin(team) %}
-<script>
 urlDict["task_byproject"] = "{{ path("task_byproject",{"projectId":"idPlaceHold"}) }}";
 urlDict["planning_new"] = "{{ path("planning_new") }}";
 urlDict["planning_resize"] = "{{ path("planning_resize",{"planningId":"idPlaceHold","newSize":"sizePlaceHold"}) }}";
