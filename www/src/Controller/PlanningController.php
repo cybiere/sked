@@ -284,10 +284,9 @@ class PlanningController extends Controller
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
-		$referer = $request->headers->get('referer');
 		if(!($planning = $planningRepository->find($planningId))){
-			$this->addFlash('danger','Erreur : élément de planning non trouvé');
-			return $this->redirect($referer);
+			$arrData = ['success' => false, 'errormsg' => 'Planning non trouvé'];
+			return new JsonResponse($arrData);
 		}
 
 		if(!$me->canAdmin($planning)){
@@ -296,7 +295,8 @@ class PlanningController extends Controller
 
 		$em->remove($planning);
 		$em->flush();
-		return $this->redirect($referer);
+		$arrData = ['success' => true];
+		return new JsonResponse($arrData);
 	}
 
 	/**
@@ -308,19 +308,30 @@ class PlanningController extends Controller
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
-		$referer = $request->headers->get('referer');
 		if(!($planning = $planningRepository->find($planningId))){
-			$this->addFlash('danger','Erreur : élément de planning non trouvé');
-			return $this->redirect($referer);
+			$arrData = ['success' => false, 'errormsg' => 'Planning non trouvé'];
+			return new JsonResponse($arrData);
 		}
 		if(!$me->canAdmin($planning)){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 		$planning->setConfirmed($planning->isConfirmed()?false:true);
 		$em->flush();
-
-
-		return $this->redirect($referer);
+		if($planning->isMeeting()){
+			if($planning->isConfirmed()){
+				$addclass="meeting";
+			}else{
+				$addclass="meeting-unconfirmed";
+			}
+		}else{
+			if($planning->isConfirmed()){
+				$addclass="billable";
+			}else{
+				$addclass="billable-unconfirmed";
+			}
+		}
+		$arrData = ['success' => true,'addclass' => $addclass];
+		return new JsonResponse($arrData);
 	}
 
 	/**
@@ -332,10 +343,9 @@ class PlanningController extends Controller
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
-		$referer = $request->headers->get('referer');
 		if(!($planning = $planningRepository->find($planningId))){
-			$this->addFlash('danger','Erreur : élément de planning non trouvé');
-			return $this->redirect($referer);
+			$arrData = ['success' => false, 'errormsg' => 'Planning non trouvé'];
+			return new JsonResponse($arrData);
 		}
 		if(!$me->canAdmin($planning)){
 			throw $this->createNotFoundException("Cette page n'existe pas");
@@ -343,7 +353,20 @@ class PlanningController extends Controller
 		$planning->setMeeting($planning->isMeeting()?false:true);
 		$em->flush();
 
-
-		return $this->redirect($referer);
+		if($planning->isMeeting()){
+			if($planning->isConfirmed()){
+				$addclass="meeting";
+			}else{
+				$addclass="meeting-unconfirmed";
+			}
+		}else{
+			if($planning->isConfirmed()){
+				$addclass="billable";
+			}else{
+				$addclass="billable-unconfirmed";
+			}
+		}
+		$arrData = ['success' => true,'addclass' => $addclass];
+		return new JsonResponse($arrData);
 	}
 }

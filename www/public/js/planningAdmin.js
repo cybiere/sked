@@ -51,7 +51,7 @@ function printPlanningItem(){
 					else
 						popTitle = data.taskName
 				else
-					popTitle = data.projectName //TODO link to project ?
+					popTitle = data.projectName
 				item.attr("title",popTitle)
 				if(data.projectId != 0)
 					itemName = data.projectClient+" "+data.projectName
@@ -75,21 +75,23 @@ function printPlanningItem(){
 				}
 				if(data.admin){
 					if(data.projectId != 0){
-						confirmLink = urlDict['planning_confirm'].replace("123", data.planningId);
-						popContent = popContent.concat("<div class='popupaction col-md-3'><a class='btn btn-outline-success' href='"+confirmLink+"'><i class='far fa-check-circle'></i></a></div>")
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-check-circle'></i></button></div>")
 						if(data.projectBillable){
-							meetingLink = urlDict['planning_meeting'].replace("123", data.planningId);
-							popContent = popContent.concat("<div class='popupaction col-md-3'><a class='btn btn-outline-info' href='"+meetingLink+"'><i class='fas fa-exclamation-circle'></a></i></div>")
+							popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='meetingPlanning("+data.planningId+")'><i class='fas fa-exclamation-circle'></i></button></div>")
 						}
 						editLink = urlDict['project_edit'].replace("123", data.projectId);
 						popContent = popContent.concat("<div class='popupaction col-md-3'><a class='btn btn-outline-warning' href='"+editLink+"'><i class='fas fa-edit'></i></a></div>")
 					}
-					deleteLink = urlDict['planning_delete'].replace("123", data.planningId);
-					popContent = popContent.concat("<div class='popupaction col-md-3'><a class='btn btn-outline-danger' href='"+deleteLink+"'><i class='fas fa-trash'></i></a></div>")
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-danger' onclick='delPlanning("+data.planningId+")'><i class='fas fa-trash'></i></button></div>")
 				}
 				popContent = popContent.concat("</div>")
 				item.data("content",popContent)
 				item.outerWidth(item.parents('td').outerWidth()*item.data("duration")-3);
+				item.resizable(resizeOptions);
+				item.draggable(dragOptions); 
+				item.on('mousedown',function(e){
+					e.stopPropagation();
+				});
 			}else{
 				item.remove();
 				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
@@ -100,9 +102,64 @@ function printPlanningItem(){
 
 }
 
+function delPlanning(planningId){
+	url=urlDict["planning_delete"].replace("123", planningId);
+	$.ajax(url,{
+		async:false,
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			if(data.success){
+				$("div[data-planningId='"+planningId+"']").remove()
+			}else{
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			}
+		}
+	});
+}
 
+function confirmPlanning(planningId){
+	url=urlDict["planning_confirm"].replace("123", planningId);
+	$.ajax(url,{
+		async:false,
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			if(data.success){
+				$("div[data-planningId='"+planningId+"']").removeClass("meeting meeting-unconfirmed billable billable-unconfirmed").addClass(data.addclass)
+			}else{
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			}
+		}
+	});
+}
 
-$(".hasAdmin").resizable({
+function meetingPlanning(planningId){
+	url=urlDict["planning_meeting"].replace("123", planningId);
+	$.ajax(url,{
+		async:false,
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			if(data.success){
+				$("div[data-planningId='"+planningId+"']").removeClass("meeting meeting-unconfirmed billable billable-unconfirmed").addClass(data.addclass)
+			}else{
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			}
+		}
+	});
+}
+
+resizeOptions = {
 	handles: "e",
 	containment: ".schedule",
 	resize: function(e,ui){
@@ -137,16 +194,18 @@ $(".hasAdmin").resizable({
 			}
 		});
 	}
-});
-$('.project').on('mousedown',function(e){
-	e.stopPropagation();
-});
-$('.hasAdmin').draggable({
+}
+dragOptions = {
 	revert : true,
 	revertDuration: 0,
 	cursor: "grab",
 	cursorAt: { left:5 }
-}); 
+}
+$(".hasAdmin").resizable(resizeOptions);
+$('.hasAdmin').draggable(dragOptions); 
+$('.project').on('mousedown',function(e){
+	e.stopPropagation();
+});
 
 $('.projectContainerAdmin').droppable({
 	classes: {
