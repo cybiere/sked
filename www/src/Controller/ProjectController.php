@@ -105,7 +105,7 @@ class ProjectController extends Controller
 				$em->flush();
 				$this->addFlash('success','Tâche enregistrée');
 				$task = new Task();
-				$form = $this->createForm(TaskType::class,$task,['project'=>$project]);
+				$form = $this->createForm(TaskType::class,$task,["project"=>$project,"users"=>$managedUsers]);
 			}else{
 				throw $this->createNotFoundException("Cette page n'existe pas");
 			}
@@ -128,33 +128,14 @@ class ProjectController extends Controller
 		}else{
 			$startDateObj = new \DateTime();
 		}
-		$baseYear = intval($startDateObj->format('Y'));
-		$holidays = array();
-		for($i=-1;$i<=1;$i++){
-			$year=$baseYear+$i;
-			$easterDate  = \easter_date($year);
-			$easterDay   = date('j', $easterDate);
-			$easterMonth = date('n', $easterDate);
-			$easterYear  = date('Y', $easterDate);
 
-			// Dates fixes
-			$holidays[] = mktime(0, 0, 0, 1,  1,  $year);  // 1er janvier
-			$holidays[] = mktime(0, 0, 0, 5,  1,  $year);  // Fête du travail
-			$holidays[] = mktime(0, 0, 0, 5,  8,  $year);  // Victoire des alliés
-			$holidays[] = mktime(0, 0, 0, 7,  14, $year);  // Fête nationale
-			$holidays[] = mktime(0, 0, 0, 8,  15, $year);  // Assomption
-			$holidays[] = mktime(0, 0, 0, 11, 1,  $year);  // Toussaint
-			$holidays[] = mktime(0, 0, 0, 11, 11, $year);  // Armistice
-			$holidays[] = mktime(0, 0, 0, 12, 25, $year);  // Noel
-
-			// Dates variables
-			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 1,  $easterYear);
-			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 39, $easterYear);
-			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 50, $easterYear);
-		}
-		sort($holidays);
-
-		return $this->render('project/view.html.twig',array('project'=>$project,'plannings'=>$plannings,'users'=>$users,'holidays'=>$holidays,'form'=>$form->createView(),'me'=>$me));
+		return $this->render('project/view.html.twig',array(
+			'project'=>$project,
+			'plannings'=>$plannings,
+			'users'=>$users,
+			'holidays'=>CommonController::getHolidays($startDateObj->format('Y')),
+			'form'=>$form->createView(),
+			'me'=>$me));
 	}
 
 
@@ -234,9 +215,9 @@ class ProjectController extends Controller
 		$project->setArchived(!$project->isArchived());
 		$em->flush();
 		if($project->isArchived()){
-			$this->addFlash('success','Projet désarchivé');
-		}else{
 			$this->addFlash('success','Projet archivé');
+		}else{
+			$this->addFlash('success','Projet désarchivé');
 		}
 		return $this->redirect($referer);
 	}

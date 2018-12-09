@@ -32,7 +32,7 @@
 		<div class="row kanban">
 			<div class="col kanCol" data-status='0'>
 				<h3>Non confirmé</h3>
-				{% for project in team.projects if project.projectStatus == NULL %}
+				{% for project in team.projects if project.projectStatus == NULL and not project.archived %}
 				{{ kanproject(project,me) }}
 				{% endfor %}
 			</div>
@@ -54,7 +54,7 @@
 	<a class="card-header" data-toggle="collapse" href="#billable" role="button" aria-expanded="false" aria-controls="showMore">
 		Projects facturables en cours
 	</a>
-	<div class="card-body collapse show" id="billable">
+	<div class="card-body collapse" id="billable">
 		<table class="table table-hover table-sm">
 			<thead class="thead-light">
 				<tr>
@@ -270,6 +270,7 @@
 						{% if me.canAdmin(project) %}
 						<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
 						<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-up"></i></a>
+						<a href='{{ path('project_del',{"projectId":project.id})}}' class="text-danger"><i title="Supprimer" class="fas fa-trash"></i></a>
 						{% endif %}
 					</td>
 				</tr>
@@ -304,6 +305,7 @@
 						{% if me.canAdmin(project) %}
 						<a href='{{ path('project_edit',{"projectId":project.id})}}'><i title='Modifier' class='fas fa-edit'></i></a>
 						<a href='{{ path('project_archive',{"projectId":project.id})}}'><i title="Archiver" class="fas fa-caret-square-up"></i></a>
+						<a href='{{ path('project_del',{"projectId":project.id})}}' class="text-danger"><i title="Supprimer" class="fas fa-trash"></i></a>
 						{% endif %}
 					</td>
 				</tr>
