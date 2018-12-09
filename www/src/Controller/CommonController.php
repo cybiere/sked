@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-class common{
+class CommonController{
 
 	public static function getHolidays($baseYear){
 		$holidays = array();

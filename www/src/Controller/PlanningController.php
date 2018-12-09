@@ -103,7 +103,7 @@ class PlanningController extends Controller
 			$startDateObj = new \DateTime("now");
 		}
 		return $this->render('planning/index.html.twig', [
-			'holidays' => Common::getHolidays($startDateObj->format('Y')),
+			'holidays' => CommonController::getHolidays($startDateObj->format('Y')),
 			'startDate' => $startDate,
 			'users' => $users,
 			'projects' => $projects,

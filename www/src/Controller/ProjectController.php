@@ -133,7 +133,7 @@ class ProjectController extends Controller
 			'project'=>$project,
 			'plannings'=>$plannings,
 			'users'=>$users,
-			'holidays'=>Common::getHolidays($startDateObj->format('Y')),
+			'holidays'=>CommonController::getHolidays($startDateObj->format('Y')),
 			'form'=>$form->createView(),
 			'me'=>$me));
 	}

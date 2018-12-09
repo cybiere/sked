@@ -217,7 +217,7 @@ class UserController extends Controller{
 		return $this->render('user/view.html.twig',array(
 			'user'=>$user,
 			'plannings'=>$plannings,
-			'holidays'=>Common::getHolidays($startDateObj->format('Y'))
+			'holidays'=>CommonController::getHolidays($startDateObj->format('Y'))
 		));
 	}
 }
