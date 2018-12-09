@@ -34,7 +34,7 @@
 	<body>
 
 		<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-			<a class="navbar-brand" href="{{ path('planning_index')}}" title="Sked v1.2.2"><img src="/img/logo_sked_light.png" alt="Logo Sked" /> Sked</a>
+			<a class="navbar-brand" href="{{ path('planning_index')}}" title="Sked v1.2.3"><img src="/img/logo_sked_light.png" alt="Logo Sked" /> Sked</a>
 
 			<div class="collapse navbar-collapse">
 				<ul class="navbar-nav mr-auto">
@@ -51,7 +51,7 @@
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_index"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('user_index') }}">Utilisateurs</a>
 					</li>
-					<li class="nav-item{% if app.request.attributes.get('_route') in ["team_index"] %} active{% endif %}">
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["team_index","team_view","team_edit"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('team_index') }}">Équipes</a>
 					</li>
 					{% endif %}
@@ -100,13 +100,29 @@
 				$(this).popover('toggle')
 				return false;
 			});
-$( "#helpBtn" ).on('blur',function() {
-	$(this).popover('hide')
-});
-$(function () {
-	$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
-})
+			$( "#helpBtn" ).on('blur',function() {
+				$(this).popover('hide')
+			});
+			$(function () {
+				$('[data-toggle="popover"]').popover({trigger:'manual',placement:'bottom'})
+			})
 		</script>
+
+		{% if app.session.get('user').admin %}
+		<script>
+		var urlDict = {}
+		urlDict["planning_info"] = "{{ path("planning_info",{"planningId":"idPlaceHold"}) }}";
+		urlDict["project_view"] = "{{ path("project_view",{"projectId":123}) }}";
+		urlDict["task_byproject"] = "{{ path("task_byproject",{"projectId":"idPlaceHold"}) }}";
+		urlDict["planning_new"] = "{{ path("planning_new") }}";
+		urlDict["planning_resize"] = "{{ path("planning_resize",{"planningId":"idPlaceHold","newSize":"sizePlaceHold"}) }}";
+		urlDict["planning_move"] = "{{ path("planning_move",{"planningId":"idPlaceHold","newStart":"startPlaceHold","newHour":"hourPlaceHold","newUser":"userPlaceHold","newSize":"sizePlaceHold"}) }}";
+		urlDict["planning_confirm"] = "{{ path("planning_confirm",{"planningId":"123"}) }}";
+		urlDict["planning_meeting"] = "{{ path("planning_meeting",{"planningId":"123"}) }}";
+		urlDict["planning_delete"] = "{{ path("planning_del",{"planningId":"123"}) }}";
+		urlDict["project_edit"] = "{{ path("project_edit",{"projectId":"123"}) }}";
+		</script>
+		{% endif %}
 		{% block extraJs %}{% endblock %}
 	</body>
 </html>

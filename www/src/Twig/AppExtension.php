@@ -101,7 +101,17 @@ class AppExtension extends AbstractExtension
 		data-planningId="<?php echo htmlspecialchars($planning->getId()); ?>"
 		data-toggle="popover"
 		data-html="true"
-		title="<?php if($planning->getTask() != NULL){if($planning->getTask()->getComments()){ echo "<a href='#' data-toggle='tooltip' title='".htmlspecialchars($planning->getTask()->getComments())."'>".htmlspecialchars($planning->getTask()->getName())."</a>";}else{echo htmlspecialchars($planning->getTask()->getName());}}else echo $planning->getProject() == NULL?"Absence":"<a href='".$this->router->generate('project_view',array("projectId"=>$planning->getProject()->getId()))."'>".htmlspecialchars($planning->getProject()->getName())."</a>"; ?>"
+		title="
+<?php 
+		if($planning->getTask() != NULL){
+			if($planning->getTask()->getComments()){ 
+				echo "<a href='#' data-toggle='tooltip' title='".htmlspecialchars($planning->getTask()->getComments())."'>".htmlspecialchars($planning->getTask()->getName())."</a>";
+			}else{
+				echo htmlspecialchars($planning->getTask()->getName());
+			}
+		}else 
+			echo $planning->getProject() == NULL?"Absence":"<a href='".$this->router->generate('project_view',array("projectId"=>$planning->getProject()->getId()))."'>".htmlspecialchars($planning->getProject()->getName())."</a>"; ?>
+"
 		data-content="
 			<div class='row'>
 <?php if($planning->getProject() != NULL){ ?>
@@ -114,15 +124,15 @@ class AppExtension extends AbstractExtension
 			<dt class='col-md-6'>jh planif/vendus</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getPlannedDays())."/".htmlspecialchars($planning->getProject()->getNbDays()); ?></dd>
 			<dt class='col-md-6'>Commentaires</dt><dd class='col-md-6'><?php echo nl2br(htmlspecialchars($planning->getProject()->getComments())); ?></dd>
 <?php if($isAdmin && $project == 0){ ?>
-			<div class='popupaction col-md-3'><a class='btn btn-outline-success' href='<?php echo $this->router->generate('planning_confirm',array("planningId"=>$planning->getId())); ?>'><i class='far fa-check-circle'></i></a></div>
+<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning(<?php echo $planning->getId(); ?>)'><i class='far fa-check-circle'></i></button></div>
 			<?php if($planning->getProject()->isBillable()){ ?>
-			<div class='popupaction col-md-3'><a class='btn btn-outline-info' href='<?php echo $this->router->generate('planning_meeting',array("planningId"=>$planning->getId())); ?>'><i class='fas fa-exclamation-circle'></i></a></div>
+			<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='meetingPlanning(<?php echo $planning->getId(); ?>)'><i class='fas fa-exclamation-circle'></i></button></div>
 			<?php } ?>
 			<div class='popupaction col-md-3'><a class='btn btn-outline-warning' href='<?php echo $this->router->generate('project_edit',array("projectId"=>$planning->getProject()->getId())); ?>'><i class='fas fa-edit'></i></a></div>
 <?php } ?>
 <?php } ?>
 <?php if($isAdmin && $project == 0){ ?>
-			<div class='popupaction col-md-3'><a class='btn btn-outline-danger' href='<?php echo $this->router->generate('planning_del',array("planningId"=>$planning->getId())); ?>'><i class='fas fa-trash'></i></a></div>
+<div class='popupaction col-md-3'><button class='btn btn-outline-danger' onclick='delPlanning(<?php echo $planning->getId(); ?>)'><i class='fas fa-trash'></i></button></div>
 <?php } ?>
 			</div>
 		"
@@ -147,14 +157,14 @@ class AppExtension extends AbstractExtension
 				$i++;
 			}
 			if($team->getLevel() != 0) echo "↳ ";
-			echo htmlspecialchars($team->getName());
+			echo "<a href='".$this->router->generate('team_view',array("teamId"=>$team->getId()))."'>".htmlspecialchars($team->getName())."</a>";
 		?>
 		</td>
 		<td><?php echo count($team->getUsers()); ?></td>
 		<td><?php foreach($team->getManagers() as $user){ echo "<span class='managerList'>".htmlspecialchars($user->getFullname())."</span>";} ?></td>
 		<td class="actions">
 			<a href='<?php echo $this->router->generate('team_view',array("teamId"=>$team->getId())); ?>'><i title='Détails' class='fa fa-search'></i></a>
-			<a href='<?php echo $this->router->generate('team_index',array("teamId"=>$team->getId())); ?>'><i title='Modifier' class='fas fa-edit'></i></a>
+			<a href='<?php echo $this->router->generate('team_edit',array("teamId"=>$team->getId())); ?>'><i title='Modifier' class='fas fa-edit'></i></a>
 			<a class="text-danger" href='<?php echo $this->router->generate('team_del',array("teamId"=>$team->getId())); ?>'><i title="Supprimer" class="fas fa-trash"></i></a>
 		</td>
 	</tr>

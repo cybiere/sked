@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Team;
+use App\Entity\Task;
 use App\Entity\Project;
 use App\Entity\Planning;
 use App\Form\PlanningType;
@@ -69,27 +70,6 @@ class PlanningController extends Controller
 			}
 		}
 
-		$planning = new Planning();
-		$form = $this->createForm(PlanningType::class,$planning,
-			[
-				'projects'=>$managedProjects,
-				'users'=>$managedUsers
-			]);
-
-		$form->handleRequest($request);
-		if ($form->isSubmitted() && $form->isValid()) {
-			$planning = $form->getData();
-			if(!$me->canAdmin($planning)){
-				$this->addFlash('danger',"Vous n'avez pas le droit de modifier ce planning.");
-			}else{
-				if(!is_object($planning) && $planning->getProject() == 0) $planning->setProject(NULL);
-				$em->persist($planning);
-				$em->flush();
-				$this->addFlash('success','Planning ajouté');
-			}
-		}
-
-
 		$hasAdmin = $me->isAdmin();
 		foreach($users as $user){
 			if($hasAdmin) break;
@@ -107,7 +87,6 @@ class PlanningController extends Controller
 			'startDate' => $startDate,
 			'users' => $users,
 			'projects' => $projects,
-			'form' => $form->createView(),
 			'me' => $me,
 			'hasAdmin' => $hasAdmin,
 		]);
@@ -115,7 +94,7 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/resize/{planningId}/{newSize}",name="planning_resize")
+	 * @Route("/p/resize/{planningId}/{newSize}",name="planning_resize")
 	 */
 	public function resize(Request $request,$planningId,$newSize){
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
@@ -139,7 +118,111 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/move/{planningId}/{newStart}/{newHour}/{newUser}/{newSize}",name="planning_move")
+	 * @Route("/p/info/{planningId}",name="planning_info")
+	 */
+	public function info(Request $request,$planningId){
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if(!($planning = $planningRepository->find($planningId))){
+			$arrData = ['success' => false, 'errormsg' => 'Elément de planning non trouvé'];
+			return new JsonResponse($arrData);
+		}
+		$project = $planning->getProject();
+		$task = $planning->getTask();
+		$arrData = [
+			'success' => true,
+			'planningId'=> $planning->getId(),
+			'duration' => $planning->getNbSlices(),
+			'confirmed' => $planning->isConfirmed(),
+			'meeting' => $planning->isMeeting(),
+			'admin'=> $me->canAdmin($planning),
+		];
+		if($project != NULL){
+			$arrData['projectId'] = $project->getId();
+			$arrData['projectName'] = $project->getName();
+			$arrData['projectReference'] = $project->getReference();
+			$arrData['projectClient'] = $project->getClient();
+			$arrData['projectPlannedDays'] = $project->getPlannedDays();
+			$arrData['projectNbDays'] = $project->getNbDays();
+			$arrData['projectComments'] = $project->getComments();
+			$arrData['projectBillable'] = $project->isBillable();
+			if($project->getProjectManager() != NULL){
+				$arrData['projectManagerId'] = $project->getProjectManager()->getId();
+				$arrData['projectManagerName'] = $project->getProjectManager()->getFullname();
+			}
+		}else{
+			$arrData['projectId'] = 0;
+			$arrData['projectName'] = "Absence";
+		}
+		if($task != NULL){
+			$arrData['taskId'] = $task->getId();
+			$arrData['taskName'] = $task->getName();
+			$arrData['taskComments'] = $task->getComments();
+		}else{
+			$arrData['taskId'] = 0;
+		}	
+
+		return new JsonResponse($arrData);
+	}
+
+	/**
+	 * @Route("/p/new",name="planning_new")
+	 */
+	public function newPlanning(Request $request){
+		if(!$request->isMethod('POST')){
+			$arrData = ['success' => false, 'errormsg' => 'Méthode invalide'];
+			return new JsonResponse($arrData);
+		}
+
+		$data = $request->request->all();
+		$em = $this->getDoctrine()->getManager();
+
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if($data['project'] != 0){
+			if(!($project = $projectRepository->find($data['project']))){
+				$arrData = ['success' => false, 'errormsg' => 'Impossible de trouver le projet associé'];
+				return new JsonResponse($arrData);
+			}
+		}else{
+			$project = NULL;
+		}
+		if(!($user = $userRepository->find($data['user']))){
+			$arrData = ['success' => false, 'errormsg' => 'Impossible de trouver la ressource associée'];
+			return new JsonResponse($arrData);
+		}
+
+		if(!$me->canAdmin($user) || ($project != NULL && !$me->canAdmin($project))){
+			$arrData = ['success' => false, 'errormsg' => "Vous n'avez pas le droit de créer ce planning"];
+			return new JsonResponse($arrData);
+		}
+
+		$planning = new Planning();
+		$planning->setUser($user);
+		$planning->setProject($project);
+		$planning->setStartDate(new \DateTime($data['startDate']));
+		$planning->setStartHour($data['startHour'] == "pm"?"pm":"am");
+		$planning->setNbSlices($data['nbSlices']);
+		$planning->setMeeting($data['meeting'] == "true"?true:false);
+		$planning->setConfirmed($data['confirmed'] == "false"?false:true);
+		if(($task = $taskRepository->find($data['task']))){
+			$planning->setTask($task);
+		}
+
+		$em->persist($planning);
+		$em->flush();
+		$arrData = ['success' => true,'id' => $planning->getId()];
+		return new JsonResponse($arrData);
+	}
+
+	/**
+	 * @Route("/p/move/{planningId}/{newStart}/{newHour}/{newUser}/{newSize}",name="planning_move")
 	 */
 	public function move(Request $request,$planningId,$newStart,$newHour,$newUser,$newSize){
 		$em = $this->getDoctrine()->getManager();
@@ -171,7 +254,7 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/del/{planningId}",name="planning_del")
+	 * @Route("/p/del/{planningId}",name="planning_del")
 	 */
 	public function del(Request $request,$planningId){
 		$em = $this->getDoctrine()->getManager();
@@ -179,10 +262,9 @@ class PlanningController extends Controller
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
-		$referer = $request->headers->get('referer');
 		if(!($planning = $planningRepository->find($planningId))){
-			$this->addFlash('danger','Erreur : élément de planning non trouvé');
-			return $this->redirect($referer);
+			$arrData = ['success' => false, 'errormsg' => 'Planning non trouvé'];
+			return new JsonResponse($arrData);
 		}
 
 		if(!$me->canAdmin($planning)){
@@ -191,11 +273,12 @@ class PlanningController extends Controller
 
 		$em->remove($planning);
 		$em->flush();
-		return $this->redirect($referer);
+		$arrData = ['success' => true];
+		return new JsonResponse($arrData);
 	}
 
 	/**
-	 * @Route("/confirm/{planningId}",name="planning_confirm")
+	 * @Route("/p/confirm/{planningId}",name="planning_confirm")
 	 */
 	public function confirm(Request $request,$planningId){
 		$em = $this->getDoctrine()->getManager();
@@ -203,23 +286,34 @@ class PlanningController extends Controller
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
-		$referer = $request->headers->get('referer');
 		if(!($planning = $planningRepository->find($planningId))){
-			$this->addFlash('danger','Erreur : élément de planning non trouvé');
-			return $this->redirect($referer);
+			$arrData = ['success' => false, 'errormsg' => 'Planning non trouvé'];
+			return new JsonResponse($arrData);
 		}
 		if(!$me->canAdmin($planning)){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 		$planning->setConfirmed($planning->isConfirmed()?false:true);
 		$em->flush();
-
-
-		return $this->redirect($referer);
+		if($planning->isMeeting()){
+			if($planning->isConfirmed()){
+				$addclass="meeting";
+			}else{
+				$addclass="meeting-unconfirmed";
+			}
+		}else{
+			if($planning->isConfirmed()){
+				$addclass="billable";
+			}else{
+				$addclass="billable-unconfirmed";
+			}
+		}
+		$arrData = ['success' => true,'addclass' => $addclass];
+		return new JsonResponse($arrData);
 	}
 
 	/**
-	 * @Route("/meeting/{planningId}",name="planning_meeting")
+	 * @Route("/p/meeting/{planningId}",name="planning_meeting")
 	 */
 	public function meeting(Request $request,$planningId){
 		$em = $this->getDoctrine()->getManager();
@@ -227,10 +321,9 @@ class PlanningController extends Controller
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
-		$referer = $request->headers->get('referer');
 		if(!($planning = $planningRepository->find($planningId))){
-			$this->addFlash('danger','Erreur : élément de planning non trouvé');
-			return $this->redirect($referer);
+			$arrData = ['success' => false, 'errormsg' => 'Planning non trouvé'];
+			return new JsonResponse($arrData);
 		}
 		if(!$me->canAdmin($planning)){
 			throw $this->createNotFoundException("Cette page n'existe pas");
@@ -238,9 +331,20 @@ class PlanningController extends Controller
 		$planning->setMeeting($planning->isMeeting()?false:true);
 		$em->flush();
 
-
-		return $this->redirect($referer);
+		if($planning->isMeeting()){
+			if($planning->isConfirmed()){
+				$addclass="meeting";
+			}else{
+				$addclass="meeting-unconfirmed";
+			}
+		}else{
+			if($planning->isConfirmed()){
+				$addclass="billable";
+			}else{
+				$addclass="billable-unconfirmed";
+			}
+		}
+		$arrData = ['success' => true,'addclass' => $addclass];
+		return new JsonResponse($arrData);
 	}
-
-
 }

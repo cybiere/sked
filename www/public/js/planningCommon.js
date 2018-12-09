@@ -1,11 +1,12 @@
 var resizeTimer;
+
 $(window).on('resize', function(e) {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(function() {
-	$('.project').each(function(index){
-		$(this).outerWidth($(this).parents('td').outerWidth()*$(this).data("duration")-3);
-	});
-  }, 250);
+	clearTimeout(resizeTimer);
+	resizeTimer = setTimeout(function() {
+		$('.project').each(function(index){
+			$(this).outerWidth($(this).parents('td').outerWidth()*$(this).data("duration")-3);
+		});
+	}, 250);
 
 });
 
@@ -21,3 +22,5 @@ $( ".project" ).contextmenu(function() {
 $( ".project" ).on('blur',function() {
 	$(this).popover('hide')
 });
+
+

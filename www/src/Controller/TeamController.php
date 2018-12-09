@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Team;
 use App\Entity\User;
+use App\Entity\Project;
 use App\Entity\ProjectStatus;
 use App\Form\TeamType;
 use App\Form\ProjectStatusType;
@@ -19,9 +20,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class TeamController extends Controller
 {
     /**
-	 * @Route("/{teamId}", name="team_index", defaults={"teamId"=0},requirements={"teamId"="\d+"})
+	 * @Route("/", name="team_index")
      */
-	public function index(Request $request, $teamId=0)
+	public function index(Request $request)
 	{
 		if(!$this->get('session')->get('user')->isAdmin()){
 			throw $this->createNotFoundException("Cette page n'existe pas");
@@ -29,10 +30,7 @@ class TeamController extends Controller
 
 		$em = $this->getDoctrine()->getManager();
 		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
-
-		if(!($team = $teamRepository->find($teamId))){
-			$team = new Team();
-		}
+		$team = new Team();
 
 		$form = $this->createForm(TeamType::class,$team);
 		$form->handleRequest($request);
@@ -47,6 +45,60 @@ class TeamController extends Controller
 		return $this->render('team/index.html.twig', [
 			"form"=>$form->createView(),
 			"teams"=>$teams
+        ]);
+	}
+
+	/**
+	 * @Route("/view/{teamId}",name="team_view")
+	 */
+	public function view(Request $request,$teamId){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		$em = $this->getDoctrine()->getManager();
+		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if(!($team = $teamRepository->find($teamId))){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$projects = $projectRepository->findAll();
+
+		$managedProjects = [];
+		$managedUsers = [];
+		if($me->isAdmin()){
+			$managedProjects = $projects;
+			$managedUsers = $userRepository->findBy(array("isResource"=>true));
+		}else{
+			foreach($projects as $project){
+				if($me->canAdmin($project)){
+					$managedProjects[] = $project;
+				}
+			}
+			foreach($users as $user){
+				if($me->canAdmin($user)){
+					$managedUsers[] = $user;
+				}
+			}
+		}
+
+		try {
+			$startDateObj = new \DateTime($startDate);
+		} catch (\Exception $e) {
+			$startDate = "now";
+			$startDateObj = new \DateTime("now");
+		}
+
+		return $this->render('team/view.html.twig', [
+			"team"=>$team,
+			'holidays' => CommonController::getHolidays($startDateObj->format('Y')),
+			'startDate' => $startDate,
+			'users' => $team->getUsers(),
+			'projects' => $projects,
+			'me' => $me,
         ]);
 	}
 
@@ -71,9 +123,9 @@ class TeamController extends Controller
 	}
 
 	/**
-	 * @Route("/view/{teamId}",name="team_view")
+	 * @Route("/edit/{teamId}",name="team_edit")
 	 */
-	public function view(Request $request,$teamId){
+	public function edit(Request $request,$teamId){
 		if(!$this->get('session')->get('user')->isAdmin()){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
@@ -100,7 +152,7 @@ class TeamController extends Controller
 			$form = $this->createForm(ProjectStatusType::class,$projectStatus);
 		}
 
-		return $this->render('team/view.html.twig', [
+		return $this->render('team/edit.html.twig', [
 			"team"=>$team,
 			"users"=>$userRepository->findAll(),
 			"form"=>$form->createView(),
