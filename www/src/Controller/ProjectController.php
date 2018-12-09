@@ -105,7 +105,7 @@ class ProjectController extends Controller
 				$em->flush();
 				$this->addFlash('success','Tâche enregistrée');
 				$task = new Task();
-				$form = $this->createForm(TaskType::class,$task,['project'=>$project]);
+				$form = $this->createForm(TaskType::class,$task,["project"=>$project,"users"=>$managedUsers]);
 			}else{
 				throw $this->createNotFoundException("Cette page n'existe pas");
 			}
