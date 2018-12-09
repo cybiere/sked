@@ -43,7 +43,7 @@ th.schedDate{
 	border-right: 1px #ccc solid;
 }
 th.schedUser{
-	width: 120px;
+	width: 140px;
 	text-align:right;
 } 
 .schedHour{
@@ -175,4 +175,7 @@ th.schedUser{
 }
 .card-footer{
 	text-align:center;
+}
+p span.title{
+	font-weight:bold;
 }
