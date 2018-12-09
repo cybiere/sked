@@ -306,11 +306,6 @@ $(document).mouseup(function(e){
 
 var newPlanning = {}
 function addPlanning(){
-	$('#planning_meeting').prop('checked',$('#addForm_meeting').prop('checked'));
-	$('#planning_confirmed').prop('checked',$('#addForm_confirmed').prop('checked'));
-	$('#planning_project').val($('#addForm_projectId').val());
-	$('#planning_task').val($('#addForm_taskId').val());
-
 	newPlanning['user'] = $('#addModal_ressourceForm').html()
 	newPlanning['startDate'] = $('#addModal_startDateForm').html()
 	newPlanning['startHour'] = $('#addModal_startHourForm').html()
@@ -320,8 +315,13 @@ function addPlanning(){
 	newPlanning['project'] = $('#addForm_projectId').val()
 	newPlanning['task'] = $('#addForm_taskId').val()
 
+
 	$('#addPlanning_Modal').modal('hide');
-	//TODO RAZ champs modal
+
+	$('#addForm_meeting').prop('checked',false)
+	$('#addForm_confirmed').prop('checked',true)
+	$('#addForm_projectId').val("")
+	$('#addForm_taskId').val("")
 	if(projectsRemaining[newPlanning['project']] != null && newPlanning['nbSlices'] > projectsRemaining[newPlanning['project']]){
 		$('#overrun_Modal').modal();
 		return false;

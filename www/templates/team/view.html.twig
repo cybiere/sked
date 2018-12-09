@@ -91,17 +91,6 @@
 {% block extraJs %}
 {% if me.canAdmin(team) %}
 <script>
-var urlDict = {}
-urlDict["planning_info"] = "{{ path("planning_info",{"planningId":"idPlaceHold"}) }}";
-urlDict["project_view"] = "{{ path("project_view",{"projectId":123}) }}";
-urlDict["task_byproject"] = "{{ path("task_byproject",{"projectId":"idPlaceHold"}) }}";
-urlDict["planning_new"] = "{{ path("planning_new") }}";
-urlDict["planning_resize"] = "{{ path("planning_resize",{"planningId":"idPlaceHold","newSize":"sizePlaceHold"}) }}";
-urlDict["planning_move"] = "{{ path("planning_move",{"planningId":"idPlaceHold","newStart":"startPlaceHold","newHour":"hourPlaceHold","newUser":"userPlaceHold","newSize":"sizePlaceHold"}) }}";
-urlDict["planning_confirm"] = "{{ path("planning_confirm",{"planningId":"123"}) }}";
-urlDict["planning_meeting"] = "{{ path("planning_meeting",{"planningId":"123"}) }}";
-urlDict["planning_delete"] = "{{ path("planning_del",{"planningId":"123"}) }}";
-urlDict["project_edit"] = "{{ path("project_edit",{"projectId":"123"}) }}";
 var users=[];
 {% for user in users %}
 	users[{{ user.id }}] = "{{ user.fullname }}"

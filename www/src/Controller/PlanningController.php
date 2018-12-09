@@ -70,27 +70,6 @@ class PlanningController extends Controller
 			}
 		}
 
-		$planning = new Planning();
-		$form = $this->createForm(PlanningType::class,$planning,
-			[
-				'projects'=>$managedProjects,
-				'users'=>$managedUsers
-			]);
-
-		$form->handleRequest($request);
-		if ($form->isSubmitted() && $form->isValid()) {
-			$planning = $form->getData();
-			if(!$me->canAdmin($planning)){
-				$this->addFlash('danger',"Vous n'avez pas le droit de modifier ce planning.");
-			}else{
-				if(!is_object($planning) && $planning->getProject() == 0) $planning->setProject(NULL);
-				$em->persist($planning);
-				$em->flush();
-				$this->addFlash('success','Planning ajouté');
-			}
-		}
-
-
 		$hasAdmin = $me->isAdmin();
 		foreach($users as $user){
 			if($hasAdmin) break;
@@ -108,7 +87,6 @@ class PlanningController extends Controller
 			'startDate' => $startDate,
 			'users' => $users,
 			'projects' => $projects,
-			'form' => $form->createView(),
 			'me' => $me,
 			'hasAdmin' => $hasAdmin,
 		]);

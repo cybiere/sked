@@ -5,26 +5,8 @@
 {% block body %}
 {% set days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'] %}
 {% set months = ['','Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'] %}
-<h1>Planning
-					{% if hasAdmin %}
-	<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addPlanning" role="button" aria-expanded="false" aria-controls="addButton">
-		Ajouter une entrée de planning
-	</a>
-					{% endif %}
-</h1>
+<h1>Planning</h1>
 
-					{% if hasAdmin %}
-<div class="collapse" id="addPlanning">
-	<div class="card bg-light">
-		<h2 class="card-header">Ajouter une entrée de planning</h2>
-		<div class="card-body">
-			{{ form_start(form, {'attr': {'id': 'addPlanning_form'}}) }}
-			{{ form_widget(form) }}
-			{{ form_end(form) }}
-		</div>
-	</div>
-</div>
-					{% endif %}
 <hr />
 {% set planningStart = startDate|date_modify('first day of this month') %}
 <div class="d-flex justify-content-center">
@@ -117,10 +99,6 @@ var projectsRemaining=[];
 		projectsRemaining[{{project.id}}] = null;
 	{% endif %}
 {% endfor %}
-var urlDict = {}
-urlDict["task_byproject"] = "{{ path("task_byproject",{"projectId":"idPlaceHold"}) }}";
-urlDict["planning_resize"] = "{{ path("planning_resize",{"planningId":"idPlaceHold","newSize":"sizePlaceHold"}) }}";
-urlDict["planning_move"] = "{{ path("planning_move",{"planningId":"idPlaceHold","newStart":"startPlaceHold","newHour":"hourPlaceHold","newUser":"userPlaceHold","newSize":"sizePlaceHold"}) }}";
 </script>
 <script src="/js/planningAdmin.js"></script>
 {% endif %}
