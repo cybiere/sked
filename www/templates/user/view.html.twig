@@ -108,18 +108,7 @@
 {% endblock %}
 
 {% block extraJs %}
-<script>
-	$('.project').each(function(index){
-		$(this).outerWidth($(this).parents('td').outerWidth()*$(this).data("duration")-3);
-	});
-$( ".project" ).contextmenu(function() {
-	$(this).popover('show')
-	return false;
-});
-$( ".project" ).on('blur',function() {
-	$(this).popover('hide')
-});
-</script>
+<script src="/js/planningCommon.js"></script>
 {% endblock %}
 
 

@@ -180,17 +180,8 @@
 {% endfor %}
 {% endblock %}
 {% block extraJs %}
+<script src="/js/planningCommon.js"></script>
 <script>
-$('.project').each(function(index){
-	$(this).outerWidth($(this).parents('td').outerWidth()*$(this).data("duration")-3);
-});
-$( ".project" ).contextmenu(function() {
-	$(this).popover('show')
-	return false;
-});
-$( ".project" ).on('blur',function() {
-	$(this).popover('hide')
-});
 {% if hasAdmin %}
 $(".hasAdmin").resizable({
 	handles: "e",
