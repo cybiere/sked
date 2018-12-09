@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Team;
 use App\Entity\User;
+use App\Entity\Project;
 use App\Entity\ProjectStatus;
 use App\Form\TeamType;
 use App\Form\ProjectStatusType;
@@ -56,17 +57,48 @@ class TeamController extends Controller
 		}
 		$em = $this->getDoctrine()->getManager();
 		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
-		$projectStatusRepository = $this->getDoctrine()->getRepository(projectStatus::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($team = $teamRepository->find($teamId))){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
+		$projects = $projectRepository->findAll();
+
+		$managedProjects = [];
+		$managedUsers = [];
+		if($me->isAdmin()){
+			$managedProjects = $projects;
+			$managedUsers = $userRepository->findBy(array("isResource"=>true));
+		}else{
+			foreach($projects as $project){
+				if($me->canAdmin($project)){
+					$managedProjects[] = $project;
+				}
+			}
+			foreach($users as $user){
+				if($me->canAdmin($user)){
+					$managedUsers[] = $user;
+				}
+			}
+		}
+
+		try {
+			$startDateObj = new \DateTime($startDate);
+		} catch (\Exception $e) {
+			$startDate = "now";
+			$startDateObj = new \DateTime("now");
+		}
+
 		return $this->render('team/view.html.twig', [
 			"team"=>$team,
-			"users"=>$userRepository->findAll(),
-			"statuses" => $projectStatusRepository->findByTeam($team)
+			'holidays' => CommonController::getHolidays($startDateObj->format('Y')),
+			'startDate' => $startDate,
+			'users' => $team->getUsers(),
+			'projects' => $projects,
+			'me' => $me,
         ]);
 	}
 

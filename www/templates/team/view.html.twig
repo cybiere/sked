@@ -8,14 +8,79 @@
 
 <h1>Equipe {{ team.name }} 
 	<a class="btn btn-outline-dark float-right" href="{{ path('team_index')}}">Retour</a>
-	{% if app.session.get('user').admin %}
-	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('team_index',{'teamId':team.id})}}">Modifier</a>
+	{% if me.canAdmin(team) %}
+	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('team_edit',{'teamId':team.id})}}">Modifier</a>
 	{% endif %}
 </h1>
 
 <p><span class="title">Managers de l'équipe : </span>{% for user in team.managers %}{% if not loop.first %}, {% endif %}{{ user.fullname }}{% endfor %}</p>
 
 <h2>Planning</h2>
+{% if me.canAdmin(team) %}
+{% include 'common/addPlanningModals.html.twig' %}
+{% endif %}
+
+{% set baseDate = startDate|date('d-m-Y') %}
+{% set today = "now"|date('d-m-Y')|date_modify('midnight') %}
+{% set nbMonths = 3 %}
+{% for i in range(0,nbMonths-1) %}
+
+{% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
+{% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
+{% set nbSlices = 0 %}
+<table class="table table-sm table-hover schedule">
+	<thead>
+		<tr>
+			<th class="schedUser schedDate">{{ months[startDate|date('n')] ~ ' ' ~ startDate|date('Y') }}</th>
+			{% for i in range(0,(startDate|date('t')|number_format)-1) %}
+            {% set x = startDate|date_modify('+'~ i ~' days')|date_modify('midnight') %}
+			{% if x|date('N') < 6 %}
+			{% set nbSlices = nbSlices+2 %}
+			<th colspan="2" class="schedDate{% if x|date('N') == 5 %} friday{% endif %}{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">{{ days[x|date('w')] ~ ' ' ~ x|date('d') }}</th>
+			{% endif %}
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for user in users %}
+		<tr>
+			{% set slicesShown = 0 %}
+			<th class="schedUser">
+				{% if me.canAdmin(user) %}
+					<a href="{{ path("user_view",{"userId":user.id}) }}">{{ user.username }}</a>
+				{% else %}
+					{{ user.username }}
+				{% endif %}
+			</th>
+			{% for i in range(0,(startDate|date('t')|number_format)-1) %}
+            {% set x = startDate|date_modify('+'~ i ~' days') %}
+			{% if x|date('N') < 6 %}
+			<td class="schedHour{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+				{% set slicesShown = slicesShown+1 %}
+				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+					{% for planning in user.plannings %}
+					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
+					<div class="planningPlaceholder" data-planningid="{{planning.id}}">Planning</div>
+					{% endif %}
+					{% endfor %}
+				</div>
+			</td>
+			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+				{% set slicesShown = slicesShown+1 %}
+				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+					{% for planning in user.plannings %}
+					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
+					<div class="planningPlaceholder" data-planningid="{{planning.id}}">Planning</div>
+					{% endif %}
+					{% endfor %}
+				</div></td>
+				{% endif %}
+				{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endfor %}
 
 <h2>Projets</h2>
 
@@ -23,3 +88,38 @@
 
 {% endblock %}
 
+{% block extraJs %}
+<script>
+var urlDict = {}
+urlDict["planning_info"] = "{{ path("planning_info",{"planningId":"idPlaceHold"}) }}";
+urlDict["project_view"] = "{{ path("project_view",{"projectId":123}) }}";
+</script>
+{% if me.canAdmin(team) %}
+<script>
+urlDict["task_byproject"] = "{{ path("task_byproject",{"projectId":"idPlaceHold"}) }}";
+urlDict["planning_new"] = "{{ path("planning_new") }}";
+urlDict["planning_resize"] = "{{ path("planning_resize",{"planningId":"idPlaceHold","newSize":"sizePlaceHold"}) }}";
+urlDict["planning_move"] = "{{ path("planning_move",{"planningId":"idPlaceHold","newStart":"startPlaceHold","newHour":"hourPlaceHold","newUser":"userPlaceHold","newSize":"sizePlaceHold"}) }}";
+urlDict["planning_confirm"] = "{{ path("planning_confirm",{"planningId":"123"}) }}";
+urlDict["planning_meeting"] = "{{ path("planning_meeting",{"planningId":"123"}) }}";
+urlDict["planning_delete"] = "{{ path("planning_del",{"planningId":"123"}) }}";
+urlDict["project_edit"] = "{{ path("project_edit",{"projectId":"123"}) }}";
+var users=[];
+{% for user in users %}
+	users[{{ user.id }}] = "{{ user.fullname }}"
+{% endfor %}
+var projectsRemaining=[];
+{% for project in projects %}
+	{% if project.nbDays is not null and project.nbDays != 0 %}
+		projectsRemaining[{{project.id}}] = {{ (project.nbDays - project.plannedDays) * 2 }};
+	{% else %}
+		projectsRemaining[{{project.id}}] = null;
+	{% endif %}
+{% endfor %}
+</script>
+{% endif %}
+<script src="/js/planningCommon.js"></script>
+{% if me.canAdmin(team) %}
+<script src="/js/planningAdmin.js"></script>
+{% endif %}
+{% endblock %}

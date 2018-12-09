@@ -122,9 +122,13 @@ $(document).mouseup(function(e){
 		$('#planning_nbSlices').val(nbSlices);
 
 		$('#addModal_ressource').html(users[add_userId]);
+		$('#addModal_ressourceForm').html(add_userId);
 		$('#addModal_startDate').html(new Date(add_startDate).toLocaleDateString('fr-FR'));
+		$('#addModal_startDateForm').html(add_startDate);
 		$('#addModal_startHour').html(add_startHour == "am" ? "matin" : "midi");
+		$('#addModal_startHourForm').html(add_startHour);
 		$('#addModal_duration').html(nbSlices/2 + 'jh');
+		$('#addModal_durationForm').html(nbSlices);
 		$('#addPlanning_Modal').modal();
 
 		baseX=0;
@@ -137,17 +141,62 @@ $(document).mouseup(function(e){
 	}
 });
 
+var newPlanning = {}
 function addPlanning(){
 	$('#planning_meeting').prop('checked',$('#addForm_meeting').prop('checked'));
 	$('#planning_confirmed').prop('checked',$('#addForm_confirmed').prop('checked'));
 	$('#planning_project').val($('#addForm_projectId').val());
 	$('#planning_task').val($('#addForm_taskId').val());
-	if(projectsRemaining[$('#addForm_projectId').val()] != null && $('#planning_nbSlices').val() > projectsRemaining[$('#addForm_projectId').val()]){
-		$('#addPlanning_Modal').modal('hide');
+
+	newPlanning['user'] = $('#addModal_ressourceForm').html()
+	newPlanning['startDate'] = $('#addModal_startDateForm').html()
+	newPlanning['startHour'] = $('#addModal_startHourForm').html()
+	newPlanning['nbSlices'] = $('#addModal_durationForm').html()
+	newPlanning['meeting'] = $('#addForm_meeting').prop('checked')
+	newPlanning['confirmed'] = $('#addForm_confirmed').prop('checked')
+	newPlanning['project'] = $('#addForm_projectId').val()
+	newPlanning['task'] = $('#addForm_taskId').val()
+
+	$('#addPlanning_Modal').modal('hide');
+	//TODO RAZ champs modal
+	if(projectsRemaining[newPlanning['project']] != null && newPlanning['nbSlices'] > projectsRemaining[newPlanning['project']]){
 		$('#overrun_Modal').modal();
 		return false;
+	}else{
+		sendPlanningNewRequest()
 	}
-	$('#addPlanning_form').submit();
+}
+
+function sendPlanningNewRequest(){
+	$('#overrun_Modal').modal('hide');
+	$.ajax({
+		type: "POST",
+		url:urlDict["planning_new"],
+		data:newPlanning,
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			if(data.success){
+				newDiv = $("<div data-planningid='"+data.id+"' class='planningPlaceholder'>Planning</div>")
+				newDiv.appendTo($("div[data-date='"+newPlanning['startDate']+"'][data-hour='"+newPlanning['startHour']+"'][data-user='"+newPlanning['user']+"']"))
+				newDiv.each(printPlanningItem);
+				newDiv.contextmenu(function() {
+					$(this).popover('show')
+						return false;
+					});
+				newDiv.on('blur',function() {
+					$(this).popover('hide')
+				});
+
+
+			}else{
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			}
+		}
+	});
 }
 
 $('#addForm_projectId').change(function(){

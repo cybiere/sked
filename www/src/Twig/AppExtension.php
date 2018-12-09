@@ -101,7 +101,17 @@ class AppExtension extends AbstractExtension
 		data-planningId="<?php echo htmlspecialchars($planning->getId()); ?>"
 		data-toggle="popover"
 		data-html="true"
-		title="<?php if($planning->getTask() != NULL){if($planning->getTask()->getComments()){ echo "<a href='#' data-toggle='tooltip' title='".htmlspecialchars($planning->getTask()->getComments())."'>".htmlspecialchars($planning->getTask()->getName())."</a>";}else{echo htmlspecialchars($planning->getTask()->getName());}}else echo $planning->getProject() == NULL?"Absence":"<a href='".$this->router->generate('project_view',array("projectId"=>$planning->getProject()->getId()))."'>".htmlspecialchars($planning->getProject()->getName())."</a>"; ?>"
+		title="
+<?php 
+		if($planning->getTask() != NULL){
+			if($planning->getTask()->getComments()){ 
+				echo "<a href='#' data-toggle='tooltip' title='".htmlspecialchars($planning->getTask()->getComments())."'>".htmlspecialchars($planning->getTask()->getName())."</a>";
+			}else{
+				echo htmlspecialchars($planning->getTask()->getName());
+			}
+		}else 
+			echo $planning->getProject() == NULL?"Absence":"<a href='".$this->router->generate('project_view',array("projectId"=>$planning->getProject()->getId()))."'>".htmlspecialchars($planning->getProject()->getName())."</a>"; ?>
+"
 		data-content="
 			<div class='row'>
 <?php if($planning->getProject() != NULL){ ?>
@@ -147,7 +157,7 @@ class AppExtension extends AbstractExtension
 				$i++;
 			}
 			if($team->getLevel() != 0) echo "↳ ";
-			echo htmlspecialchars($team->getName());
+			echo "<a href='".$this->router->generate('team_view',array("teamId"=>$team->getId()))."'>".htmlspecialchars($team->getName())."</a>";
 		?>
 		</td>
 		<td><?php echo count($team->getUsers()); ?></td>
