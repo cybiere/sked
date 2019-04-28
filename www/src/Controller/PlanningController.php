@@ -82,7 +82,20 @@ class PlanningController extends Controller
 			$startDate = "now";
 			$startDateObj = new \DateTime("now");
 		}
+		$renderMonths = 3;
+
+		$maxOffsets = [];
+		for($i=0;$i<$renderMonths;$i++){
+			$offDate = clone $startDateObj;
+			$offDate->modify("+".$i."months");
+			foreach($users as $user){
+				$maxOffsets[$i][$user->getId()] = CommonController::calcOffset($offDate,$user);
+			}
+		}
+
 		return $this->render('planning/index.html.twig', [
+			'nbMonths' => 3,
+			'maxOffsets' => $maxOffsets,
 			'holidays' => CommonController::getHolidays($startDateObj->format('Y')),
 			'startDate' => $startDate,
 			'users' => $users,

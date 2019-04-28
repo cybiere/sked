@@ -343,7 +343,7 @@ function sendPlanningNewRequest(){
 		success:function(data, status, xhr){
 			if(data.success){
 				newDiv = $("<div data-planningid='"+data.id+"' class='planningPlaceholder'>Planning</div>")
-				newDiv.appendTo($("div[data-date='"+newPlanning['startDate']+"'][data-hour='"+newPlanning['startHour']+"'][data-user='"+newPlanning['user']+"']"))
+				newDiv.appendTo($("div[data-date='"+newPlanning['startDate']+"'][data-hour='"+newPlanning['startHour']+"'][data-user='"+newPlanning['user']+"']:first"))
 				newDiv.each(printPlanningItem);
 				newDiv.contextmenu(function() {
 					$(this).popover('show')

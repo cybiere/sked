@@ -59,6 +59,7 @@ class Planning
      */
 	private $task;
 
+	public $offset;
 
 	public function getId(){
 		return $this->id;

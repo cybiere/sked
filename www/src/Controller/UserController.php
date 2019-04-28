@@ -214,7 +214,19 @@ class UserController extends Controller{
 
 		$startDateObj = new \DateTime();
 
+		$renderMonths = 3;
+
+		$maxOffsets = [];
+		for($i=0;$i<$renderMonths;$i++){
+			$offDate = clone $startDateObj;
+			$offDate->modify("+".$i."months");
+			$maxOffsets[$i][$user->getId()] = CommonController::calcOffset($offDate,$user);
+		}
+
+
 		return $this->render('user/view.html.twig',array(
+			'nbMonths' => 3,
+			'maxOffsets' => $maxOffsets,
 			'user'=>$user,
 			'plannings'=>$plannings,
 			'holidays'=>CommonController::getHolidays($startDateObj->format('Y'))

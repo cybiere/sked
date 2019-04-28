@@ -42,6 +42,13 @@ th.schedDate{
 	border-top: 0;
 	border-right: 1px #ccc solid;
 }
+.schedule tbody td{
+	border-bottom: 0px;
+	border-top: 0px;
+}
+.schedule tbody:hover{
+	background: #efefef;
+}
 th.schedUser{
 	width: 140px;
 	text-align:right;

@@ -128,8 +128,38 @@ class ProjectController extends Controller
 		}else{
 			$startDateObj = new \DateTime();
 		}
+		if(count($plannings) < 1){
+			$nbMonths = 1;
+		}else{
+			$endMonth = $plannings[count($plannings)-1]->getStartDate()->format('n');
+			$startMonth = $startDateObj->format('n');
+			$endYear = $plannings[count($plannings)-1]->getStartDate()->format('Y');
+			$startYear = $startDateObj->format('Y');
+			while($endYear > $startYear){
+				$endYear--;
+				$endMonth+=12;
+			}
+			$nbMonths = $endMonth - $startMonth +1;
+		}
+
+		$maxOffsets = [];
+		$maxOffsets[-1][2] = 0;
+		$maxOffsets[-1][3] = 0;
+		$maxOffsets[-1][4] = 0;
+		$maxOffsets[-1][5] = 0;
+		for($i=0;$i<$nbMonths;$i++){
+			$offDate = clone $startDateObj;
+			$offDate->modify("+".$i."months");
+			foreach($users as $user){
+				$maxOffsets[$i][$user->getId()] = CommonController::calcOffset($offDate,$user);
+			}
+		}
+
 
 		return $this->render('project/view.html.twig',array(
+			'nbMonths' => $nbMonths,
+			'maxOffsets' => $maxOffsets,
+			'startDate' => $startDateObj,
 			'project'=>$project,
 			'plannings'=>$plannings,
 			'users'=>$users,

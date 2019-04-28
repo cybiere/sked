@@ -91,8 +91,20 @@ class TeamController extends Controller
 			$startDate = "now";
 			$startDateObj = new \DateTime("now");
 		}
+		$renderMonths = 3;
+
+		$maxOffsets = [];
+		for($i=0;$i<$renderMonths;$i++){
+			$offDate = clone $startDateObj;
+			$offDate->modify("+".$i."months");
+			foreach($team->getUsers() as $user){
+				$maxOffsets[$i][$user->getId()] = CommonController::calcOffset($offDate,$user);
+			}
+		}
 
 		return $this->render('team/view.html.twig', [
+			'nbMonths' => 3,
+			'maxOffsets' => $maxOffsets,
 			"team"=>$team,
 			'holidays' => CommonController::getHolidays($startDateObj->format('Y')),
 			'startDate' => $startDate,
