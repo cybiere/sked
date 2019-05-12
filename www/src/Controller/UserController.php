@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Team;
 use App\Entity\Planning;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -68,12 +69,17 @@ class UserController extends Controller{
 
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 
 		$user = new User();
 		$formBuilder = $this->createFormBuilder($user)->add('username', TextType::class,array('label'=>"Nom d'utilisateur"));
 		if(!$this->container->hasParameter('ldap_url')){
 			$formBuilder->add('fullname', TextType::class)
 			   ->add('email', TextType::class);
+		}
+		$teams = $teamRepository->findAll();
+		if($teams != NULL){
+			$formBuilder->add('team', NULL);
 		}
 		$form = $formBuilder->add('save', SubmitType::class, array('label' => "Ajouter l'utilisateur"))->getForm();
 
@@ -85,12 +91,40 @@ class UserController extends Controller{
 			if($userRepository->findOneBy(['username' => $user->getUsername()])){
 				$this->addFlash('warning',"Attention : l'utilisateur ".$user->getUsername()." existe déjà");
 			}else{
-				if($this->addUser($user->getUsername()))
+				if($this->addUser($user->getUsername())){
+					$newUser = $userRepository->findOneBy(['username' => $user->getUsername()]);
+					$newUser->setTeam($user->getTeam());
+					$em->flush();
 					$this->addFlash('success','Utilisateur ajouté');
+				}
 			}
 		}
 		$users = $userRepository->findAll();
-		return $this->render('user/index.html.twig',array('users'=>$users,'form'=>$form->createView()));
+		return $this->render('user/index.html.twig',array('users'=>$users,'form'=>$form->createView(),'teams'=>$teams));
+	}
+
+	/**
+	 * @Route("/{id}/team",name="user_changeTeam")
+	 */
+	public function changeTeam(Request $request,User $user){
+		$em = $this->getDoctrine()->getManager();
+		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
+		$teamId = $request->request->get('team');
+		if($teamId == 0){
+			$user->setTeam(NULL);
+			$em->flush();
+			$this->addFlash('success',"Équipe modifiée");
+			return $this->redirectToRoute('user_index');
+		}
+		$team = $teamRepository->find($teamId);
+		if(!$team){
+			$this->addFlash('danger',"L'équipe recherchée n'existe pas");
+		}else{
+			$user->setTeam($team);
+			$em->flush();
+			$this->addFlash('success',"Équipe modifiée");
+		}
+		return $this->redirectToRoute('user_index');
 	}
 
 	/**

@@ -147,7 +147,7 @@
 {% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
 {% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
 {% set nbSlices = 0 %}
-<table class="table table-sm table-hover schedule">
+<table class="table table-sm schedule">
 	<thead>
 		<tr>
 			<th class="schedUser schedDate">{{ months[startDate|date('n')] ~ ' ' ~ startDate|date('Y') }}</th>

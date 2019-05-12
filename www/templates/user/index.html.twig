@@ -12,7 +12,7 @@
 
 <h2>Utilisateurs existants</h2>
 <table class="table table-sm table-hover">
-	<tr><th>id</th><th>Nom complet</th><th>Nom d'utilisateur</th><th>Ressource</th><th>Admin</th><th class="actions">Actions</th></tr>
+	<tr><th>id</th><th>Nom complet</th><th>Nom d'utilisateur</th><th>Ressource</th><th>Admin</th><th>Equipe</th><th class="actions">Actions</th></tr>
 	{% for user in users %}
 	<tr {% if user.id == app.session.get('user').id %}class="table-info"{% endif %}>
 		<td>{{user.id}}</td>
@@ -28,10 +28,21 @@
 				<span class="badge badge-warning">Admin</span>
 			{% endif %}
 		</td>
+		<td>
+			<form action="{{ path('user_changeTeam',{"id":user.id}) }}" method="post">
+			<select name="team" onchange='$("#team_btn_{{user.id}}").css("visibility","visible")'>
+				<option value="0"></option>
+				{% for team in teams %}
+				<option value="{{ team.id }}"{% if user.team == team %} selected{% endif %}>{{ team.name }}</option>
+				{% endfor %}
+			</select>
+			<button type="submit" class="btn btn-sm btn-success" style="visibility:hidden" id='team_btn_{{user.id}}'><i class='far fa-save'></i></button>
+			</form>
+		</td>
 		<td class="actions">
 			<a href="{{ path("user_toggleResource",{'userid':user.id}) }}"><i class='fas fa-user-circle'></i></a>
 			<a href="{{ path("user_toggleAdmin",{'userid':user.id}) }}"><i class='fas fa-chess-king'></i></a>
-			<a href="{{ path("user_del",{'username':user.username}) }}"><i class='fas fa-trash'</a>
+			<a href="{{ path("user_del",{'username':user.username}) }}"><i class='fas fa-trash'></i></a>
 		</td>
 	{% endfor %}
 </table>
@@ -41,9 +52,12 @@
 {% block helpContent %}
 <ul>
 	<li>Ressource : afficher l'utilisateur dans le tableau de planning</li>
-	<li>Admin : droit de modification et de suppression sur tous les éléments</li>
+	<li>Admin : droit de modification et de suppression sur tous les éléments
+		<ul>
 	<li>Il n'est pas possible de supprimer un utilisateur administrateur</li>
-	<li>Il n'est pas possible de se retirer les droits utilisateurs</li>
+	<li>Il n'est pas possible de se retirer à soi-même les droits utilisateurs</li>
+		</ul>
+	</li>
 	<li>Actions d'administration
 		<ul>
 			<li><i class='fas fa-user-circle'></i>Donner/retirer le statut ressource</li>
