@@ -17,29 +17,16 @@
 <div class="row">
 	<div class="col">
 		<table class="table">
-			<tr><th>Membres de l'équipe</th><th class="actions"></th></tr>
+			<tr><th>Membres de l'équipe</th></tr>
 			<tbody id="members">
 			{% for user in team.users %}
 			<tr>
 				<td>
 					{{ user.fullname }}
-				</td><td class="actions">
-					<a class="text-danger" href='{{ path('team_delMember',{"teamId":team.id,"userId":user.id}) }}'><i title="Supprimer" class="fas fa-trash"></i></a>
 				</td>
 			</tr>
 			{% endfor %}
 			</tbody>
-			<tr>
-				<td colspan="2">
-					<select id="addMemberId">
-						<option value="0"></option>
-						{% for user in users if user not in team.users %}
-						<option value="{{ user.id }}">{{ user.fullname }}</option>
-						{% endfor %}
-					</select>
-					<button class="btn btn-sm btn-primary" id="addMember"><span class="fa fa-plus-circle"></span></button>
-				</td>
-			</tr>
 		</table>
 	</div>
 	<div class="col">

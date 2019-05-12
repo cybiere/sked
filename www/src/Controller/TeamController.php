@@ -173,52 +173,6 @@ class TeamController extends Controller
 	}
 
 	/**
-	 * @Route("/addMember/{teamId}/{userId}",name="team_addMember")
-	 */
-	public function addMember(Request $request,$teamId,$userId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
-		$em = $this->getDoctrine()->getManager();
-		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
-		$userRepository = $this->getDoctrine()->getRepository(User::class);
-
-		if(!($team = $teamRepository->find($teamId))){
-			$arrData = ['success' => false, 'errormsg' => 'Équipe non trouvée'];
-		}elseif(!($user = $userRepository->find($userId))){
-			$arrData = ['success' => false, 'errormsg' => 'Utilisateur non trouvé'];
-		}else{
-			$team->addUser($user);
-			$em->flush();
-			$arrData = ['success' => true];
-		}
-		return new JsonResponse($arrData);
-	}
-
-	/**
-	 * @Route("/delMember/{teamId}/{userId}",name="team_delMember")
-	 */
-	public function delMember(Request $request,$teamId,$userId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
-		$em = $this->getDoctrine()->getManager();
-		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
-		$userRepository = $this->getDoctrine()->getRepository(User::class);
-
-		if(!($team = $teamRepository->find($teamId))){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}elseif(!($user = $userRepository->find($userId))){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}else{
-			$team->removeUser($user);
-			$em->flush();
-		}
-		$referer = $request->headers->get('referer');
-		return $this->redirect($referer);
-	}
-
-	/**
 	 * @Route("/addManager/{teamId}/{userId}",name="team_addManager")
 	 */
 	public function addManager(Request $request,$teamId,$userId){
