@@ -58,6 +58,11 @@
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_view"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('user_view') }}">Mon profil</a>
 					</li>
+					{% if app.session.get('user').team %}
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["team_view"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('team_view') }}">Mon équipe</a>
+					</li>
+					{% endif %}
 				</ul>
 				<ul class="navbar-nav">
 					<li class="nav-item"><span class="navbar-text">Connecté en tant que {{ app.session.get('user').fullname }}</span></li>

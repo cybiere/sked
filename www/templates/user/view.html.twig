@@ -12,8 +12,30 @@
 </h1>
 <div class="row">
 	<div class="col">
-		<h2>Responsable des projets :</h2>
 		<table class="table table-sm table-hover">
+			<tr>
+				<th>Membre de l'équipe :</th>
+				<td>
+					{% if user.team %}
+					<a href="{{ path('team_view',{'teamId':user.team.id}) }}">{{ user.team.name }}</a>
+					{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2">Responsable des équipes</th>
+			</tr>
+			{% for team in user.managedTeams %}
+			<tr>
+				<td colspan="2">
+					<a href="{{ path('team_view',{'teamId':team.id}) }}">{{ team.name }}</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+		<table class="table table-sm table-hover">
+			<tr>
+				<th colspan="4">Responsable des projets</th>
+			</tr>
 			{% for project in user.managedProjects %}
 			<tr>
 				<td>

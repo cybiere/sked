@@ -49,17 +49,28 @@ class TeamController extends Controller
 	}
 
 	/**
-	 * @Route("/view/{teamId}",name="team_view")
+	 * @Route("/view/{teamId}",name="team_view",defaults={"teamId"="0"})
 	 */
 	public function view(Request $request,$teamId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
 		$em = $this->getDoctrine()->getManager();
 		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if($teamId == 0){
+			$teamId = $me->getTeam()->getId();
+		}else{
+			$allowedTeams = [];
+			$myTeam = $me->getTeam();
+			if($myTeam != null) $allowedTeams[] = $myTeam->getId();
+			foreach($me->getManagedTeams() as $team){
+				$allowedTeams[] = $team->getId();
+			}
+			if(!$this->get('session')->get('user')->isAdmin() and !in_array($teamId,$allowedTeams)){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
+		}
 
 		if(!($team = $teamRepository->find($teamId))){
 			throw $this->createNotFoundException("Cette page n'existe pas");
@@ -78,7 +89,7 @@ class TeamController extends Controller
 					$managedProjects[] = $project;
 				}
 			}
-			foreach($users as $user){
+			foreach($team->getUsers() as $user){
 				if($me->canAdmin($user)){
 					$managedUsers[] = $user;
 				}

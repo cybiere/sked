@@ -88,32 +88,6 @@
 
 {% block extraJs %}
 <script>
-$('#addMember').click(function(e){
-	newId = $('#addMemberId').val()
-	if(newId != 0){
-		url= "{{ path("team_addMember",{"teamId":team.id,"userId":"idPlaceHold"}) }}";
-		url = url.replace("idPlaceHold",newId);
-		$.ajax(url,{
-			async:false,
-			error:function(xhr,status,error){
-				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
-				$('#flashMessages').append(message);
-			},
-			success:function(data, status, xhr){
-				if(data.success){
-					url = "{{ path('team_delMember',{'teamId':team.id,'userId':'idPlaceHold'}) }}"
-					url = url.replace("idPlaceHold",newId);
-					$('#members').append('<tr><td> ' + $('#addMemberId option:selected').text() + '</td><td class="actions"><a class="text-danger" href="' + url + '"><i title="Supprimer" class="fas fa-trash"></i></a></td></tr>');
-					$("#addMemberId option[value='" + newId + "']").remove();
-				}else{
-					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
-					$('#flashMessages').append(message);
-				}
-			}
-		});
-
-	}
-});
 $('#addManager').click(function(e){
 	newId = $('#addManagerId').val()
 	if(newId != 0){
