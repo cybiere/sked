@@ -63,7 +63,14 @@ class ProjectController extends Controller
 		if($this->get('session')->get('user')->isAdmin()){
 			$myTeams = $teamRepository->findAll();
 		}else{
-			$myTeams = array_unique(array_merge($me->getTeams()->toArray(),$me->getManagedTeams()));
+			if($me->getTeam() == null){
+				$myTeams = $me->getManagedTeams();
+			}elseif($me->getManagedTeams() == null){
+				$myTeams = [$me->getTeam()];
+			}else{
+				$myTeams = $me->getManagedTeams()->toArray();
+				$myTeams[] = $me->getTeam();
+			}
 			$teamlessProjects = [];
 		}
 		$teamlessProjects = $projectRepository->findByTeam(NULL);
