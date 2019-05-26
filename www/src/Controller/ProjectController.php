@@ -68,8 +68,9 @@ class ProjectController extends Controller
 			}elseif($me->getManagedTeams() == null){
 				$myTeams = [$me->getTeam()];
 			}else{
-				$myTeams = $me->getManagedTeams()->toArray();
-				$myTeams[] = $me->getTeam();
+				$myTeams = $me->getManagedTeams();
+				if(!in_array($me->getTeam(),$myTeams))
+					$myTeams[] = $me->getTeam();
 			}
 			$teamlessProjects = [];
 		}

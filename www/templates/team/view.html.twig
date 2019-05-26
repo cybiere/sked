@@ -7,7 +7,6 @@
 {% set months = ['','Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'] %}
 
 <h1>Equipe {{ team.name }} 
-	<a class="btn btn-outline-dark float-right" href="{{ path('team_index')}}">Retour</a>
 	{% if me.canAdmin(team) %}
 	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('team_edit',{'teamId':team.id})}}">Modifier</a>
 	{% endif %}

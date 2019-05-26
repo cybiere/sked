@@ -149,16 +149,19 @@ class TeamController extends Controller
 	 * @Route("/edit/{teamId}",name="team_edit")
 	 */
 	public function edit(Request $request,$teamId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
 		$em = $this->getDoctrine()->getManager();
 		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$projectStatusRepository = $this->getDoctrine()->getRepository(projectStatus::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($team = $teamRepository->find($teamId))){
 			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+	if(!$this->get('session')->get('user')->isAdmin()){
+			if(!$me->canAdmin($team))
+				throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
 		$projectStatus = new ProjectStatus();

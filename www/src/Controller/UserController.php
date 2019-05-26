@@ -223,7 +223,9 @@ class UserController extends Controller{
 		}
 
 		$this->get('session')->set('user',$user);
-		return $this->redirectToRoute('planning_index');
+		if($user->getTeam())
+			return $this->redirectToRoute('team_view');
+		return $this->redirectToRoute('user_view');
 	}
 
 	/**

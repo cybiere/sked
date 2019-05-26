@@ -7,10 +7,7 @@
 {% set months = ['','Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'] %}
 
 <h1>Equipe {{ team.name }} 
-	<a class="btn btn-outline-dark float-right" href="{{ path('team_index')}}">Retour</a>
-	{% if app.session.get('user').admin %}
-	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('team_index',{'teamId':team.id})}}">Modifier</a>
-	{% endif %}
+	<a class="btn btn-outline-dark float-right" href="{{ path('team_view',{'teamId':team.id})}}">Retour</a>
 </h1>
 
 <h2>Informations</h2>
@@ -38,7 +35,9 @@
 				<td>
 					{{ user.fullname }}
 				</td><td class="actions">
-					<a class="text-danger" href='{{ path('team_delManager',{"teamId":team.id,"userId":user.id}) }}'><i title="Supprimer" class="fas fa-trash"></i></a>
+					{% if app.session.get('user').admin %}
+						<a class="text-danger" href='{{ path('team_delManager',{"teamId":team.id,"userId":user.id}) }}'><i title="Supprimer" class="fas fa-trash"></i></a>
+						{% endif %}
 				</td>
 			</tr>
 			{% endfor %}
