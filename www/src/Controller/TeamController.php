@@ -285,6 +285,9 @@ class TeamController extends Controller
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 		$i=1;
+		foreach($status->getProjects() as $project){
+			$project->setProjectStatus(null);
+		}
 		while(($nextStatus = $statusRepository->findInTeamByOrder($status->getTeam(),$status->getStatusOrder()+$i)) != NULL){
 			$nextStatus->setStatusOrder($nextStatus->getStatusOrder()-1);
 			$i++;

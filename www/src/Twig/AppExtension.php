@@ -29,7 +29,7 @@ class AppExtension extends AbstractExtension
 	}
 
 	public function kanprojectFunction($project,$me){
-		$isAdmin = $me->canAdmin($project);
+		$isAdmin = $me?$me->canAdmin($project):false;
 ?>
 	<div class='card kanProject<?php if($isAdmin){ echo " hasAdmin"; }?>' data-projectid="<?php echo htmlspecialchars($project->getId()); ?>">
 		<h4 class="card-header text-center">
