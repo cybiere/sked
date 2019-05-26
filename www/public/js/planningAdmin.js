@@ -201,8 +201,8 @@ dragOptions = {
 	cursor: "grab",
 	cursorAt: { left:5 }
 }
-$(".hasAdmin").resizable(resizeOptions);
-$('.hasAdmin').draggable(dragOptions); 
+$(".project.hasAdmin").resizable(resizeOptions);
+$('.project.hasAdmin').draggable(dragOptions); 
 $('.project').on('mousedown',function(e){
 	e.stopPropagation();
 });
@@ -211,6 +211,7 @@ $('.projectContainerAdmin').droppable({
 	classes: {
 		"ui-droppable-hover":"activeDrop",
 	},
+	accept: ".project",
 	tolerance: "pointer",
 	drop : function(e, ui){
 		destCell = this;

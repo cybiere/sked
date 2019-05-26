@@ -87,28 +87,23 @@
 <h2>Projets</h2>
 
 {% if not team.projectStatuses is empty %}
-<div class="card">
-	<a class="card-header" data-toggle="collapse" href="#kan{{team.name}}" role="button" aria-expanded="false" aria-controls="showMore">
-		Tableau des projets pour l'équipe {{ team.name }}
-	</a>
-	<div class="card-body collapse show" id="kan{{team.name}}">
+	<div id="kan{{team.name}}">
 		<div class="row kanban">
 			<div class="col kanCol" data-status='0'>
 				<h3>Non confirmé</h3>
 				{% for project in team.projects if project.projectStatus == NULL and not project.archived %}
-				{{ kanproject(project,false) }}
+				{{ kanproject(project,me) }}
 				{% endfor %}
 			</div>
 			{% for status in team.projectStatuses %}
 			<div class="col kanCol" data-status='{{status.id}}'>
 				<h3>{{status.name}}</h3>
 				{% for project in status.projects if not project.archived %}
-				{{ kanproject(project,false) }}
+				{{ kanproject(project,me) }}
 				{% endfor %}
 			</div>
 			{% endfor %}
 		</div>
-	</div>
 </div>
 <hr />
 {% else %}
@@ -183,5 +178,6 @@ projectsRemaining[{{project.id}}] = null;
 <script src="/js/planningCommon.js"></script>
 {% if me.canAdmin(team) %}
 <script src="/js/planningAdmin.js"></script>
+<script src="/js/projectAdmin.js"></script>
 {% endif %}
 {% endblock %}
