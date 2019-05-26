@@ -34,17 +34,25 @@
 	<body>
 
 		<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-			<a class="navbar-brand" href="{{ path('planning_index')}}" title="Sked v1.2.3"><img src="/img/logo_sked_light.png" alt="Logo Sked" /> Sked</a>
+			<a class="navbar-brand" href="{{ path('site_index')}}" title="Sked v1.2.3"><img src="/img/logo_sked_light.png" alt="Logo Sked" /> Sked</a>
 
 			<div class="collapse navbar-collapse">
 				<ul class="navbar-nav mr-auto">
-					<li class="nav-item{% if app.request.attributes.get('_route') in ["planning_index"] %} active{% endif %}">
-						<a class="nav-link" href="{{ path('planning_index') }}">Planning</a>
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_view","site_index"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('user_view') }}">Mon profil</a>
 					</li>
+					{% if app.session.get('user').team %}
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["team_view"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('team_view') }}">Mon équipe</a>
+					</li>
+					{% endif %}
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["project_index","project_view","project_edit"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('project_index') }}">Projets</a>
 					</li>
 					{% if app.session.get('user').admin %}
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["planning_index"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('planning_index') }}">Planning</a>
+					</li>
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["task_index"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('task_index') }}">Tâches</a>
 					</li>
@@ -53,14 +61,6 @@
 					</li>
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["team_index","team_view","team_edit"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('team_index') }}">Équipes</a>
-					</li>
-					{% endif %}
-					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_view"] %} active{% endif %}">
-						<a class="nav-link" href="{{ path('user_view') }}">Mon profil</a>
-					</li>
-					{% if app.session.get('user').team %}
-					<li class="nav-item{% if app.request.attributes.get('_route') in ["team_view"] %} active{% endif %}">
-						<a class="nav-link" href="{{ path('team_view') }}">Mon équipe</a>
 					</li>
 					{% endif %}
 				</ul>

@@ -13,12 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Ldap\Ldap;
 
-/**
- * @Route("/user")
- */
 class UserController extends Controller{
-
-
 	private function addUser($username,$isAdmin=false){
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
@@ -60,7 +55,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	 * @Route("/",name="user_index")
+	 * @Route("/user/",name="user_index")
 	 */
 	public function index(Request $request){
 		if(!$this->get('session')->get('user')->isAdmin()){
@@ -104,7 +99,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	 * @Route("/{id}/team",name="user_changeTeam")
+	 * @Route("/user/{id}/team",name="user_changeTeam")
 	 */
 	public function changeTeam(Request $request,User $user){
 		$em = $this->getDoctrine()->getManager();
@@ -128,7 +123,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	 * @Route("/del/{username}",name="user_del")
+	 * @Route("/user/del/{username}",name="user_del")
 	 */
 	public function delete(Request $request,$username){
 		if(!$this->get('session')->get('user')->isAdmin()){
@@ -155,7 +150,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	 * @Route("/toggleResource/{userid}",name="user_toggleResource")
+	 * @Route("/user/toggleResource/{userid}",name="user_toggleResource")
 	 */
 	public function toggleResource(Request $request,$userid){
 		if(!$this->get('session')->get('user')->isAdmin()){
@@ -175,8 +170,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	/**
-	 * @Route("/toggleAdmin/{userid}",name="user_toggleAdmin")
+	 * @Route("/user/toggleAdmin/{userid}",name="user_toggleAdmin")
 	 */
 	public function toggleAdmin(Request $request,$userid){
 		if(!$this->get('session')->get('user')->isAdmin()){
@@ -199,7 +193,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	 * @Route("/enrol",name="user_enrol")
+	 * @Route("/user/enrol",name="user_enrol")
 	 */
 	public function enrolUser(){
 		$em = $this->getDoctrine()->getManager();
@@ -229,7 +223,8 @@ class UserController extends Controller{
 	}
 
 	/**
-	 * @Route("/profile/{userId}", name="user_view", defaults={"userId"=0},requirements={"userId"="\d+"})
+	 * @Route("/", name="site_index")
+	 * @Route("/user/profile/{userId}", name="user_view", defaults={"userId"=0},requirements={"userId"="\d+"})
 	 */
 	public function viewUser($userId=0){
 		$em = $this->getDoctrine()->getManager();

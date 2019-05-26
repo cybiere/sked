@@ -17,11 +17,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class PlanningController extends Controller
 {
 	/**
-	 * @Route("/", name="planning_index")
+	 * @Route("/planning", name="planning_index")
 	 * @Route("/planning/{startDate}", name="planning_index_shift", defaults={"startDate"="now"})
 	 */
 	public function index(Request $request, $startDate="now")
 	{
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
 		$em = $this->getDoctrine()->getManager();
 		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
@@ -38,8 +41,9 @@ class PlanningController extends Controller
 			}elseif($me->getManagedTeams() == null){
 				$myTeams = [$me->getTeam()];
 			}else{
-				$myTeams = $me->getManagedTeams()->toArray();
-				$myTeams[] = $me->getTeam();
+				$myTeams = $me->getManagedTeams();
+				if(!in_array($me->getTeam(),$myTeams))
+					$myTeams[] = $me->getTeam();
 			}
 			if(count($myTeams)==0){
 				$users = [$me];
@@ -114,7 +118,7 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/p/resize/{planningId}/{newSize}",name="planning_resize")
+	 * @Route("/planning/resize/{planningId}/{newSize}",name="planning_resize")
 	 */
 	public function resize(Request $request,$planningId,$newSize){
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
@@ -138,7 +142,7 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/p/info/{planningId}",name="planning_info")
+	 * @Route("/planning/info/{planningId}",name="planning_info")
 	 */
 	public function info(Request $request,$planningId){
 		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
@@ -188,7 +192,7 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/p/new",name="planning_new")
+	 * @Route("/planning/new",name="planning_new")
 	 */
 	public function newPlanning(Request $request){
 		if(!$request->isMethod('POST')){
@@ -242,7 +246,7 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/p/move/{planningId}/{newStart}/{newHour}/{newUser}/{newSize}",name="planning_move")
+	 * @Route("/planning/move/{planningId}/{newStart}/{newHour}/{newUser}/{newSize}",name="planning_move")
 	 */
 	public function move(Request $request,$planningId,$newStart,$newHour,$newUser,$newSize){
 		$em = $this->getDoctrine()->getManager();
@@ -274,7 +278,7 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/p/del/{planningId}",name="planning_del")
+	 * @Route("/planning/del/{planningId}",name="planning_del")
 	 */
 	public function del(Request $request,$planningId){
 		$em = $this->getDoctrine()->getManager();
@@ -298,7 +302,7 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/p/confirm/{planningId}",name="planning_confirm")
+	 * @Route("/planning/confirm/{planningId}",name="planning_confirm")
 	 */
 	public function confirm(Request $request,$planningId){
 		$em = $this->getDoctrine()->getManager();
@@ -333,7 +337,7 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/p/meeting/{planningId}",name="planning_meeting")
+	 * @Route("/planning/meeting/{planningId}",name="planning_meeting")
 	 */
 	public function meeting(Request $request,$planningId){
 		$em = $this->getDoctrine()->getManager();
