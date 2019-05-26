@@ -8,6 +8,7 @@ use App\Entity\Project;
 use App\Entity\ProjectStatus;
 use App\Form\TeamType;
 use App\Form\ProjectStatusType;
+use App\Form\ProjectType;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -76,6 +77,21 @@ class TeamController extends Controller
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
+		$project = new Project();
+		$projectForm = $this->createForm(ProjectType::class,$project,['teams'=>[$team],'users'=>$team->getUsers()]);
+
+		$projectForm->handleRequest($request);
+		if ($projectForm->isSubmitted() && $projectForm->isValid()) {
+			$project = $projectForm->getData();
+			if(!$me->canAdmin($project)){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
+			$em->persist($project);
+			$em->flush();
+			$this->addFlash('success','Projet ajouté');
+		}
+
+
 		$projects = $projectRepository->findAll();
 
 		$managedProjects = [];
@@ -121,6 +137,7 @@ class TeamController extends Controller
 			'startDate' => $startDate,
 			'users' => $team->getUsers(),
 			'projects' => $projects,
+			'projectForm' => $projectForm->createView(),
 			'me' => $me,
         ]);
 	}
