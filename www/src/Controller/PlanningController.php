@@ -18,7 +18,7 @@ class PlanningController extends Controller
 {
 	/**
 	 * @Route("/planning", name="planning_index")
-	 * @Route("/planning/{startDate}", name="planning_index_shift", defaults={"startDate"="now"})
+	 * @Route("/planning/{startDate}", name="planning_index_shift", defaults={"startDate"="now"}, methods={"GET"})
 	 */
 	public function index(Request $request, $startDate="now")
 	{
@@ -192,14 +192,9 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/planning/new",name="planning_new")
+	 * @Route("/planning/new", name="planning_new", methods={"POST"})
 	 */
 	public function newPlanning(Request $request){
-		if(!$request->isMethod('POST')){
-			$arrData = ['success' => false, 'errormsg' => 'Méthode invalide'];
-			return new JsonResponse($arrData);
-		}
-
 		$data = $request->request->all();
 		$em = $this->getDoctrine()->getManager();
 
