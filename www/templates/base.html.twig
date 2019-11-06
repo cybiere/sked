@@ -125,6 +125,7 @@
 		urlDict["planning_delete"] = "{{ path("planning_del",{"planningId":"123"}) }}";
 		urlDict["project_edit"] = "{{ path("project_edit",{"projectId":"123"}) }}";
 		urlDict["project_move"] = "{{ path("project_move",{"projectId":"idPlaceHold","newStatus":"statusPlaceHold"}) }}";
+		urlDict["project_getUsers"] = "{{ path("project_getUsers", { "id" : "idPlaceHold" }) }}";
 		</script>
 		{% block extraJs %}{% endblock %}
 	</body>

@@ -366,4 +366,30 @@ class ProjectController extends Controller
 		return $this->redirect($referer);
 	}
 
+	/**
+	 * @Route("/projects/getUsers/{id}",name="project_getUsers")
+	 */
+	public function getUsers(Request $request, $id){
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if (! ($project = $projectRepository->find($id))) {
+			throw $this->createNotFoundException("Ce projet n'existe pas");
+		}
+
+		if (! $me->canAdmin($project)) {
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		} else {
+			$teamRepository = $this->getDoctrine()->getRepository(Team::class);
+			$team = $teamRepository->find($project->getTeam());
+			$arrData = [ 'success' => true, 'users '=> array() ];
+			foreach ($team->getUsers() as $user) {
+				$arrData['users'][] = [ 'id' => $user->getId(), 'name' => $user->getFullname() ];
+			}
+		}
+
+		return new JsonResponse($arrData);
+	}
+
 }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Task;
+use App\Entity\Team;
 use App\Entity\Project;
 use App\Entity\User;
 use App\Form\TaskType;
@@ -28,16 +29,29 @@ class TaskController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
 
+		$options = array();
+
 		if(($task = $taskRepository->find($taskId))){
 			if($task->isClosed()){
 				$this->addFlash('danger','Impossible de modifier une tâche clôturée');
 				return $this->redirectToRoute('task_index');
 			}
+
+			$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+			$teamRepository = $this->getDoctrine()->getRepository(Team::class);
+
+			$project = $projectRepository->find($task->getProject());
+			$team = $teamRepository->find($project->getTeam());
+
+			$options['project'] = $project;
+			$options['users'] = $team->getUsers();
 		}else{
 			$task = new Task();
+			$userRepository = $this->getDoctrine()->getRepository(User::class);
+			$options['users'] = $userRepository->findAll();
 		}
 
-		$form = $this->createForm(TaskType::class,$task);
+		$form = $this->createForm(TaskType::class,$task,$options);
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$em->persist($task);
