@@ -95,6 +95,9 @@ class AppExtension extends AbstractExtension
 		if($project == 0 && $isAdmin){
 			echo " hasAdmin";
 		}
+		if ($planning->isMeetup()) { echo " meetup"; }
+		if ($planning->isDeliverable()) { echo " deliverable"; }
+		if ($planning->isCapitalization()) { echo " capitalization"; }
 		?>"
 		tabindex="0" 
 		data-duration="<?php echo htmlspecialchars($planning->getNbSlices()); ?>" 
@@ -128,6 +131,9 @@ class AppExtension extends AbstractExtension
 			<?php if($planning->getProject()->isBillable()){ ?>
 			<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='meetingPlanning(<?php echo $planning->getId(); ?>)'><i class='fas fa-exclamation-circle'></i></button></div>
 			<?php } ?>
+			<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='deliverablePlanning(<?php echo $planning->getId(); ?>)'><i class='far fa-envelope'></i></button></div>
+			<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='meetupPlanning(<?php echo $planning->getId(); ?>)'><i class='fas fa-users'></i></button></div>
+			<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='capitalizationPlanning(<?php echo $planning->getId(); ?>)'><i class='far fa-money-bill-alt'></i></button></div>
 			<div class='popupaction col-md-3'><a class='btn btn-outline-warning' href='<?php echo $this->router->generate('project_edit',array("projectId"=>$planning->getProject()->getId())); ?>'><i class='fas fa-edit'></i></a></div>
 <?php } ?>
 <?php } ?>
