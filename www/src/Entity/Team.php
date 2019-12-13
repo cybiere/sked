@@ -47,7 +47,7 @@ class Team
 	private $parent;
 
 	/**
-	 * @ORM\OneToMany(targetEntity="Project", mappedBy="team")
+	 * @ORM\OneToMany(targetEntity="App\Entity\Project", mappedBy="team")
 	 */
 	private $projects;
 
