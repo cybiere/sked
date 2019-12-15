@@ -119,6 +119,9 @@ var projectsRemaining=[];
 			<li><span class='legend billable'>Vert</span> Projet facturable</li>
 			<li><span class='legend meeting'>Rouge</span> Important : réunion, déplacement</li>
 			<li><span class='legend billable-unconfirmed'>Hachuré</span> Date non confirmée</li>
+			<li><span class='legend meetup'>Violet</span> Réunion</li>
+			<li><span class='legend deliverable'>Marron</span> Livrable</li>
+			<li><span class='legend capitalization'>Bleu clair</span> Capitalisation</li>
 		</ul>
 	</li>
 	{% if hasAdmin %}
@@ -126,6 +129,9 @@ var projectsRemaining=[];
 		<ul>
 			<li><span class='btn btn-sm btn-outline-success'><i class='far fa-check-circle'></i></span>Confirmer l'élément de planning</li>
 			<li><span class='btn btn-sm btn-outline-warning'><i class='fas fa-edit'></i></span>Modifier le projet</li>
+			<li><span class='btn btn-sm btn-outline-info'><i class='far fa-envelope'></i></span>Livrable</li>
+			<li><span class='btn btn-sm btn-outline-info'><i class='fas fa-users'></i></span>Meeting</li>
+			<li><span class='btn btn-sm btn-outline-info'><i class='far fa-money-bill-alt'></i></span>Capitalisation</li>
 			<li><span class='btn btn-sm btn-outline-danger'><i class='fas fa-trash'></i></span>Supprimer l'élément de planning</li>
 		</ul>
 	</li>

@@ -164,6 +164,18 @@ th.schedUser{
 	border-color:#551;
 	color:inherit;
 }
+.meetup {
+	background:#bb66af;
+	border-color:#550040;
+}
+.deliverable {
+	background:#bb8e66;
+	border-color:#bbb266;
+}
+.capitalization {
+	background:#6695bb;
+	border-color:#6679bb;
+}
 .modal-dialog {
 	max-width:1000px !important;
 } 

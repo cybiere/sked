@@ -122,9 +122,13 @@
 		urlDict["planning_move"] = "{{ path("planning_move",{"planningId":"idPlaceHold","newStart":"startPlaceHold","newHour":"hourPlaceHold","newUser":"userPlaceHold","newSize":"sizePlaceHold"}) }}";
 		urlDict["planning_confirm"] = "{{ path("planning_confirm",{"planningId":"123"}) }}";
 		urlDict["planning_meeting"] = "{{ path("planning_meeting",{"planningId":"123"}) }}";
+		urlDict["planning_deliverable"] = "{{ path("planning_deliverable",{"planningId":"123"}) }}";
+		urlDict["planning_meetup"] = "{{ path("planning_meetup",{"planningId":"123"}) }}";
+		urlDict["planning_capitalization"] = "{{ path("planning_capitalization",{"planningId":"123"}) }}";
 		urlDict["planning_delete"] = "{{ path("planning_del",{"planningId":"123"}) }}";
 		urlDict["project_edit"] = "{{ path("project_edit",{"projectId":"123"}) }}";
 		urlDict["project_move"] = "{{ path("project_move",{"projectId":"idPlaceHold","newStatus":"statusPlaceHold"}) }}";
+		urlDict["project_getUsers"] = "{{ path("project_getUsers", { "id" : "idPlaceHold" }) }}";
 		</script>
 		{% block extraJs %}{% endblock %}
 	</body>

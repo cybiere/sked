@@ -48,6 +48,21 @@ class Planning
 	private $confirmed=false;
 
 	/**
+	 * @ORM\Column(type="boolean")
+	 */
+	private $deliverable=false;
+
+	/**
+	 * @ORM\Column(type="boolean")
+	 */
+	private $meetup=false;
+
+	/**
+	 * @ORM\Column(type="boolean")
+	 */
+	private $capitalization=false;
+
+	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="plannings")
 	 * @ORM\JoinColumn(nullable=true)
      */
@@ -109,6 +124,30 @@ class Planning
 
 	public function setConfirmed($isConfirmed){
 		$this->confirmed = $isConfirmed?true:false;
+	}
+
+	public function isDeliverable(){
+		return $this->deliverable;
+	}
+
+	public function setDeliverable($deliverable){
+		$this->deliverable = $deliverable?true:false;
+	}
+
+	public function isMeetup(){
+		return $this->meetup;
+	}
+
+	public function setMeetup($meetup){
+		$this->meetup = $meetup?true:false;
+	}
+
+	public function isCapitalization(){
+		return $this->capitalization;
+	}
+
+	public function setCapitalization($capitalization){
+		$this->capitalization = $capitalization?true:false;
 	}
 
 	public function getProject(){

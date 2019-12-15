@@ -18,7 +18,7 @@ class PlanningController extends Controller
 {
 	/**
 	 * @Route("/planning", name="planning_index")
-	 * @Route("/planning/{startDate}", name="planning_index_shift", defaults={"startDate"="now"})
+	 * @Route("/planning/{startDate}", name="planning_index_shift", defaults={"startDate"="now"}, methods={"GET"})
 	 */
 	public function index(Request $request, $startDate="now")
 	{
@@ -161,6 +161,9 @@ class PlanningController extends Controller
 			'duration' => $planning->getNbSlices(),
 			'confirmed' => $planning->isConfirmed(),
 			'meeting' => $planning->isMeeting(),
+			'meetup' => $planning->isMeetup(),
+			'deliverable' => $planning->isDeliverable(),
+			'capitalization' => $planning->isCapitalization(),
 			'admin'=> $me->canAdmin($planning),
 		];
 		if($project != NULL){
@@ -192,14 +195,9 @@ class PlanningController extends Controller
 	}
 
 	/**
-	 * @Route("/planning/new",name="planning_new")
+	 * @Route("/planning/new", name="planning_new", methods={"POST"})
 	 */
 	public function newPlanning(Request $request){
-		if(!$request->isMethod('POST')){
-			$arrData = ['success' => false, 'errormsg' => 'Méthode invalide'];
-			return new JsonResponse($arrData);
-		}
-
 		$data = $request->request->all();
 		$em = $this->getDoctrine()->getManager();
 
@@ -235,6 +233,9 @@ class PlanningController extends Controller
 		$planning->setNbSlices($data['nbSlices']);
 		$planning->setMeeting($data['meeting'] == "true"?true:false);
 		$planning->setConfirmed($data['confirmed'] == "false"?false:true);
+		$planning->setMeetup($data['meetup'] == "false"?false:true);
+		$planning->setDeliverable($data['deliverable'] == "false"?false:true);
+		$planning->setCapitalization($data['capitalization'] == "false"?false:true);
 		if(($task = $taskRepository->find($data['task']))){
 			$planning->setTask($task);
 		}
@@ -360,6 +361,114 @@ class PlanningController extends Controller
 				$addclass="meeting";
 			}else{
 				$addclass="meeting-unconfirmed";
+			}
+		}else{
+			if($planning->isConfirmed()){
+				$addclass="billable";
+			}else{
+				$addclass="billable-unconfirmed";
+			}
+		}
+		$arrData = ['success' => true,'addclass' => $addclass];
+		return new JsonResponse($arrData);
+	}
+
+	/**
+	 * @Route("/planning/deliverable/{planningId}",name="planning_deliverable")
+	 */
+	public function deliverable(Request $request,$planningId){
+		$em = $this->getDoctrine()->getManager();
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if(!($planning = $planningRepository->find($planningId))){
+			$arrData = ['success' => false, 'errormsg' => 'Planning non trouvé'];
+			return new JsonResponse($arrData);
+		}
+		if(!$me->canAdmin($planning)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		$planning->setDeliverable($planning->isDeliverable()?false:true);
+		$em->flush();
+
+		if($planning->isDeliverable()){
+			if($planning->isConfirmed()){
+				$addclass="deliverable";
+			}else{
+				$addclass="deliverable-unconfirmed";
+			}
+		}else{
+			if($planning->isConfirmed()){
+				$addclass="billable";
+			}else{
+				$addclass="billable-unconfirmed";
+			}
+		}
+		$arrData = ['success' => true,'addclass' => $addclass];
+		return new JsonResponse($arrData);
+	}
+
+	/**
+	 * @Route("/planning/meetup/{planningId}",name="planning_meetup")
+	 */
+	public function meetup(Request $request,$planningId){
+		$em = $this->getDoctrine()->getManager();
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if(!($planning = $planningRepository->find($planningId))){
+			$arrData = ['success' => false, 'errormsg' => 'Planning non trouvé'];
+			return new JsonResponse($arrData);
+		}
+		if(!$me->canAdmin($planning)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		$planning->setMeetup($planning->isMeetup()?false:true);
+		$em->flush();
+
+		if($planning->isMeetup()){
+			if($planning->isConfirmed()){
+				$addclass="meetup";
+			}else{
+				$addclass="meetup-unconfirmed";
+			}
+		}else{
+			if($planning->isConfirmed()){
+				$addclass="billable";
+			}else{
+				$addclass="billable-unconfirmed";
+			}
+		}
+		$arrData = ['success' => true,'addclass' => $addclass];
+		return new JsonResponse($arrData);
+	}
+
+	/**
+	 * @Route("/planning/capitalization/{planningId}",name="planning_capitalization")
+	 */
+	public function capitalization(Request $request,$planningId){
+		$em = $this->getDoctrine()->getManager();
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if(!($planning = $planningRepository->find($planningId))){
+			$arrData = ['success' => false, 'errormsg' => 'Planning non trouvé'];
+			return new JsonResponse($arrData);
+		}
+		if(!$me->canAdmin($planning)){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+		$planning->setCapitalization($planning->isCapitalization()?false:true);
+		$em->flush();
+
+		if($planning->isCapitalization()){
+			if($planning->isConfirmed()){
+				$addclass="capitalization";
+			}else{
+				$addclass="capitalization-unconfirmed";
 			}
 		}else{
 			if($planning->isConfirmed()){

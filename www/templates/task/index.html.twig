@@ -5,7 +5,7 @@
 {% block body %}
 <h1>Gestion des tâches</h1>
 
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'class': 'addTask'}}) }}
 {{ form_widget(form) }}
 {{ form_end(form) }}
 
@@ -66,3 +66,6 @@
 </table>
 {% endblock %}
 
+{% block extraJs %}
+<script src="/js/taskAdmin.js"></script>
+{% endblock %}
