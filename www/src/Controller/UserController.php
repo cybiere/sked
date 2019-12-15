@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Team;
 use App\Entity\Planning;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -12,12 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Ldap\Ldap;
 
-/**
- * @Route("/user")
- */
 class UserController extends Controller{
-
-
 	private function addUser($username,$isAdmin=false){
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
@@ -59,7 +55,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	 * @Route("/",name="user_index")
+	 * @Route("/user/",name="user_index")
 	 */
 	public function index(Request $request){
 		if(!$this->get('session')->get('user')->isAdmin()){
@@ -68,12 +64,17 @@ class UserController extends Controller{
 
 		$em = $this->getDoctrine()->getManager();
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 
 		$user = new User();
 		$formBuilder = $this->createFormBuilder($user)->add('username', TextType::class,array('label'=>"Nom d'utilisateur"));
 		if(!$this->container->hasParameter('ldap_url')){
 			$formBuilder->add('fullname', TextType::class)
 			   ->add('email', TextType::class);
+		}
+		$teams = $teamRepository->findAll();
+		if($teams != NULL){
+			$formBuilder->add('team', NULL);
 		}
 		$form = $formBuilder->add('save', SubmitType::class, array('label' => "Ajouter l'utilisateur"))->getForm();
 
@@ -85,16 +86,44 @@ class UserController extends Controller{
 			if($userRepository->findOneBy(['username' => $user->getUsername()])){
 				$this->addFlash('warning',"Attention : l'utilisateur ".$user->getUsername()." existe déjà");
 			}else{
-				if($this->addUser($user->getUsername()))
+				if($this->addUser($user->getUsername())){
+					$newUser = $userRepository->findOneBy(['username' => $user->getUsername()]);
+					$newUser->setTeam($user->getTeam());
+					$em->flush();
 					$this->addFlash('success','Utilisateur ajouté');
+				}
 			}
 		}
 		$users = $userRepository->findAll();
-		return $this->render('user/index.html.twig',array('users'=>$users,'form'=>$form->createView()));
+		return $this->render('user/index.html.twig',array('users'=>$users,'form'=>$form->createView(),'teams'=>$teams));
 	}
 
 	/**
-	 * @Route("/del/{username}",name="user_del")
+	 * @Route("/user/{id}/team",name="user_changeTeam")
+	 */
+	public function changeTeam(Request $request,User $user){
+		$em = $this->getDoctrine()->getManager();
+		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
+		$teamId = $request->request->get('team');
+		if($teamId == 0){
+			$user->setTeam(NULL);
+			$em->flush();
+			$this->addFlash('success',"Équipe modifiée");
+			return $this->redirectToRoute('user_index');
+		}
+		$team = $teamRepository->find($teamId);
+		if(!$team){
+			$this->addFlash('danger',"L'équipe recherchée n'existe pas");
+		}else{
+			$user->setTeam($team);
+			$em->flush();
+			$this->addFlash('success',"Équipe modifiée");
+		}
+		return $this->redirectToRoute('user_index');
+	}
+
+	/**
+	 * @Route("/user/del/{username}",name="user_del")
 	 */
 	public function delete(Request $request,$username){
 		if(!$this->get('session')->get('user')->isAdmin()){
@@ -121,7 +150,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	 * @Route("/toggleResource/{userid}",name="user_toggleResource")
+	 * @Route("/user/toggleResource/{userid}",name="user_toggleResource")
 	 */
 	public function toggleResource(Request $request,$userid){
 		if(!$this->get('session')->get('user')->isAdmin()){
@@ -141,8 +170,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	/**
-	 * @Route("/toggleAdmin/{userid}",name="user_toggleAdmin")
+	 * @Route("/user/toggleAdmin/{userid}",name="user_toggleAdmin")
 	 */
 	public function toggleAdmin(Request $request,$userid){
 		if(!$this->get('session')->get('user')->isAdmin()){
@@ -165,7 +193,7 @@ class UserController extends Controller{
 	}
 
 	/**
-	 * @Route("/enrol",name="user_enrol")
+	 * @Route("/user/enrol",name="user_enrol")
 	 */
 	public function enrolUser(){
 		$em = $this->getDoctrine()->getManager();
@@ -189,11 +217,14 @@ class UserController extends Controller{
 		}
 
 		$this->get('session')->set('user',$user);
-		return $this->redirectToRoute('planning_index');
+		if($user->getTeam())
+			return $this->redirectToRoute('team_view');
+		return $this->redirectToRoute('user_view');
 	}
 
 	/**
-	 * @Route("/profile/{userId}", name="user_view", defaults={"userId"=0},requirements={"userId"="\d+"})
+	 * @Route("/", name="site_index")
+	 * @Route("/user/profile/{userId}", name="user_view", defaults={"userId"=0},requirements={"userId"="\d+"})
 	 */
 	public function viewUser($userId=0){
 		$em = $this->getDoctrine()->getManager();
@@ -214,7 +245,19 @@ class UserController extends Controller{
 
 		$startDateObj = new \DateTime();
 
+		$renderMonths = 3;
+
+		$maxOffsets = [];
+		for($i=0;$i<$renderMonths;$i++){
+			$offDate = clone $startDateObj;
+			$offDate->modify("+".$i."months");
+			$maxOffsets[$i][$user->getId()] = CommonController::calcOffset($offDate,$user);
+		}
+
+
 		return $this->render('user/view.html.twig',array(
+			'nbMonths' => 3,
+			'maxOffsets' => $maxOffsets,
 			'user'=>$user,
 			'plannings'=>$plannings,
 			'holidays'=>CommonController::getHolidays($startDateObj->format('Y'))

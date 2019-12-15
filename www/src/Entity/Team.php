@@ -25,8 +25,7 @@ class Team
 	private $name;
 
 	/**
-	 * @ORM\ManyToMany(targetEntity="User", inversedBy="teams")
-	 * @ORM\JoinTable(name="users_teams")
+	 * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="team")
 	 */
 	private $users;
 
@@ -48,7 +47,7 @@ class Team
 	private $parent;
 
 	/**
-	 * @ORM\OneToMany(targetEntity="Project", mappedBy="team")
+	 * @ORM\OneToMany(targetEntity="App\Entity\Project", mappedBy="team")
 	 */
 	private $projects;
 

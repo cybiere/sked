@@ -61,9 +61,9 @@ class User
 	private $tasks;
 
 	/**
-     * @ORM\ManyToMany(targetEntity="Team", mappedBy="users")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\Team", inversedBy="users")
      */
-    private $teams;
+    private $team;
 
 	/**
      * @ORM\ManyToMany(targetEntity="Team", mappedBy="managers")
@@ -75,7 +75,6 @@ class User
         $this->managedProjects = new ArrayCollection();
         $this->plannings = new ArrayCollection();
         $this->tasks = new ArrayCollection();
-        $this->teams = new ArrayCollection();
     }
 
 	public function __toString(){
@@ -151,11 +150,16 @@ class User
     }
 
 	/**
-     * @return Collection|Team[]
+     * @return Team
      */
-    public function getTeams()
+    public function getTeam()
     {
-		return $this->teams;
+		return $this->team;
+	}
+    public function setTeam($team)
+    {
+		$this->team = $team;
+		return $this;
 	}
 
 	/**
@@ -188,9 +192,8 @@ class User
 			return $this->canAdmin($target->getProject());
 		}
 		if(is_a($target,User::class)){
-			foreach($target->getTeams() as $team){
-				if($team->canAdmin($this)) return true;
-			}
+			if($target->getTeam() == null) return false;
+			if($target->getTeam()->canAdmin($this)) return true;
 			return false;
 		}
 		if(is_a($target,Team::class)){

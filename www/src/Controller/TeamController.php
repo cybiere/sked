@@ -8,6 +8,7 @@ use App\Entity\Project;
 use App\Entity\ProjectStatus;
 use App\Form\TeamType;
 use App\Form\ProjectStatusType;
+use App\Form\ProjectType;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -49,21 +50,47 @@ class TeamController extends Controller
 	}
 
 	/**
-	 * @Route("/view/{teamId}",name="team_view")
+	 * @Route("/view/{teamId}",name="team_view",defaults={"teamId"="0"})
 	 */
 	public function view(Request $request,$teamId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
 		$em = $this->getDoctrine()->getManager();
 		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
+		if($teamId == 0){
+			$teamId = $me->getTeam()->getId();
+		}else{
+			$allowedTeams = [];
+			$myTeam = $me->getTeam();
+			if($myTeam != null) $allowedTeams[] = $myTeam->getId();
+			foreach($me->getManagedTeams() as $team){
+				$allowedTeams[] = $team->getId();
+			}
+			if(!$this->get('session')->get('user')->isAdmin() and !in_array($teamId,$allowedTeams)){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
+		}
+
 		if(!($team = $teamRepository->find($teamId))){
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
+
+		$project = new Project();
+		$projectForm = $this->createForm(ProjectType::class,$project,['teams'=>[$team],'users'=>$team->getUsers()]);
+
+		$projectForm->handleRequest($request);
+		if ($projectForm->isSubmitted() && $projectForm->isValid()) {
+			$project = $projectForm->getData();
+			if(!$me->canAdmin($project)){
+				throw $this->createNotFoundException("Cette page n'existe pas");
+			}
+			$em->persist($project);
+			$em->flush();
+			$this->addFlash('success','Projet ajouté');
+		}
+
 
 		$projects = $projectRepository->findAll();
 
@@ -78,7 +105,7 @@ class TeamController extends Controller
 					$managedProjects[] = $project;
 				}
 			}
-			foreach($users as $user){
+			foreach($team->getUsers() as $user){
 				if($me->canAdmin($user)){
 					$managedUsers[] = $user;
 				}
@@ -91,13 +118,26 @@ class TeamController extends Controller
 			$startDate = "now";
 			$startDateObj = new \DateTime("now");
 		}
+		$renderMonths = 3;
+
+		$maxOffsets = [];
+		for($i=0;$i<$renderMonths;$i++){
+			$offDate = clone $startDateObj;
+			$offDate->modify("+".$i."months");
+			foreach($team->getUsers() as $user){
+				$maxOffsets[$i][$user->getId()] = CommonController::calcOffset($offDate,$user);
+			}
+		}
 
 		return $this->render('team/view.html.twig', [
+			'nbMonths' => 3,
+			'maxOffsets' => $maxOffsets,
 			"team"=>$team,
 			'holidays' => CommonController::getHolidays($startDateObj->format('Y')),
 			'startDate' => $startDate,
 			'users' => $team->getUsers(),
 			'projects' => $projects,
+			'projectForm' => $projectForm->createView(),
 			'me' => $me,
         ]);
 	}
@@ -126,16 +166,19 @@ class TeamController extends Controller
 	 * @Route("/edit/{teamId}",name="team_edit")
 	 */
 	public function edit(Request $request,$teamId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
 		$em = $this->getDoctrine()->getManager();
 		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$projectStatusRepository = $this->getDoctrine()->getRepository(projectStatus::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
 
 		if(!($team = $teamRepository->find($teamId))){
 			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+	if(!$this->get('session')->get('user')->isAdmin()){
+			if(!$me->canAdmin($team))
+				throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 
 		$projectStatus = new ProjectStatus();
@@ -158,52 +201,6 @@ class TeamController extends Controller
 			"form"=>$form->createView(),
 			"statuses" => $projectStatusRepository->findByTeam($team)
         ]);
-	}
-
-	/**
-	 * @Route("/addMember/{teamId}/{userId}",name="team_addMember")
-	 */
-	public function addMember(Request $request,$teamId,$userId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
-		$em = $this->getDoctrine()->getManager();
-		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
-		$userRepository = $this->getDoctrine()->getRepository(User::class);
-
-		if(!($team = $teamRepository->find($teamId))){
-			$arrData = ['success' => false, 'errormsg' => 'Équipe non trouvée'];
-		}elseif(!($user = $userRepository->find($userId))){
-			$arrData = ['success' => false, 'errormsg' => 'Utilisateur non trouvé'];
-		}else{
-			$team->addUser($user);
-			$em->flush();
-			$arrData = ['success' => true];
-		}
-		return new JsonResponse($arrData);
-	}
-
-	/**
-	 * @Route("/delMember/{teamId}/{userId}",name="team_delMember")
-	 */
-	public function delMember(Request $request,$teamId,$userId){
-		if(!$this->get('session')->get('user')->isAdmin()){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}
-		$em = $this->getDoctrine()->getManager();
-		$teamRepository = $this->getDoctrine()->getRepository(Team::class);
-		$userRepository = $this->getDoctrine()->getRepository(User::class);
-
-		if(!($team = $teamRepository->find($teamId))){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}elseif(!($user = $userRepository->find($userId))){
-			throw $this->createNotFoundException("Cette page n'existe pas");
-		}else{
-			$team->removeUser($user);
-			$em->flush();
-		}
-		$referer = $request->headers->get('referer');
-		return $this->redirect($referer);
 	}
 
 	/**
@@ -305,6 +302,9 @@ class TeamController extends Controller
 			throw $this->createNotFoundException("Cette page n'existe pas");
 		}
 		$i=1;
+		foreach($status->getProjects() as $project){
+			$project->setProjectStatus(null);
+		}
 		while(($nextStatus = $statusRepository->findInTeamByOrder($status->getTeam(),$status->getStatusOrder()+$i)) != NULL){
 			$nextStatus->setStatusOrder($nextStatus->getStatusOrder()-1);
 			$i++;

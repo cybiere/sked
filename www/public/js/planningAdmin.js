@@ -39,6 +39,19 @@ function printPlanningItem(){
 						item.addClass("non-billable")
 					}
 				}
+
+				if(data.meetup){
+					item.addClass("meetup")
+				}
+
+				if(data.deliverable){
+					item.addClass("deliverable")
+				}
+
+				if(data.capitalization){
+					item.addClass("capitalization")
+				}
+
 				item.data("duration",data.duration)
 				item.attr("tabindex","0")
 				item.data("toggle","popover")
@@ -76,6 +89,11 @@ function printPlanningItem(){
 				if(data.admin){
 					if(data.projectId != 0){
 					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-check-circle'></i></button></div>")
+
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-envelope'></i></button></div>")
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-users'></i></button></div>")
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-money'></i></button></div>")
+
 						if(data.projectBillable){
 							popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='meetingPlanning("+data.planningId+")'><i class='fas fa-exclamation-circle'></i></button></div>")
 						}
@@ -159,6 +177,63 @@ function meetingPlanning(planningId){
 	});
 }
 
+function deliverablePlanning(planningId){
+	url=urlDict["planning_deliverable"].replace("123", planningId);
+	$.ajax(url,{
+		async:false,
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			if(data.success){
+				$("div[data-planningId='"+planningId+"']").removeClass("meeting meeting-unconfirmed billable billable-unconfirmed").addClass(data.addclass)
+			}else{
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			}
+		}
+	});
+}
+
+function meetupPlanning(planningId){
+	url=urlDict["planning_meetup"].replace("123", planningId);
+	$.ajax(url,{
+		async:false,
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			if(data.success){
+				$("div[data-planningId='"+planningId+"']").removeClass("meeting meeting-unconfirmed billable billable-unconfirmed").addClass(data.addclass)
+			}else{
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			}
+		}
+	});
+}
+
+function capitalizationPlanning(planningId){
+	url=urlDict["planning_capitalization"].replace("123", planningId);
+	$.ajax(url,{
+		async:false,
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			if(data.success){
+				$("div[data-planningId='"+planningId+"']").removeClass("meeting meeting-unconfirmed billable billable-unconfirmed").addClass(data.addclass)
+			}else{
+				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+				$('#flashMessages').append(message);
+			}
+		}
+	});
+}
+
 resizeOptions = {
 	handles: "e",
 	containment: ".schedule",
@@ -201,8 +276,8 @@ dragOptions = {
 	cursor: "grab",
 	cursorAt: { left:5 }
 }
-$(".hasAdmin").resizable(resizeOptions);
-$('.hasAdmin').draggable(dragOptions); 
+$(".project.hasAdmin").resizable(resizeOptions);
+$('.project.hasAdmin').draggable(dragOptions); 
 $('.project').on('mousedown',function(e){
 	e.stopPropagation();
 });
@@ -211,6 +286,7 @@ $('.projectContainerAdmin').droppable({
 	classes: {
 		"ui-droppable-hover":"activeDrop",
 	},
+	accept: ".project",
 	tolerance: "pointer",
 	drop : function(e, ui){
 		destCell = this;
@@ -314,6 +390,9 @@ function addPlanning(){
 	newPlanning['confirmed'] = $('#addForm_confirmed').prop('checked')
 	newPlanning['project'] = $('#addForm_projectId').val()
 	newPlanning['task'] = $('#addForm_taskId').val()
+	newPlanning['meetup'] = $('#addForm_meetup').prop('checked')
+	newPlanning['deliverable'] = $('#addForm_deliverable').prop('checked')
+	newPlanning['capitalization'] = $('#addForm_capitalization').prop('checked')
 
 
 	$('#addPlanning_Modal').modal('hide');
@@ -343,7 +422,7 @@ function sendPlanningNewRequest(){
 		success:function(data, status, xhr){
 			if(data.success){
 				newDiv = $("<div data-planningid='"+data.id+"' class='planningPlaceholder'>Planning</div>")
-				newDiv.appendTo($("div[data-date='"+newPlanning['startDate']+"'][data-hour='"+newPlanning['startHour']+"'][data-user='"+newPlanning['user']+"']"))
+				newDiv.appendTo($("div[data-date='"+newPlanning['startDate']+"'][data-hour='"+newPlanning['startHour']+"'][data-user='"+newPlanning['user']+"']:first"))
 				newDiv.each(printPlanningItem);
 				newDiv.contextmenu(function() {
 					$(this).popover('show')

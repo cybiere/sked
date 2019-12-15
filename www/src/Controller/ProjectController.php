@@ -63,7 +63,15 @@ class ProjectController extends Controller
 		if($this->get('session')->get('user')->isAdmin()){
 			$myTeams = $teamRepository->findAll();
 		}else{
-			$myTeams = array_unique(array_merge($me->getTeams()->toArray(),$me->getManagedTeams()));
+			if($me->getTeam() == null){
+				$myTeams = $me->getManagedTeams();
+			}elseif($me->getManagedTeams() == null){
+				$myTeams = [$me->getTeam()];
+			}else{
+				$myTeams = $me->getManagedTeams();
+				if(!in_array($me->getTeam(),$myTeams))
+					$myTeams[] = $me->getTeam();
+			}
 			$teamlessProjects = [];
 		}
 		$teamlessProjects = $projectRepository->findByTeam(NULL);
@@ -128,8 +136,38 @@ class ProjectController extends Controller
 		}else{
 			$startDateObj = new \DateTime();
 		}
+		if(count($plannings) < 1){
+			$nbMonths = 1;
+		}else{
+			$endMonth = $plannings[count($plannings)-1]->getStartDate()->format('n');
+			$startMonth = $startDateObj->format('n');
+			$endYear = $plannings[count($plannings)-1]->getStartDate()->format('Y');
+			$startYear = $startDateObj->format('Y');
+			while($endYear > $startYear){
+				$endYear--;
+				$endMonth+=12;
+			}
+			$nbMonths = $endMonth - $startMonth +1;
+		}
+
+		$maxOffsets = [];
+		$maxOffsets[-1][2] = 0;
+		$maxOffsets[-1][3] = 0;
+		$maxOffsets[-1][4] = 0;
+		$maxOffsets[-1][5] = 0;
+		for($i=0;$i<$nbMonths;$i++){
+			$offDate = clone $startDateObj;
+			$offDate->modify("+".$i."months");
+			foreach($users as $user){
+				$maxOffsets[$i][$user->getId()] = CommonController::calcOffset($offDate,$user);
+			}
+		}
+
 
 		return $this->render('project/view.html.twig',array(
+			'nbMonths' => $nbMonths,
+			'maxOffsets' => $maxOffsets,
+			'startDate' => $startDateObj,
 			'project'=>$project,
 			'plannings'=>$plannings,
 			'users'=>$users,
@@ -326,6 +364,32 @@ class ProjectController extends Controller
 		}
 		$referer = $request->headers->get('referer');
 		return $this->redirect($referer);
+	}
+
+	/**
+	 * @Route("/projects/getUsers/{id}",name="project_getUsers")
+	 */
+	public function getUsers(Request $request, $id){
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if (! ($project = $projectRepository->find($id))) {
+			throw $this->createNotFoundException("Ce projet n'existe pas");
+		}
+
+		if (! $me->canAdmin($project)) {
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		} else {
+			$teamRepository = $this->getDoctrine()->getRepository(Team::class);
+			$team = $teamRepository->find($project->getTeam());
+			$arrData = [ 'success' => true, 'users '=> array() ];
+			foreach ($team->getUsers() as $user) {
+				$arrData['users'][] = [ 'id' => $user->getId(), 'name' => $user->getFullname() ];
+			}
+		}
+
+		return new JsonResponse($arrData);
 	}
 
 }

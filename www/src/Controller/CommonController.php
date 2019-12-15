@@ -31,4 +31,29 @@ class CommonController{
 		sort($holidays);
 		return $holidays;
 	}
+
+	public static function calcOffset($startDate,$user){
+		$maxOffset = 0;
+		for($sliceIter=1;$sliceIter<=$startDate->format("t")*2;$sliceIter++){
+			$curDate = new \Datetime($startDate->format("m")."/".ceil($sliceIter/2)."/".$startDate->format("Y"));
+			$hour = $sliceIter%2==1?"am":"pm";
+			foreach($user->getPlannings() as $planning){
+				if($planning->getStartDate() == $curDate && $planning->getStartHour() == $hour){
+					$offCount=0;
+					while(isset($offset[$sliceIter][$offCount])) $offCount++;
+					//on est sur le slice de départ du projet
+					$filledSlices = $planning->getNbSlices();
+					$durationDate = clone $curDate;
+					for($durationIter=0 ; $durationIter < $filledSlices ; $durationIter++){
+						if($durationDate->format('N') >= 6) $filledSlices++;
+						$offset[$sliceIter+$durationIter][$offCount] = $planning;
+						$durationDate->modify('+12hours');
+					}
+					$planning->offset = $offCount; 
+					if($offCount > $maxOffset) $maxOffset = $offCount; 
+				}
+			}
+		}
+		return $maxOffset;
+	}
 }

@@ -34,17 +34,25 @@
 	<body>
 
 		<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-			<a class="navbar-brand" href="{{ path('planning_index')}}" title="Sked v1.2.3"><img src="/img/logo_sked_light.png" alt="Logo Sked" /> Sked</a>
+			<a class="navbar-brand" href="{{ path('site_index')}}" title="Sked v1.2.4"><img src="/img/logo_sked_light.png" alt="Logo Sked" /> Sked</a>
 
 			<div class="collapse navbar-collapse">
 				<ul class="navbar-nav mr-auto">
-					<li class="nav-item{% if app.request.attributes.get('_route') in ["planning_index"] %} active{% endif %}">
-						<a class="nav-link" href="{{ path('planning_index') }}">Planning</a>
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_view","site_index"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('user_view') }}">Mon profil</a>
 					</li>
+					{% if app.session.get('user').team %}
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["team_view"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('team_view') }}">Mon équipe</a>
+					</li>
+					{% endif %}
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["project_index","project_view","project_edit"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('project_index') }}">Projets</a>
 					</li>
 					{% if app.session.get('user').admin %}
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["planning_index"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('planning_index') }}">Planning</a>
+					</li>
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["task_index"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('task_index') }}">Tâches</a>
 					</li>
@@ -55,9 +63,6 @@
 						<a class="nav-link" href="{{ path('team_index') }}">Équipes</a>
 					</li>
 					{% endif %}
-					<li class="nav-item{% if app.request.attributes.get('_route') in ["user_view"] %} active{% endif %}">
-						<a class="nav-link" href="{{ path('user_view') }}">Mon profil</a>
-					</li>
 				</ul>
 				<ul class="navbar-nav">
 					<li class="nav-item"><span class="navbar-text">Connecté en tant que {{ app.session.get('user').fullname }}</span></li>
@@ -117,8 +122,13 @@
 		urlDict["planning_move"] = "{{ path("planning_move",{"planningId":"idPlaceHold","newStart":"startPlaceHold","newHour":"hourPlaceHold","newUser":"userPlaceHold","newSize":"sizePlaceHold"}) }}";
 		urlDict["planning_confirm"] = "{{ path("planning_confirm",{"planningId":"123"}) }}";
 		urlDict["planning_meeting"] = "{{ path("planning_meeting",{"planningId":"123"}) }}";
+		urlDict["planning_deliverable"] = "{{ path("planning_deliverable",{"planningId":"123"}) }}";
+		urlDict["planning_meetup"] = "{{ path("planning_meetup",{"planningId":"123"}) }}";
+		urlDict["planning_capitalization"] = "{{ path("planning_capitalization",{"planningId":"123"}) }}";
 		urlDict["planning_delete"] = "{{ path("planning_del",{"planningId":"123"}) }}";
 		urlDict["project_edit"] = "{{ path("project_edit",{"projectId":"123"}) }}";
+		urlDict["project_move"] = "{{ path("project_move",{"projectId":"idPlaceHold","newStatus":"statusPlaceHold"}) }}";
+		urlDict["project_getUsers"] = "{{ path("project_getUsers", { "id" : "idPlaceHold" }) }}";
 		</script>
 		{% block extraJs %}{% endblock %}
 	</body>

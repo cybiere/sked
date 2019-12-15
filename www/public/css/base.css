@@ -42,6 +42,13 @@ th.schedDate{
 	border-top: 0;
 	border-right: 1px #ccc solid;
 }
+.schedule tbody td{
+	border-bottom: 0px;
+	border-top: 0px;
+}
+.schedule tbody:hover{
+	background: #efefef;
+}
 th.schedUser{
 	width: 140px;
 	text-align:right;
@@ -156,6 +163,18 @@ th.schedUser{
 	background:#bb7;
 	border-color:#551;
 	color:inherit;
+}
+.meetup {
+	background:#bb66af;
+	border-color:#550040;
+}
+.deliverable {
+	background:#bb8e66;
+	border-color:#bbb266;
+}
+.capitalization {
+	background:#6695bb;
+	border-color:#6679bb;
 }
 .modal-dialog {
 	max-width:1000px !important;

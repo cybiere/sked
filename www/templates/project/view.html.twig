@@ -138,10 +138,8 @@
 {% if plannings is empty %}
 <span class="noPlannings">Aucun planning n'a été saisi pour ce projet</span>
 {% else %}
-{% set planningStart = plannings[0].startDate|date_modify('first day of this month') %}
+{% set planningStart = startDate|date_modify('first day of this month') %}
 {% set baseDate = planningStart|date('d-m-Y') %}
-{% set difference = date(plannings|last.startDate).diff(date(planningStart)) %}
-{% set nbMonths = difference.m+1 %}
 {% set today = "now"|date('d-m-Y')|date_modify('midnight') %}
 
 {% for i in range(0,nbMonths-1) %}
@@ -149,7 +147,7 @@
 {% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
 {% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
 {% set nbSlices = 0 %}
-<table class="table table-sm table-hover schedule">
+<table class="table table-sm schedule">
 	<thead>
 		<tr>
 			<th class="schedUser schedDate">{{ months[startDate|date('n')] ~ ' ' ~ startDate|date('Y') }}</th>
@@ -162,19 +160,28 @@
 			{% endfor %}
 		</tr>
 	</thead>
+	{% for user in users %}
 	<tbody>
-		{% for user in users %}
+		{% for offset in range(0,maxOffsets[i][user.id]) %}
 		<tr>
 			{% set slicesShown = 0 %}
-			<th class="schedUser">{{ user.username }}</th>
+			{% if offset == 0 %}
+			<th class="schedUser" rowspan="{{maxOffsets[i][user.id] + 1}}">
+				{% if me.canAdmin(user) %}
+					<a href="{{ path("user_view",{"userId":user.id}) }}">{{ user.username }}</a>
+				{% else %}
+					{{ user.username }}
+				{% endif %}
+			</th>
+			{% endif %}
 			{% for i in range(0,(startDate|date('t')|number_format)-1) %}
             {% set x = startDate|date_modify('+'~ i ~' days') %}
 			{% if x|date('N') < 6 %}
 			<td class="schedHour{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
 				{% set slicesShown = slicesShown+1 %}
-				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
-					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" %}
+					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" and planning.offset == offset %}
 					{{ printPlanning(planning,me.canAdmin(planning),project.id) }}
 					{% endif %}
 					{% endfor %}
@@ -182,9 +189,9 @@
 			</td>
 			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
 				{% set slicesShown = slicesShown+1 %}
-				<div class="projectContainer" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
+				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="pm" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
-					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" %}
+					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" and planning.offset == offset %}
 					{{ printPlanning(planning,me.canAdmin(planning),project.id) }}
 					{% endif %}
 					{% endfor %}
@@ -194,6 +201,8 @@
 		</tr>
 		{% endfor %}
 	</tbody>
+		{% endfor %}
+
 </table>
 {% endfor %}
 {% endif %}

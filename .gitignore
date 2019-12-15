@@ -1,3 +1,9 @@
 conception
 docker-compose.yml
 site
+www/.env
+www/.env.local
+www/public/bundles/
+www/var/
+www/vendor/
+www/src/Migrations/
