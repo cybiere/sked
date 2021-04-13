@@ -19,5 +19,5 @@ database:
 ldap:
   image: rroemhild/test-openldap
   ports:
-    - "389:389"
-    - "636:636"
+    - "389:10389"
+    - "636:10636"
