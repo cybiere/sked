@@ -421,18 +421,7 @@ function sendPlanningNewRequest(){
 		},
 		success:function(data, status, xhr){
 			if(data.success){
-				newDiv = $("<div data-planningid='"+data.id+"' class='planningPlaceholder'>Planning</div>")
-				newDiv.appendTo($("div[data-date='"+newPlanning['startDate']+"'][data-hour='"+newPlanning['startHour']+"'][data-user='"+newPlanning['user']+"']:first"))
-				newDiv.each(printPlanningItem);
-				newDiv.contextmenu(function() {
-					$(this).popover('show')
-						return false;
-					});
-				newDiv.on('blur',function() {
-					$(this).popover('hide')
-				});
-
-
+				location.reload();
 			}else{
 				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 				$('#flashMessages').append(message);
