@@ -229,7 +229,20 @@ class PlanningController extends Controller
 		$planning->setUser($user);
 		$planning->setProject($project);
 		$planning->setStartDate(new \DateTime($data['startDate']));
-		$planning->setStartHour($data['startHour'] == "pm"?"pm":"am");
+		if (! in_array(
+			$data['startHour'],
+			array(
+				'am',
+				'am2',
+				'pm',
+				'pm2'
+			)
+		)) {
+			$planning->setStartHour("am");
+		} else {
+			$planning->setStartHour($data['startHour']);
+		}
+
 		$planning->setNbSlices($data['nbSlices']);
 		$planning->setMeeting($data['meeting'] == "true"?true:false);
 		$planning->setConfirmed($data['confirmed'] == "false"?false:true);
@@ -267,7 +280,19 @@ class PlanningController extends Controller
 			$arrData = ['success' => false, 'errormsg' => "Vous n'avez pas le droit de modifier ce planning"];
 			return new JsonResponse($arrData);
 		}
-		if($newHour != "pm") $newHour = "am";
+
+		if (! in_array(
+			$newHour,
+			array(
+				'am',
+				'am2',
+				'pm',
+				'pm2'
+			)
+		)) {
+			$newHour = "am";
+		}
+
 		if($newSize < 1) $newSize = 1;
 		$planning->setStartDate(new \DateTime($newStart));
 		$planning->setStartHour($newHour);

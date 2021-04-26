@@ -22,12 +22,12 @@ class Planning
 	private $startDate;
 
 	/**
-     * @ORM\Column(type="string", length=2)
+     * @ORM\Column(type="string", length=3)
      */
 	private $startHour;
 
 	/**
-     * @ORM\Column(type="integer")
+	 * @ORM\Column(type="decimal", precision=7, scale=2)
      */
 	private $nbSlices;
 
@@ -98,7 +98,18 @@ class Planning
 	}
 
 	public function setStartHour($startHour){
-		if($startHour != "pm") $startHour = "am";
+		if (! in_array(
+			$startHour,
+			array(
+				'am',
+				'am2',
+				'pm',
+				'pm2'
+			)
+		)) {
+			$startHour = "am";
+		}
+
 		$this->startHour = $startHour;
 	}
 

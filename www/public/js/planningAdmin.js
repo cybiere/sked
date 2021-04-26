@@ -238,12 +238,12 @@ resizeOptions = {
 	handles: "e",
 	containment: ".schedule",
 	resize: function(e,ui){
-		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1);
+		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1) / 2;
 		$(this).find('i').text(newSize/2);
 		$(this).outerHeight(30);
 	},
 	stop : function(event, ui){
-		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1);
+		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1) / 2;
 		if(newSize > $(this).parent().data("remainingslices")+1){
 			newSize = $(this).parent().data("remainingslices")+1;
 		}
@@ -259,8 +259,7 @@ resizeOptions = {
 			},
 			success:function(data, status, xhr){
 				if(data.success){
-					ui.element.data("duration",newSize);
-					$(ui.element).outerWidth($(ui.element).parent().parent().outerWidth()*newSize-3);
+					location.reload();
 				}else{
 					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 					$('#flashMessages').append(message);
@@ -309,8 +308,7 @@ $('.projectContainerAdmin').droppable({
 			},
 			success:function(data, status, xhr){
 				if(data.success){
-					ui.draggable.detach().appendTo(destCell);
-					ui.draggable.outerWidth($(destCell).parent().outerWidth()*ui.draggable.data("duration")-3);
+					location.reload();
 				}else{
 					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 					$('#flashMessages').append(message);
@@ -351,7 +349,7 @@ $(document).mouseup(function(e){
 	if(mouseDown){
 		ghostSize = e.pageX-baseX
 		modulo = ghostSize % gridWidth;
-		nbSlices = Math.round((ghostSize-modulo)/gridWidth+1);
+		nbSlices = Math.round((ghostSize-modulo)/gridWidth+1) / 2;
 
 		newGhost.remove();
 
@@ -364,7 +362,17 @@ $(document).mouseup(function(e){
 		$('#addModal_ressourceForm').html(add_userId);
 		$('#addModal_startDate').html(new Date(add_startDate).toLocaleDateString('fr-FR'));
 		$('#addModal_startDateForm').html(add_startDate);
-		$('#addModal_startHour').html(add_startHour == "am" ? "matin" : "midi");
+
+		if (add_startHour == "am") {
+			$('#addModal_startHour').html("matin");
+		} else if (add_startHour == "am2") {
+			$('#addModal_startHour').html("fin matin");
+		} else if (add_startHour == "pm") {
+			$('#addModal_startHour').html("midi");
+		} else if (add_startHour == "pm2") {
+			$('#addModal_startHour').html("fin midi");
+		}
+
 		$('#addModal_startHourForm').html(add_startHour);
 		$('#addModal_duration').html(nbSlices/2 + 'jh');
 		$('#addModal_durationForm').html(nbSlices);
