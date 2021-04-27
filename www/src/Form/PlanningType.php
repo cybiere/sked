@@ -25,6 +25,8 @@ class PlanningType extends AbstractType
             ->add('project',null,array('label'=>'Projet','choices'=>$options['projects'],'required'=>true))
             ->add('task',null,array('label'=>'Tâche'))
             ->add('user',null,array('label'=>'Ressource','choices'=>$options['users'],'required'=>true))
+            ->add('user',null,array('label'=>'Ressource','choices'=>$options['users'],'required'=>true))
+            ->add('comments',TextareaType::class,array('required'=>false,'label'=>'Commentaires'))
             ->add('save',SubmitType::class,array('label'=>'Enregistrer'))
         ;
     }

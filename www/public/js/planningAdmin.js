@@ -234,6 +234,36 @@ function capitalizationPlanning(planningId){
 	});
 }
 
+function editPlanningComment(planningId) {
+  // fetch comment from DOM
+  input = document.getElementById('planning-'  + planningId).getAttribute('data-comments');
+
+  // prompt for new comment
+  output = prompt("Modifier le commentaire", input)
+
+  // has user hint cancel?
+  if (output == null)
+    return;
+
+  // be sure comment are not identical
+  if (input == output)
+    return;
+
+  // send ajax query to backend
+	$.ajax({
+		type: "POST",
+		url:urlDict["planning_comment_edit"].replace("123", planningId),
+		data:{ 'comments': output },
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			location.reload();
+		}
+	});
+}
+
 resizeOptions = {
 	handles: "e",
 	containment: ".schedule",
@@ -401,6 +431,7 @@ function addPlanning(){
 	newPlanning['meetup'] = $('#addForm_meetup').prop('checked')
 	newPlanning['deliverable'] = $('#addForm_deliverable').prop('checked')
 	newPlanning['capitalization'] = $('#addForm_capitalization').prop('checked')
+	newPlanning['comments'] = $('#addForm_comments').val()
 
 
 	$('#addPlanning_Modal').modal('hide');

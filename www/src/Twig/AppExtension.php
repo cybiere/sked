@@ -104,6 +104,9 @@ class AppExtension extends AbstractExtension
 		data-planningId="<?php echo htmlspecialchars($planning->getId()); ?>"
 		data-toggle="popover"
 		data-html="true"
+		id="planning-<?php echo $planning->getId(); ?>"
+		data-id="<?php echo $planning->getId(); ?>"
+		data-comments="<?php echo addslashes($planning->getComments()); ?>"
 		title="
 <?php 
 		if($planning->getTask() != NULL){
@@ -125,7 +128,11 @@ class AppExtension extends AbstractExtension
 			<dt class='col-md-6'>Client</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getClient()); ?></dd>
 			<dt class='col-md-6'>Responsable projet</dt><dd class='col-md-6'><?php if($planning->getProject()->getProjectManager()) echo htmlspecialchars($planning->getProject()->getProjectManager()->getFullname()); ?></dd>
 			<dt class='col-md-6'>jh planif/vendus</dt><dd class='col-md-6'><?php echo htmlspecialchars($planning->getProject()->getPlannedDays())."/".htmlspecialchars($planning->getProject()->getNbDays()); ?></dd>
+<?php if($planning->getComments()){ ?>
+			<dt class='col-md-6' onclick='editPlanningComment(<?php echo $planning->getId(); ?>)'>Commentaires</dt><dd class='col-md-6' onclick='editPlanningComment(<?php echo $planning->getId(); ?>)'><?php echo nl2br(htmlspecialchars($planning->getComments())); ?></dd>
+<?php } else { ?>
 			<dt class='col-md-6'>Commentaires</dt><dd class='col-md-6'><?php echo nl2br(htmlspecialchars($planning->getProject()->getComments())); ?></dd>
+<?php } ?>
 <?php if($isAdmin && $project == 0){ ?>
 <div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning(<?php echo $planning->getId(); ?>)'><i class='far fa-check-circle'></i></button></div>
 			<?php if($planning->getProject()->isBillable()){ ?>
@@ -135,6 +142,7 @@ class AppExtension extends AbstractExtension
 			<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='meetupPlanning(<?php echo $planning->getId(); ?>)'><i class='fas fa-users'></i></button></div>
 			<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='capitalizationPlanning(<?php echo $planning->getId(); ?>)'><i class='far fa-money-bill-alt'></i></button></div>
 			<div class='popupaction col-md-3'><a class='btn btn-outline-warning' href='<?php echo $this->router->generate('project_edit',array("projectId"=>$planning->getProject()->getId())); ?>'><i class='fas fa-edit'></i></a></div>
+			<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='editPlanningComment(<?php echo $planning->getId(); ?>)'><i class='far fa-comments'></i></button></div>
 <?php } ?>
 <?php } ?>
 <?php if($isAdmin && $project == 0){ ?>

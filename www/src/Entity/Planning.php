@@ -63,6 +63,11 @@ class Planning
 	private $capitalization=false;
 
 	/**
+	 * @ORM\Column(type="string", length=1000, nullable=true)
+	 */
+	private $comments;
+
+	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="plannings")
 	 * @ORM\JoinColumn(nullable=true)
      */
@@ -183,6 +188,14 @@ class Planning
 
 	public function setTask($task){
 		$this->task = $task;
+	}
+
+	public function getComments(){
+		return $this->comments;
+	}
+
+	public function setComments($comments){
+		$this->comments = $comments;
 	}
 
 }

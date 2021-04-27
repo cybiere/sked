@@ -252,6 +252,7 @@ class PlanningController extends Controller
 		if(($task = $taskRepository->find($data['task']))){
 			$planning->setTask($task);
 		}
+		$planning->setComments($data['comments']);
 
 		$em->persist($planning);
 		$em->flush();
@@ -505,4 +506,36 @@ class PlanningController extends Controller
 		$arrData = ['success' => true,'addclass' => $addclass];
 		return new JsonResponse($arrData);
 	}
+
+	/**
+	 * @Route("/planning/coment/{planningId}",name="planning_comment", methods={"POST"})
+	 */
+	public function planning_comment(Request $request, $planningId) {
+
+		$data = $request->request->all();
+		$em = $this->getDoctrine()->getManager();
+
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if (!$planning = $planningRepository->find($planningId)){
+			$arrData = ['success' => false, 'errormsg' => "Impossible de trouver ce planning"];
+			return new JsonResponse($arrData);
+		}
+
+		if(!$me->canAdmin($planning)){
+			$arrData = ['success' => false, 'errormsg' => "Vous n'avez pas le droit de créer ce planning"];
+			return new JsonResponse($arrData);
+		}
+
+		$planning->setComments($data['comments']);
+
+		$em->persist($planning);
+		$em->flush();
+
+		$arrData = ['success' => true,'id' => $planning->getId()];
+		return new JsonResponse($arrData);
+		}
 }
