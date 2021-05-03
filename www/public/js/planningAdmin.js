@@ -469,6 +469,34 @@ function sendPlanningNewRequest(){
 	});
 }
 
+function projectAdd(){
+	$.ajax({
+		type: "POST",
+		url:urlDict["project_index"],
+		data:$("[id^='project_']").serialize(),
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			// close collapse form
+			$('#addProject').collapse('hide');
+
+			// add new project and select it
+			$('#addForm_projectId').append(
+				new Option(
+					data.name + " - " + data.client +
+					(data.nbDays ? " (" + (data.nbDays - data.plannedDays) + "jh rest.)" : null) +
+					")",
+					data.id
+				)
+			);
+
+			$('#addForm_projectId option[value='+data.id+']').attr('selected','selected').change();
+		}
+	});
+}
+
 $('#addForm_projectId').change(function(){
 	if($(this).val() != 0){
 		$('#addForm_taskId').prop("disabled",true);

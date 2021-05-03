@@ -104,12 +104,27 @@ class PlanningController extends Controller
 			}
 		}
 
+		if($this->get('session')->get('user')->isAdmin()){
+			$myTeams = $teamRepository->findAll();
+		}else{
+			if($me->getTeam() == null){
+				$myTeams = $me->getManagedTeams();
+			}elseif($me->getManagedTeams() == null){
+				$myTeams = [$me->getTeam()];
+			}else{
+				$myTeams = $me->getManagedTeams();
+				if(!in_array($me->getTeam(),$myTeams))
+					$myTeams[] = $me->getTeam();
+			}
+		}
+
 		return $this->render('planning/index.html.twig', [
 			'nbMonths' => 3,
 			'maxOffsets' => $maxOffsets,
 			'holidays' => CommonController::getHolidays($startDateObj->format('Y')),
 			'startDate' => $startDate,
 			'users' => $users,
+			'teams' => $myTeams,
 			'projects' => $projects,
 			'me' => $me,
 			'hasAdmin' => $hasAdmin,

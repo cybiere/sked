@@ -58,6 +58,17 @@ class ProjectController extends Controller
 			$em->persist($project);
 			$em->flush();
 			$this->addFlash('success','Projet ajouté');
+
+			if ($request->isXmlHttpRequest())
+				return new JsonResponse(
+					array(
+						'client' => $project->getClient(),
+						'name' => $project->getName(),
+						'id' => $project->getId(),
+						'nbDays' => $project->getNbDays(),
+						'plannedDays' => $project->getPlannedDays()
+					)
+				);
 		}
 
 		if($this->get('session')->get('user')->isAdmin()){
