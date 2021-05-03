@@ -118,6 +118,94 @@ class PlanningController extends Controller
 	}
 
 	/**
+	 * @Route("/export/planning", name="planning_export")
+	 * @Route("/export/planning/{startDate}", name="planning_export_shift", defaults={"startDate"="now"}, methods={"GET"})
+	 */
+	public function export(Request $request, $startDate="now")
+	{
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+
+		$users = $userRepository->findBy(array("isResource"=>true));
+
+		try {
+			$startDateObj = new \DateTime($startDate);
+		} catch (\Exception $e) {
+			$startDate = "now";
+			$startDateObj = new \DateTime("now");
+		}
+
+		$renderMonths = 3;
+
+		// default calendar and users value
+		$calendar = array();
+		$calendars = array();
+
+		// iterate over period
+		$daterange = new \DatePeriod($startDateObj, new \DateInterval('P1D'), new \DateTime("+ {$renderMonths}months"));
+		foreach ($daterange as $date) {
+			$calendar[] = $date->format("Y-m-d") . " am";
+			$calendar[] = $date->format("Y-m-d") . " am2";
+			$calendar[] = $date->format("Y-m-d") . " pm";
+			$calendar[] = $date->format("Y-m-d") . " pm2";
+		}
+
+		// look for user planning event by period
+		foreach ($users as $user) {
+			$calendars[$user->getFullname()] = array();
+
+			foreach ($user->getPlannings() as $planning) {
+				$key = array_search(
+					($planning->getStartDate())->format("Y-m-d") . " " . $planning->getStartHour(),
+					$calendar
+				);
+	
+				if (! $key) continue; // out of calendar range
+
+				if (! $planning->getProject()) {
+					$value = "absence";
+/*
+  -project: null
+  -meeting: false
+  -confirmed: true
+  -deliverable: false
+  -meetup: false
+  -capitalization: false
+*/
+				} else {
+					$value = ($planning->getProject())->getReference();
+					if ($planning->getTask()) {
+						$value .= " - " . ($planning->getTask())->getName();
+					}
+				}
+
+				$calendars[$user->getFullname()][$key] = $value;
+
+				if ($planning->getNbSlices() == 0.5) continue;
+
+				for ($i = 1; $i <= ($planning->getNbSlices() * 2); $i++) {
+					if (! array_key_exists($key + $i, $calendar)) continue; // out of calendar range
+
+					$calendars[$user->getFullname()][$key + $i] = $value;
+				}
+			}
+		}
+
+		$response = $this->render('planning/export.csv.twig', [
+			'calendar' => $calendar,
+			'calendars' => $calendars
+		]);
+
+		$response->headers->set('Content-Type', 'text/csv');
+		$response->headers->set('Content-Disposition', 'attachment; filename="planning.csv"');
+
+		return $response;
+	}
+
+	/**
 	 * @Route("/planning/resize/{planningId}/{newSize}",name="planning_resize")
 	 */
 	public function resize(Request $request,$planningId,$newSize){
