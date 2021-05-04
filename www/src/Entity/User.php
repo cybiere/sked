@@ -46,6 +46,11 @@ class User
 	private $isAdmin=false;
 
 	/**
+     * @ORM\Column(name="`order`", type="integer")
+     */
+	private $order;
+
+	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Project", mappedBy="projectManager", orphanRemoval=false)
 	 */
 	private $managedProjects;
@@ -123,6 +128,14 @@ class User
 
 	public function setIsAdmin($admin){
 		$this->isAdmin = $admin?true:false;
+	}
+
+	public function setOrder($value){
+		$this->order = $value;
+	}
+
+	public function getOrder(){
+		return $this->order;
 	}
 
 	/**

@@ -526,4 +526,39 @@ $('#addForm_projectId').change(function(){
 	}
 });
 
+$(document).ready(function() {
+	$('.users-sortable').sortable({
+		axis: "y",
+		disabled: true,
+		placeholder: "ui-state-highlight",
+		update: function(event, ui) {
+			list = [];
 
+			// fetch user in new order
+			$(event.target).find('[data-user-id]').each(function() {
+				list.push($(this).attr('data-user-id'));
+			});
+
+			// send query to backend
+			$.ajax({
+				type: "POST",
+				url: urlDict["user_order"],
+				data: { 'order': list },
+				error: function(xhr,status,error) {
+					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+					$('#flashMessages').append(message);
+				},
+				success: function(data, status, xhr) {
+					location.reload();
+				}
+			});
+		}
+	});
+
+	// sortable only on user cell, do not interact with other draggable elements
+	$('.schedUser').hover(function () {
+		$('.users-sortable').sortable("enable")
+	}, function() {
+		$('.users-sortable').sortable("disable")
+	});
+});

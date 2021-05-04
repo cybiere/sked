@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Ldap\Ldap;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UserController extends Controller{
 	private function addUser($username,$isAdmin=false){
@@ -263,4 +264,28 @@ class UserController extends Controller{
 			'holidays'=>CommonController::getHolidays($startDateObj->format('Y'))
 		));
 	}
-}
+
+	/**
+	 * @Route("/user/order",name="user_order", methods={"POST"}))
+	 */
+	public function user_order(Request $request){
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		foreach ($request->request->get('order') as $order => $userid) {
+			$user = $userRepository->find($userid);
+
+			if($user->getOrder() == $order) continue;
+				$user->setOrder($order);
+				$em->flush();
+		}
+
+			return new JsonResponse(
+				array(
+					'sucess' => true
+				)
+			);
+	}}

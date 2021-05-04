@@ -29,7 +29,7 @@
 {% set startDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("first day of this month") %}
 {% set endDate = baseDate|date_modify("+" ~ i ~ " month")|date_modify("last day of this month") %}
 {% set nbSlices = 0 %}
-<table class="table table-sm schedule">
+<table class="table table-sm schedule {% if hasAdmin %}users-sortable{% endif %}">
 	<thead>
 		<tr>
 			<th class="schedUser schedDate">{{ months[startDate|date('n')] ~ ' ' ~ startDate|date('Y') }}</th>
@@ -42,10 +42,10 @@
 			{% endfor %}
 		</tr>
 	</thead>
-		{% for user in users %}
+		{% for user in users|sort((a, b) => a.order <=> b.order) %}
 	<tbody>
 		{% for offset in range(0,maxOffsets[i][user.id]) %}
-		<tr>
+		<tr data-user-id="{{user.id}}">
 			{% set slicesShown = 0 %}
 			{% if offset == 0 %}
 			<th class="schedUser" rowspan="{{maxOffsets[i][user.id] + 1}}">
