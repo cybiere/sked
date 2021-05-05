@@ -4,7 +4,7 @@
 {% endfor %}
 
 {% for key, period in calendar %}
-{% spaceless %}"{{ period|replace({'am2': "08h-10h", 'am': "10h-12h", 'pm2': "13h-15h", 'pm': "15h-17h"}) }}",{% endspaceless %}
+{% spaceless %}"{{ period|replace({'am2': "10h-12h", 'am': "08h-10h", 'pm2': "15h-17h", 'pm': "13h-15h"}) }}",{% endspaceless %}
 {% for users in calendars %}
 {% spaceless %}"{% if key in users|keys %}{{ users[key] }}{% endif %}"{% if not loop.last %},{% endif %}{% endspaceless %}
 {% endfor %}
