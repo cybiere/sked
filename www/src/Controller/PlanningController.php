@@ -162,6 +162,9 @@ class PlanningController extends Controller
 		// iterate over period
 		$daterange = new \DatePeriod($startDateObj, new \DateInterval('P1D'), new \DateTime("+ {$renderMonths}months"));
 		foreach ($daterange as $date) {
+			if (in_array($date->format("U"), CommonController::getHolidays($startDateObj->format('Y')))) continue;
+			if ($date->format("N") > 5) continue;
+
 			$calendar[] = $date->format("Y-m-d") . " am";
 			$calendar[] = $date->format("Y-m-d") . " am2";
 			$calendar[] = $date->format("Y-m-d") . " pm";
@@ -182,14 +185,6 @@ class PlanningController extends Controller
 
 				if (! $planning->getProject()) {
 					$value = "absence";
-/*
-  -project: null
-  -meeting: false
-  -confirmed: true
-  -deliverable: false
-  -meetup: false
-  -capitalization: false
-*/
 				} else {
 					$value = ($planning->getProject())->getReference();
 					if ($planning->getTask()) {
@@ -201,7 +196,7 @@ class PlanningController extends Controller
 
 				if ($planning->getNbSlices() == 0.5) continue;
 
-				for ($i = 1; $i <= ($planning->getNbSlices() * 2); $i++) {
+				for ($i = 1; $i < ($planning->getNbSlices() * 2); $i++) {
 					if (! array_key_exists($key + $i, $calendar)) continue; // out of calendar range
 
 					$calendars[$user->getFullname()][$key + $i] = $value;
