@@ -5,11 +5,17 @@
 {% block body %}
 {% set days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'] %}
 {% set months = ['','Jan','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'] %}
+
 <h1>Projet {{ project.client }} {{ project.name }} {% if project.archived %}<span class="badge badge-secondary">Archivé</span>{% endif %}
 	<a class="btn btn-outline-dark float-right" href="{{ path('project_index')}}">Retour</a>
 	{% if me.canAdmin(project) %}
 	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('project_edit',{'projectId':project.id})}}">Modifier</a>
 	{% endif %}
+
+{% if plannings is not empty %}
+{% set planningStart = startDate|date_modify('first day of this month') %}
+	<a href="{{ path('project_export',{'projectId':project.id})}}" class="btn btn-outline-secondary float-right"><i class='fas fa-download'></i></a>
+{% endif %}
 </h1>
 
 {% if me.canAdmin(project) %}

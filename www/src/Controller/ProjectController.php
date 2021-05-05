@@ -189,6 +189,94 @@ class ProjectController extends Controller
 
 
 	/**
+	 * @Route("/export/project/{projectId}", name="project_export")
+	 */
+	public function export(Request $request, $projectId)
+	{
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
+
+		if(!($project = $projectRepository->find($projectId))){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$calendar = array();
+		$period = array(
+			'begin' => null,
+			'end' => null
+		);
+
+		foreach ($project->getPlannings() as $planning) {
+			// find largest period range
+			if (
+				! $period['begin'] ||
+				$period['begin'] > $planning->getStartDate()
+			) {
+				$period['begin'] = $planning->getStartDate();
+			}
+		}
+
+		$renderMonths = 3;
+
+		// default calendar and users value
+		$calendar = array();
+		$calendars = array();
+
+		// iterate over period
+		$daterange = new \DatePeriod($period['begin'], new \DateInterval('P1D'), new \DateTime("+ {$renderMonths}months"));
+		foreach ($daterange as $date) {
+			if (in_array($date->format("U"), CommonController::getHolidays($period['begin']->format('Y')))) continue;
+			if ($date->format("N") > 5) continue;
+
+			$calendar[] = $date->format("Y-m-d") . " am";
+			$calendar[] = $date->format("Y-m-d") . " am2";
+			$calendar[] = $date->format("Y-m-d") . " pm";
+			$calendar[] = $date->format("Y-m-d") . " pm2";
+		}
+
+		// look for user planning event by period
+		foreach ($project->getPlannings() as $planning) {
+			$key = array_search(
+				($planning->getStartDate())->format("Y-m-d") . " " . $planning->getStartHour(),
+				$calendar
+			);
+
+			if (! $key) continue; // out of calendar range
+
+			if (isset($calendars[$project->getName()][$key])) {
+				$calendars[$project->getName()][$key] .= " | " . ($planning->getUser())->getFullname();
+			} else {
+				$calendars[$project->getName()][$key] = ($planning->getUser())->getFullname();
+			}
+
+			if ($planning->getNbSlices() == 0.5) continue;
+
+			for ($i = 1; $i < ($planning->getNbSlices() * 2); $i++) {
+				if (! array_key_exists($key + $i, $calendar)) continue; // out of calendar range
+
+				if (isset($calendars[$project->getName()][$key + $i])) {
+					$calendars[$project->getName()][$key + $i] .= " | " . ($planning->getUser())->getFullname();
+				} else {
+					$calendars[$project->getName()][$key + $i] = ($planning->getUser())->getFullname();
+				}
+			}
+		}
+
+		$response = $this->render('project/export.csv.twig', [
+			'calendar' => $calendar,
+			'calendars' => $calendars
+		]);
+
+		$response->headers->set('Content-Type', 'text/csv');
+		$response->headers->set('Content-Disposition', 'attachment; filename="project.csv"');
+
+		return $response;
+	}
+
+	/**
 	 * @Route("/edit/{projectId}",name="project_edit")
 	 */
 	public function edit(Request $request,$projectId){
