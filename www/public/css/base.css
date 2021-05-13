@@ -126,6 +126,10 @@ th.schedUser{
 	background:#7b6;
 	border-color:#150;
 }
+.neutral {
+  background: #fefff6;
+  color: #393838;
+}
 .otherProject {
 	background:#eee;
 	border-color:#ccc;

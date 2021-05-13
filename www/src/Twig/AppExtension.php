@@ -24,6 +24,7 @@ class AppExtension extends AbstractExtension
 		return array(
 			new TwigFunction('kanproject',array($this,'kanprojectFunction')),
 			new TwigFunction('printPlanning',array($this,'printPlanningFunction')),
+			new TwigFunction('printTask',array($this,'printTaskFunction')),
 			new TwigFunction('printTeam',array($this,'printTeamFunction')),
 		);
 	}
@@ -152,6 +153,29 @@ class AppExtension extends AbstractExtension
 		"
 	>
 		<?php echo $planning->getProject() == NULL?"Absence":htmlspecialchars($planning->getProject()->getClient())." ".htmlspecialchars($planning->getProject()->getName()); ?>
+
+		<i class="duration">
+			<?php echo htmlspecialchars($planning->getNbSlices()/2); ?>
+		</i>
+	</div>
+
+<?php
+	}
+
+	public function printTaskFunction($planning,$isAdmin,$project=0){
+?>
+	<div
+		class="project neutral"
+		tabindex="0" 
+		data-duration="<?php echo htmlspecialchars($planning->getNbSlices()); ?>" 
+		data-planningId="<?php echo htmlspecialchars($planning->getId()); ?>"
+		data-toggle="popover"
+		data-html="true"
+		id="planning-<?php echo $planning->getId(); ?>"
+		data-id="<?php echo $planning->getId(); ?>"
+		data-comments="<?php echo addslashes($planning->getComments()); ?>"
+	>
+		<?php echo ($planning->getTask())->getName(); ?>
 
 		<i class="duration">
 			<?php echo htmlspecialchars($planning->getNbSlices()/2); ?>
