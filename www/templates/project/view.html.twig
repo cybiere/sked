@@ -280,7 +280,9 @@
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am" and planning.offset == offset %}
 					{% if planning.task is not empty %}
+					{% if planning.project.id == project.id %}
 					{{ printTask(planning,me.canAdmin(planning),project.id) }}
+					{% endif %}
 					{% endif %}
 					{% endif %}
 					{% endfor %}
@@ -292,7 +294,9 @@
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "am2" and planning.offset == offset %}
 					{% if planning.task is not empty %}
+					{% if planning.project.id == project.id %}
 					{{ printTask(planning,me.canAdmin(planning),project.id) }}
+					{% endif %}
 					{% endif %}
 					{% endif %}
 					{% endfor %}
@@ -304,7 +308,9 @@
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm" and planning.offset == offset %}
 					{% if planning.task is not empty %}
+					{% if planning.project.id == project.id %}
 					{{ printTask(planning,me.canAdmin(planning),project.id) }}
+					{% endif %}
 					{% endif %}
 					{% endif %}
 					{% endfor %}
@@ -316,7 +322,9 @@
 					{% for planning in user.plannings %}
 					{% if planning.startDate|date('U') == x|date('U') and planning.startHour == "pm2" and planning.offset == offset %}
 					{% if planning.task is not empty %}
+					{% if planning.project.id == project.id %}
 					{{ printTask(planning,me.canAdmin(planning),project.id) }}
+					{% endif %}
 					{% endif %}
 					{% endif %}
 					{% endfor %}
