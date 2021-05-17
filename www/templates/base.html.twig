@@ -62,6 +62,9 @@
 					<li class="nav-item{% if app.request.attributes.get('_route') in ["team_index","team_view","team_edit"] %} active{% endif %}">
 						<a class="nav-link" href="{{ path('team_index') }}">Équipes</a>
 					</li>
+					<li class="nav-item{% if app.request.attributes.get('_route') in ["monitoring_index"] %} active{% endif %}">
+						<a class="nav-link" href="{{ path('monitoring_index') }}">Suivi</a>
+					</li>
 					{% endif %}
 				</ul>
 				<ul class="navbar-nav">
