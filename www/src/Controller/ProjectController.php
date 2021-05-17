@@ -228,7 +228,7 @@ class ProjectController extends Controller
 		// iterate over period
 		$daterange = new \DatePeriod($period['begin'], new \DateInterval('P1D'), new \DateTime("+ {$renderMonths}months"));
 		foreach ($daterange as $date) {
-			if (in_array($date->format("U"), CommonController::getHolidays($period['begin']->format('Y')))) continue;
+			if (in_array($date->format("Y-m-d"), CommonController::getHolidays($period['begin']->format('Y'), "Y-m-d"))) continue;
 			if ($date->format("N") > 5) continue;
 
 			$calendar[] = $date->format("Y-m-d") . " am";
