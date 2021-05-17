@@ -89,6 +89,74 @@ class Planning
 		return $this->startDate;
 	}
 
+	public function getStart() {
+		$data = clone $this->getStartDate();
+
+		$hours = 8;
+
+		if ($this->getStartHour() == "am") $hours = 8;
+		if ($this->getStartHour() == "am2") $hours = 10;
+		if ($this->getStartHour() == "pm") $hours = 13;
+		if ($this->getStartHour() == "pm2") $hours = 15;
+
+		$data->modify("+{$hours} hours");
+
+		return clone $data;
+	}
+
+	public function getEnd() {
+		$data = $this->getStart();
+
+		// iterate over each quarter of day
+		for ($i = 0; $i < $this->getNbSlices(); $i += 0.5) {
+			// pass over weekend
+			if (
+				in_array(
+					$data->format('N'),
+					array(
+						6,
+						7
+					)
+				)
+			) {
+				$data->modify("+1 day");
+			}
+
+			// pass over holidays 
+			if (
+				in_array(
+					$data->format("Y-m-d"),
+					\App\Controller\CommonController::getHolidays($data->format('Y'), "Y-m-d")
+				)
+			) {
+				$data->modify("+1 day");
+			}
+
+			// adjust hour as am/am2/pm/pm2
+			if ($data->format('G') == 8) {
+				$data->modify("+2 hours");
+			} else if ($data->format('G') == 10) {
+				$data->modify("+3 hours");
+			} else if ($data->format('G') == 13) {
+				$data->modify("+2 hours");
+			} else if ($data->format('G') == 15) {
+				$data->modify("+17 hours");
+			} else if ($data->format('G') == 15) {
+				$data->modify("+17 hours");
+			}
+
+			// don't encroach on next day
+			if (
+				$data->format('G') == 8 &&
+				$i == $this->getNbSlices() - 0.5
+			) {
+				$data->modify("-15 hours");
+			}
+		}
+
+		return $data;
+	}
+
 	public function setStartDate($startDate){
 		if(isset($this->endDate) && $this->endDate < $startDate){
 			$this->startDate = $this->endDate;
