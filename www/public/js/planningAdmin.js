@@ -52,6 +52,10 @@ function printPlanningItem(){
 					item.addClass("capitalization")
 				}
 
+				if(! data.monitoring){
+					item.addClass("monitoring")
+				}
+
 				item.data("duration",data.duration)
 				item.attr("tabindex","0")
 				item.data("toggle","popover")
@@ -431,6 +435,7 @@ function addPlanning(){
 	newPlanning['meetup'] = $('#addForm_meetup').prop('checked')
 	newPlanning['deliverable'] = $('#addForm_deliverable').prop('checked')
 	newPlanning['capitalization'] = $('#addForm_capitalization').prop('checked')
+	newPlanning['monitoring'] = $('#addForm_monitoring').prop('checked')
 	newPlanning['comments'] = $('#addForm_comments').val()
 
 

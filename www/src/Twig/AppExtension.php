@@ -99,6 +99,7 @@ class AppExtension extends AbstractExtension
 		if ($planning->isMeetup()) { echo " meetup"; }
 		if ($planning->isDeliverable()) { echo " deliverable"; }
 		if ($planning->isCapitalization()) { echo " capitalization"; }
+		if (! $planning->isMonitoring()) { echo " monitoring"; }
 		?>"
 		tabindex="0" 
 		data-duration="<?php echo htmlspecialchars($planning->getNbSlices()); ?>" 

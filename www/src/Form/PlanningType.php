@@ -22,6 +22,7 @@ class PlanningType extends AbstractType
             ->add('deliverable',null,array('label'=>'Livrable'))
             ->add('meetup',null,array('label'=>'Réunion'))
             ->add('capitalization',null,array('label'=>'Capitalisation'))
+            ->add('monitoring',null,array('label'=>'Suivi'))
             ->add('project',null,array('label'=>'Projet','choices'=>$options['projects'],'required'=>true))
             ->add('task',null,array('label'=>'Tâche'))
             ->add('user',null,array('label'=>'Ressource','choices'=>$options['users'],'required'=>true))

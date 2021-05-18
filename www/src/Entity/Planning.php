@@ -63,6 +63,11 @@ class Planning
 	private $capitalization=false;
 
 	/**
+	 * @ORM\Column(type="boolean")
+	 */
+	private $nomonitoring=false;
+
+	/**
 	 * @ORM\Column(type="string", length=1000, nullable=true)
 	 */
 	private $comments;
@@ -232,6 +237,14 @@ class Planning
 
 	public function setCapitalization($capitalization){
 		$this->capitalization = $capitalization?true:false;
+	}
+
+	public function isMonitoring(){
+		return ! $this->nomonitoring;
+	}
+
+	public function setMonitoring($data){
+		$this->nomonitoring = $data?false:true;
 	}
 
 	public function getProject(){

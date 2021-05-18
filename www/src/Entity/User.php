@@ -169,6 +169,13 @@ class User
 					$date->format("Y-m-d") > ($planning->getEnd())->format("Y-m-d")
 				) continue; // out of range
 
+				// is monitored?
+				if (! $planning->isMonitoring()) {
+					// is not monitored, remove as potential day and passed over
+					$denom--;
+					continue;
+				}
+
 				// is absent?
 				if (! $planning->getProject()) continue;
 

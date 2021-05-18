@@ -262,6 +262,7 @@ class PlanningController extends Controller
 			'meetup' => $planning->isMeetup(),
 			'deliverable' => $planning->isDeliverable(),
 			'capitalization' => $planning->isCapitalization(),
+			'monitoring' => $planning->isMonitoring(),
 			'admin'=> $me->canAdmin($planning),
 		];
 		if($project != NULL){
@@ -347,6 +348,8 @@ class PlanningController extends Controller
 		$planning->setMeetup($data['meetup'] == "false"?false:true);
 		$planning->setDeliverable($data['deliverable'] == "false"?false:true);
 		$planning->setCapitalization($data['capitalization'] == "false"?false:true);
+		$planning->setMonitoring($data['monitoring'] == "false"?false:true);
+
 		if(($task = $taskRepository->find($data['task']))){
 			$planning->setTask($task);
 		}

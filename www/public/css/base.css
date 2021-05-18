@@ -180,6 +180,9 @@ th.schedUser{
 	background:#6695bb;
 	border-color:#6679bb;
 }
+.monitoring {
+	font-weight: bold;
+}
 .modal-dialog {
 	max-width:1000px !important;
 } 
