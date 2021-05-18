@@ -90,9 +90,9 @@ function printPlanningItem(){
 					if(data.projectId != 0){
 					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-check-circle'></i></button></div>")
 
-					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-envelope'></i></button></div>")
-					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-users'></i></button></div>")
-					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-money'></i></button></div>")
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='deliverablePlanning("+data.planningId+")'><i class='far fa-envelope'></i></button></div>")
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='meetupPlanning("+data.planningId+")'><i class='far fa-users'></i></button></div>")
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='capitalizationPlanning("+data.planningId+")'><i class='far fa-money'></i></button></div>")
 
 						if(data.projectBillable){
 							popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='meetingPlanning("+data.planningId+")'><i class='fas fa-exclamation-circle'></i></button></div>")
