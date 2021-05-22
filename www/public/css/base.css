@@ -126,6 +126,10 @@ th.schedUser{
 	background:#7b6;
 	border-color:#150;
 }
+.neutral {
+  background: #fefff6;
+  color: #393838;
+}
 .otherProject {
 	background:#eee;
 	border-color:#ccc;
@@ -175,6 +179,9 @@ th.schedUser{
 .capitalization {
 	background:#6695bb;
 	border-color:#6679bb;
+}
+.monitoring {
+	font-weight: bold;
 }
 .modal-dialog {
 	max-width:1000px !important;

@@ -1,0 +1,12 @@
+{% spaceless %}"TACE",{% endspaceless %}
+{% for user in calendar %}
+{% spaceless %}"{{ user }}"{% if not loop.last %},{% endif %}{% endspaceless %}
+{% endfor %}
+
+{% for period, data in calendars %}
+{% spaceless %}"{{ period }}",{% endspaceless %}
+{% for entry in data %}
+{% spaceless %}"{{ entry.data|round }}%"{% if not loop.last %},{% endif %}{% endspaceless %}
+{% endfor %}
+
+{% endfor %}

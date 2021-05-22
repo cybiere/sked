@@ -52,6 +52,10 @@ function printPlanningItem(){
 					item.addClass("capitalization")
 				}
 
+				if(! data.monitoring){
+					item.addClass("monitoring")
+				}
+
 				item.data("duration",data.duration)
 				item.attr("tabindex","0")
 				item.data("toggle","popover")
@@ -90,9 +94,9 @@ function printPlanningItem(){
 					if(data.projectId != 0){
 					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-check-circle'></i></button></div>")
 
-					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-envelope'></i></button></div>")
-					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-users'></i></button></div>")
-					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='confirmPlanning("+data.planningId+")'><i class='far fa-money'></i></button></div>")
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='deliverablePlanning("+data.planningId+")'><i class='far fa-envelope'></i></button></div>")
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='meetupPlanning("+data.planningId+")'><i class='far fa-users'></i></button></div>")
+					popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-success' onclick='capitalizationPlanning("+data.planningId+")'><i class='far fa-money'></i></button></div>")
 
 						if(data.projectBillable){
 							popContent = popContent.concat("<div class='popupaction col-md-3'><button class='btn btn-outline-info' onclick='meetingPlanning("+data.planningId+")'><i class='fas fa-exclamation-circle'></i></button></div>")
@@ -234,16 +238,46 @@ function capitalizationPlanning(planningId){
 	});
 }
 
+function editPlanningComment(planningId) {
+  // fetch comment from DOM
+  input = document.getElementById('planning-'  + planningId).getAttribute('data-comments');
+
+  // prompt for new comment
+  output = prompt("Modifier le commentaire", input)
+
+  // has user hint cancel?
+  if (output == null)
+    return;
+
+  // be sure comment are not identical
+  if (input == output)
+    return;
+
+  // send ajax query to backend
+	$.ajax({
+		type: "POST",
+		url:urlDict["planning_comment_edit"].replace("123", planningId),
+		data:{ 'comments': output },
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			location.reload();
+		}
+	});
+}
+
 resizeOptions = {
 	handles: "e",
 	containment: ".schedule",
 	resize: function(e,ui){
-		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1);
+		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1) / 2;
 		$(this).find('i').text(newSize/2);
 		$(this).outerHeight(30);
 	},
 	stop : function(event, ui){
-		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1);
+		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1) / 2;
 		if(newSize > $(this).parent().data("remainingslices")+1){
 			newSize = $(this).parent().data("remainingslices")+1;
 		}
@@ -259,8 +293,7 @@ resizeOptions = {
 			},
 			success:function(data, status, xhr){
 				if(data.success){
-					ui.element.data("duration",newSize);
-					$(ui.element).outerWidth($(ui.element).parent().parent().outerWidth()*newSize-3);
+					location.reload();
 				}else{
 					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 					$('#flashMessages').append(message);
@@ -309,8 +342,7 @@ $('.projectContainerAdmin').droppable({
 			},
 			success:function(data, status, xhr){
 				if(data.success){
-					ui.draggable.detach().appendTo(destCell);
-					ui.draggable.outerWidth($(destCell).parent().outerWidth()*ui.draggable.data("duration")-3);
+					location.reload();
 				}else{
 					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 					$('#flashMessages').append(message);
@@ -351,7 +383,7 @@ $(document).mouseup(function(e){
 	if(mouseDown){
 		ghostSize = e.pageX-baseX
 		modulo = ghostSize % gridWidth;
-		nbSlices = Math.round((ghostSize-modulo)/gridWidth+1);
+		nbSlices = Math.round((ghostSize-modulo)/gridWidth+1) / 2;
 
 		newGhost.remove();
 
@@ -364,7 +396,17 @@ $(document).mouseup(function(e){
 		$('#addModal_ressourceForm').html(add_userId);
 		$('#addModal_startDate').html(new Date(add_startDate).toLocaleDateString('fr-FR'));
 		$('#addModal_startDateForm').html(add_startDate);
-		$('#addModal_startHour').html(add_startHour == "am" ? "matin" : "midi");
+
+		if (add_startHour == "am") {
+			$('#addModal_startHour').html("matin");
+		} else if (add_startHour == "am2") {
+			$('#addModal_startHour').html("fin matin");
+		} else if (add_startHour == "pm") {
+			$('#addModal_startHour').html("midi");
+		} else if (add_startHour == "pm2") {
+			$('#addModal_startHour').html("fin midi");
+		}
+
 		$('#addModal_startHourForm').html(add_startHour);
 		$('#addModal_duration').html(nbSlices/2 + 'jh');
 		$('#addModal_durationForm').html(nbSlices);
@@ -393,6 +435,8 @@ function addPlanning(){
 	newPlanning['meetup'] = $('#addForm_meetup').prop('checked')
 	newPlanning['deliverable'] = $('#addForm_deliverable').prop('checked')
 	newPlanning['capitalization'] = $('#addForm_capitalization').prop('checked')
+	newPlanning['monitoring'] = $('#addForm_monitoring').prop('checked')
+	newPlanning['comments'] = $('#addForm_comments').val()
 
 
 	$('#addPlanning_Modal').modal('hide');
@@ -421,22 +465,39 @@ function sendPlanningNewRequest(){
 		},
 		success:function(data, status, xhr){
 			if(data.success){
-				newDiv = $("<div data-planningid='"+data.id+"' class='planningPlaceholder'>Planning</div>")
-				newDiv.appendTo($("div[data-date='"+newPlanning['startDate']+"'][data-hour='"+newPlanning['startHour']+"'][data-user='"+newPlanning['user']+"']:first"))
-				newDiv.each(printPlanningItem);
-				newDiv.contextmenu(function() {
-					$(this).popover('show')
-						return false;
-					});
-				newDiv.on('blur',function() {
-					$(this).popover('hide')
-				});
-
-
+				location.reload();
 			}else{
 				message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + data.errormsg + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 				$('#flashMessages').append(message);
 			}
+		}
+	});
+}
+
+function projectAdd(){
+	$.ajax({
+		type: "POST",
+		url:urlDict["project_index"],
+		data:$("[id^='project_']").serialize(),
+		error:function(xhr,status,error){
+			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+			$('#flashMessages').append(message);
+		},
+		success:function(data, status, xhr){
+			// close collapse form
+			$('#addProject').collapse('hide');
+
+			// add new project and select it
+			$('#addForm_projectId').append(
+				new Option(
+					data.name + " - " + data.client +
+					(data.nbDays ? " (" + (data.nbDays - data.plannedDays) + "jh rest.)" : null) +
+					")",
+					data.id
+				)
+			);
+
+			$('#addForm_projectId option[value='+data.id+']').attr('selected','selected').change();
 		}
 	});
 }
@@ -470,4 +531,39 @@ $('#addForm_projectId').change(function(){
 	}
 });
 
+$(document).ready(function() {
+	$('.users-sortable').sortable({
+		axis: "y",
+		disabled: true,
+		placeholder: "ui-state-highlight",
+		update: function(event, ui) {
+			list = [];
 
+			// fetch user in new order
+			$(event.target).find('[data-user-id]').each(function() {
+				list.push($(this).attr('data-user-id'));
+			});
+
+			// send query to backend
+			$.ajax({
+				type: "POST",
+				url: urlDict["user_order"],
+				data: { 'order': list },
+				error: function(xhr,status,error) {
+					message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
+					$('#flashMessages').append(message);
+				},
+				success: function(data, status, xhr) {
+					location.reload();
+				}
+			});
+		}
+	});
+
+	// sortable only on user cell, do not interact with other draggable elements
+	$('.schedUser').hover(function () {
+		$('.users-sortable').sortable("enable")
+	}, function() {
+		$('.users-sortable').sortable("disable")
+	});
+});
