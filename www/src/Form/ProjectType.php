@@ -46,7 +46,8 @@ class ProjectType extends AbstractType
 			"data_class" => Project::class,
 			"teams"=>[],
 			"statuses"=>[],
-			"users"=>[]
+			"users"=>[],
+			'csrf_token_id' => 'project_add'
         ]);
     }
 }

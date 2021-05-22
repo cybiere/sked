@@ -4,7 +4,7 @@ namespace App\Controller;
 
 class CommonController{
 
-	public static function getHolidays($baseYear){
+	public static function getHolidays($baseYear, $format = "u"){
 		$holidays = array();
 		for($i=-1;$i<=1;$i++){
 			$year=$baseYear+$i;
@@ -28,7 +28,19 @@ class CommonController{
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 39, $easterYear);
 			$holidays[] = mktime(0, 0, 0, $easterMonth, $easterDay + 50, $easterYear);
 		}
+
 		sort($holidays);
+
+		array_walk(
+			$holidays,
+			function(&$value) use ($format) {
+				$value = date(
+					$format,
+					$value
+				);
+			}
+		);
+
 		return $holidays;
 	}
 

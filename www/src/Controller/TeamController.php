@@ -133,6 +133,7 @@ class TeamController extends Controller
 			'nbMonths' => 3,
 			'maxOffsets' => $maxOffsets,
 			"team"=>$team,
+			"teams" => $teamRepository->findAll(),
 			'holidays' => CommonController::getHolidays($startDateObj->format('Y')),
 			'startDate' => $startDate,
 			'users' => $team->getUsers(),

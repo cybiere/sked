@@ -22,12 +22,12 @@ class Planning
 	private $startDate;
 
 	/**
-     * @ORM\Column(type="string", length=2)
+     * @ORM\Column(type="string", length=3)
      */
 	private $startHour;
 
 	/**
-     * @ORM\Column(type="integer")
+	 * @ORM\Column(type="decimal", precision=7, scale=2)
      */
 	private $nbSlices;
 
@@ -63,6 +63,16 @@ class Planning
 	private $capitalization=false;
 
 	/**
+	 * @ORM\Column(type="boolean")
+	 */
+	private $nomonitoring=false;
+
+	/**
+	 * @ORM\Column(type="string", length=1000, nullable=true)
+	 */
+	private $comments;
+
+	/**
 	 * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="plannings")
 	 * @ORM\JoinColumn(nullable=true)
      */
@@ -84,6 +94,74 @@ class Planning
 		return $this->startDate;
 	}
 
+	public function getStart() {
+		$data = clone $this->getStartDate();
+
+		$hours = 8;
+
+		if ($this->getStartHour() == "am") $hours = 8;
+		if ($this->getStartHour() == "am2") $hours = 10;
+		if ($this->getStartHour() == "pm") $hours = 13;
+		if ($this->getStartHour() == "pm2") $hours = 15;
+
+		$data->modify("+{$hours} hours");
+
+		return clone $data;
+	}
+
+	public function getEnd() {
+		$data = $this->getStart();
+
+		// iterate over each quarter of day
+		for ($i = 0; $i < $this->getNbSlices(); $i += 0.5) {
+			// pass over weekend
+			if (
+				in_array(
+					$data->format('N'),
+					array(
+						6,
+						7
+					)
+				)
+			) {
+				$data->modify("+1 day");
+			}
+
+			// pass over holidays 
+			if (
+				in_array(
+					$data->format("Y-m-d"),
+					\App\Controller\CommonController::getHolidays($data->format('Y'), "Y-m-d")
+				)
+			) {
+				$data->modify("+1 day");
+			}
+
+			// adjust hour as am/am2/pm/pm2
+			if ($data->format('G') == 8) {
+				$data->modify("+2 hours");
+			} else if ($data->format('G') == 10) {
+				$data->modify("+3 hours");
+			} else if ($data->format('G') == 13) {
+				$data->modify("+2 hours");
+			} else if ($data->format('G') == 15) {
+				$data->modify("+17 hours");
+			} else if ($data->format('G') == 15) {
+				$data->modify("+17 hours");
+			}
+
+			// don't encroach on next day
+			if (
+				$data->format('G') == 8 &&
+				$i == $this->getNbSlices() - 0.5
+			) {
+				$data->modify("-15 hours");
+			}
+		}
+
+		return $data;
+	}
+
 	public function setStartDate($startDate){
 		if(isset($this->endDate) && $this->endDate < $startDate){
 			$this->startDate = $this->endDate;
@@ -98,7 +176,18 @@ class Planning
 	}
 
 	public function setStartHour($startHour){
-		if($startHour != "pm") $startHour = "am";
+		if (! in_array(
+			$startHour,
+			array(
+				'am',
+				'am2',
+				'pm',
+				'pm2'
+			)
+		)) {
+			$startHour = "am";
+		}
+
 		$this->startHour = $startHour;
 	}
 
@@ -150,6 +239,14 @@ class Planning
 		$this->capitalization = $capitalization?true:false;
 	}
 
+	public function isMonitoring(){
+		return ! $this->nomonitoring;
+	}
+
+	public function setMonitoring($data){
+		$this->nomonitoring = $data?false:true;
+	}
+
 	public function getProject(){
 		return $this->project;
 	}
@@ -172,6 +269,14 @@ class Planning
 
 	public function setTask($task){
 		$this->task = $task;
+	}
+
+	public function getComments(){
+		return $this->comments;
+	}
+
+	public function setComments($comments){
+		$this->comments = $comments;
 	}
 
 }

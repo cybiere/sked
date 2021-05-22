@@ -2,7 +2,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     ldap_url: ldap
-    ldap_port: 389
+    ldap_port: 10389
     ldap_bind_dn: cn=admin,dc=planetexpress,dc=com
     ldap_bind_pw: GoodNewsEveryone
     ldap_base_dn: ou=people,dc=planetexpress,dc=com

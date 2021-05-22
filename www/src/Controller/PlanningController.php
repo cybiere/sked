@@ -104,17 +104,115 @@ class PlanningController extends Controller
 			}
 		}
 
+		if($this->get('session')->get('user')->isAdmin()){
+			$myTeams = $teamRepository->findAll();
+		}else{
+			if($me->getTeam() == null){
+				$myTeams = $me->getManagedTeams();
+			}elseif($me->getManagedTeams() == null){
+				$myTeams = [$me->getTeam()];
+			}else{
+				$myTeams = $me->getManagedTeams();
+				if(!in_array($me->getTeam(),$myTeams))
+					$myTeams[] = $me->getTeam();
+			}
+		}
+
 		return $this->render('planning/index.html.twig', [
 			'nbMonths' => 3,
 			'maxOffsets' => $maxOffsets,
 			'holidays' => CommonController::getHolidays($startDateObj->format('Y')),
 			'startDate' => $startDate,
 			'users' => $users,
+			'teams' => $myTeams,
 			'projects' => $projects,
 			'me' => $me,
 			'hasAdmin' => $hasAdmin,
 		]);
 
+	}
+
+	/**
+	 * @Route("/export/planning", name="planning_export")
+	 * @Route("/export/planning/{startDate}", name="planning_export_shift", defaults={"startDate"="now"}, methods={"GET"})
+	 */
+	public function export(Request $request, $startDate="now")
+	{
+		if(!$this->get('session')->get('user')->isAdmin()){
+			throw $this->createNotFoundException("Cette page n'existe pas");
+		}
+
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+
+		$users = $userRepository->findBy(array("isResource"=>true));
+
+		try {
+			$startDateObj = new \DateTime($startDate);
+		} catch (\Exception $e) {
+			$startDate = "now";
+			$startDateObj = new \DateTime("now");
+		}
+
+		$renderMonths = 3;
+
+		// default calendar and users value
+		$calendar = array();
+		$calendars = array();
+
+		// iterate over period
+		$daterange = new \DatePeriod($startDateObj, new \DateInterval('P1D'), new \DateTime("+ {$renderMonths}months"));
+		foreach ($daterange as $date) {
+			if (in_array($date->format("Y-m-d"), CommonController::getHolidays($startDateObj->format('Y'), "Y-m-d"))) continue;
+			if ($date->format("N") > 5) continue;
+
+			$calendar[] = $date->format("Y-m-d") . " am";
+			$calendar[] = $date->format("Y-m-d") . " am2";
+			$calendar[] = $date->format("Y-m-d") . " pm";
+			$calendar[] = $date->format("Y-m-d") . " pm2";
+		}
+
+		// look for user planning event by period
+		foreach ($users as $user) {
+			$calendars[$user->getFullname()] = array();
+
+			foreach ($user->getPlannings() as $planning) {
+				$key = array_search(
+					($planning->getStartDate())->format("Y-m-d") . " " . $planning->getStartHour(),
+					$calendar
+				);
+	
+				if (! $key) continue; // out of calendar range
+
+				if (! $planning->getProject()) {
+					$value = "absence";
+				} else {
+					$value = ($planning->getProject())->getReference();
+					if ($planning->getTask()) {
+						$value .= " - " . ($planning->getTask())->getName();
+					}
+				}
+
+				$calendars[$user->getFullname()][$key] = $value;
+
+				if ($planning->getNbSlices() == 0.5) continue;
+
+				for ($i = 1; $i < ($planning->getNbSlices() * 2); $i++) {
+					if (! array_key_exists($key + $i, $calendar)) continue; // out of calendar range
+
+					$calendars[$user->getFullname()][$key + $i] = $value;
+				}
+			}
+		}
+
+		$response = $this->render('planning/export.csv.twig', [
+			'calendar' => $calendar,
+			'calendars' => $calendars
+		]);
+
+		$response->headers->set('Content-Type', 'text/csv');
+		$response->headers->set('Content-Disposition', 'attachment; filename="planning.csv"');
+
+		return $response;
 	}
 
 	/**
@@ -164,6 +262,7 @@ class PlanningController extends Controller
 			'meetup' => $planning->isMeetup(),
 			'deliverable' => $planning->isDeliverable(),
 			'capitalization' => $planning->isCapitalization(),
+			'monitoring' => $planning->isMonitoring(),
 			'admin'=> $me->canAdmin($planning),
 		];
 		if($project != NULL){
@@ -229,16 +328,32 @@ class PlanningController extends Controller
 		$planning->setUser($user);
 		$planning->setProject($project);
 		$planning->setStartDate(new \DateTime($data['startDate']));
-		$planning->setStartHour($data['startHour'] == "pm"?"pm":"am");
+		if (! in_array(
+			$data['startHour'],
+			array(
+				'am',
+				'am2',
+				'pm',
+				'pm2'
+			)
+		)) {
+			$planning->setStartHour("am");
+		} else {
+			$planning->setStartHour($data['startHour']);
+		}
+
 		$planning->setNbSlices($data['nbSlices']);
 		$planning->setMeeting($data['meeting'] == "true"?true:false);
 		$planning->setConfirmed($data['confirmed'] == "false"?false:true);
 		$planning->setMeetup($data['meetup'] == "false"?false:true);
 		$planning->setDeliverable($data['deliverable'] == "false"?false:true);
 		$planning->setCapitalization($data['capitalization'] == "false"?false:true);
+		$planning->setMonitoring($data['monitoring'] == "false"?false:true);
+
 		if(($task = $taskRepository->find($data['task']))){
 			$planning->setTask($task);
 		}
+		$planning->setComments($data['comments']);
 
 		$em->persist($planning);
 		$em->flush();
@@ -267,7 +382,19 @@ class PlanningController extends Controller
 			$arrData = ['success' => false, 'errormsg' => "Vous n'avez pas le droit de modifier ce planning"];
 			return new JsonResponse($arrData);
 		}
-		if($newHour != "pm") $newHour = "am";
+
+		if (! in_array(
+			$newHour,
+			array(
+				'am',
+				'am2',
+				'pm',
+				'pm2'
+			)
+		)) {
+			$newHour = "am";
+		}
+
 		if($newSize < 1) $newSize = 1;
 		$planning->setStartDate(new \DateTime($newStart));
 		$planning->setStartHour($newHour);
@@ -480,4 +607,36 @@ class PlanningController extends Controller
 		$arrData = ['success' => true,'addclass' => $addclass];
 		return new JsonResponse($arrData);
 	}
+
+	/**
+	 * @Route("/planning/coment/{planningId}",name="planning_comment", methods={"POST"})
+	 */
+	public function planning_comment(Request $request, $planningId) {
+
+		$data = $request->request->all();
+		$em = $this->getDoctrine()->getManager();
+
+		$userRepository = $this->getDoctrine()->getRepository(User::class);
+		$planningRepository = $this->getDoctrine()->getRepository(Planning::class);
+
+		$me = $userRepository->find($this->get('session')->get('user')->getId());
+
+		if (!$planning = $planningRepository->find($planningId)){
+			$arrData = ['success' => false, 'errormsg' => "Impossible de trouver ce planning"];
+			return new JsonResponse($arrData);
+		}
+
+		if(!$me->canAdmin($planning)){
+			$arrData = ['success' => false, 'errormsg' => "Vous n'avez pas le droit de créer ce planning"];
+			return new JsonResponse($arrData);
+		}
+
+		$planning->setComments($data['comments']);
+
+		$em->persist($planning);
+		$em->flush();
+
+		$arrData = ['success' => true,'id' => $planning->getId()];
+		return new JsonResponse($arrData);
+		}
 }

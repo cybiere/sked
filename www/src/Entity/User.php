@@ -46,6 +46,11 @@ class User
 	private $isAdmin=false;
 
 	/**
+     * @ORM\Column(name="`order`", type="integer")
+     */
+	private $order;
+
+	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Project", mappedBy="projectManager", orphanRemoval=false)
 	 */
 	private $managedProjects;
@@ -123,6 +128,82 @@ class User
 
 	public function setIsAdmin($admin){
 		$this->isAdmin = $admin?true:false;
+	}
+
+	public function setOrder($value){
+		$this->order = $value;
+	}
+
+	public function getOrder(){
+		return $this->order;
+	}
+
+	public function getTace(\DateTime $from, \DateTime $to) {
+		$daterange = new \DatePeriod(
+			$from,
+			new \DateInterval('P1D'),
+			$to
+		);
+
+		// TACE = jours produits / jours potentiels
+
+		$num = 0;
+		$denom = 0;
+		$data = array(
+			'on' => array(),
+			'off' => array()
+		);
+
+		// iterate over period day by day
+		foreach ($daterange as $date) {
+			// pass over weekend
+			if (in_array($date->format('N'), array(6, 7))) continue;
+			if (in_array($date->format("Y-m-d"), \App\Controller\CommonController::getHolidays($date->format('Y'), "Y-m-d"))) continue;
+
+			$denom++;
+
+			// find planning who are in period
+			foreach ($this->getPlannings() as $planning) {
+				if (
+					$date->format("Y-m-d") < ($planning->getStart())->format("Y-m-d") ||
+					$date->format("Y-m-d") > ($planning->getEnd())->format("Y-m-d")
+				) continue; // out of range
+
+				// is monitored?
+				if (! $planning->isMonitoring()) {
+					// is not monitored, remove as potential day and passed over
+					$denom--;
+					continue;
+				}
+
+				// is absent?
+				if (! $planning->getProject()) continue;
+
+				// is billable? 
+				if (! ($planning->getProject())->isBillable()) {
+					$data['off'][] = $date->format("Y-m-d");
+					continue;
+				}
+
+				$data['on'][] = $date->format("Y-m-d");
+				$num++;
+			}
+		}
+
+		foreach ($daterange as $date) {
+			// priority regression
+			if (
+				in_array($date->format("Y-m-d"), $data['on']) &&
+				in_array($date->format("Y-m-d"), $data['off'])
+			) {
+				$num--;
+			}
+		}
+
+		if ($denom === 0)
+			return 0;
+
+		return (($num / $denom) * 100);
 	}
 
 	/**
