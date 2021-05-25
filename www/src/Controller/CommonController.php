@@ -4,7 +4,7 @@ namespace App\Controller;
 
 class CommonController{
 
-	public static function getHolidays($baseYear, $format = "u"){
+	public static function getHolidays($baseYear, $format = "U"){
 		$holidays = array();
 		for($i=-1;$i<=1;$i++){
 			$year=$baseYear+$i;
