@@ -187,8 +187,17 @@ class PlanningController extends Controller
 					$value = "absence";
 				} else {
 					$value = ($planning->getProject())->getReference();
+
 					if ($planning->getTask()) {
 						$value .= " - " . ($planning->getTask())->getName();
+					}
+
+					if (($planning->getProject())->getClient()) {
+						$value .= " | " . ($planning->getProject())->getClient();
+					}
+
+					if ($planning->getComments()) {
+						$value .= " (" . $planning->getComments() . ")";
 					}
 				}
 
