@@ -48,7 +48,7 @@ class User
 	/**
      * @ORM\Column(name="`order`", type="integer")
      */
-	private $order;
+	private $order=0;
 
 	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Project", mappedBy="projectManager", orphanRemoval=false)
