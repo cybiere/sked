@@ -154,11 +154,18 @@ class User
 			'off' => array()
 		);
 
+		$holidays = array();
+
 		// iterate over period day by day
 		foreach ($daterange as $date) {
 			// pass over weekend
 			if (in_array($date->format('N'), array(6, 7))) continue;
-			if (in_array($date->format("Y-m-d"), \App\Controller\CommonController::getHolidays($date->format('Y'), "Y-m-d"))) continue;
+
+			if (! array_key_exists($date->format('Y'), $holidays)) {
+				$holidays[$date->format('Y')] = \App\Controller\CommonController::getHolidays($date->format('Y'), "Y-m-d");
+			}
+
+			if (in_array($date->format("Y-m-d"), $holidays[$date->format('Y')])) continue;
 
 			$denom++;
 
