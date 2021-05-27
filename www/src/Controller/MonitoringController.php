@@ -32,7 +32,6 @@ class MonitoringController extends Controller{
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
-		$teams = $teamRepository->findAll();
 		$users = $userRepository->findAll();
 
 		try {
@@ -145,7 +144,6 @@ class MonitoringController extends Controller{
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
-		$teams = $teamRepository->findAll();
 		$users = $userRepository->findAll();
 
 		try {
