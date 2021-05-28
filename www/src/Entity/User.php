@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Repository\PlanningRepository;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -140,6 +141,8 @@ class User
 	}
 
 	public function getTace(\DateTime $from, \DateTime $to) {
+		$cache = new FilesystemAdapter();
+
 		$daterange = new \DatePeriod(
 			$from,
 			new \DateInterval('P1D'),
@@ -155,19 +158,19 @@ class User
 			'off' => array()
 		);
 
-		$holidays = array();
-		$plannings = array();
-
 		// iterate over period day by day
 		foreach ($daterange as $date) {
 			// pass over weekend
 			if (in_array($date->format('N'), array(6, 7))) continue;
 
-			if (! array_key_exists($date->format('Y'), $holidays)) {
-				$holidays[$date->format('Y')] = \App\Controller\CommonController::getHolidays($date->format('Y'), "Y-m-d");
+			$holidays = $cache->getItem("holidays-{$date->format('Y')}");
+			if (! $holidays->isHit()) {
+				$holidays->set(\App\Controller\CommonController::getHolidays($date->format('Y'), "Y-m-d"));
+				$holidays->expiresAfter(3600 * 24 * 7);
+				$cache->save($holidays);
 			}
 
-			if (in_array($date->format("Y-m-d"), $holidays[$date->format('Y')])) continue;
+			if (in_array($date->format("Y-m-d"), $holidays->get())) continue;
 
 			$denom++;
 
@@ -175,12 +178,15 @@ class User
 			$date_by_month = clone $date;
 			$date_by_month->modify("first day of this month");
 
-			if (! array_key_exists($date_by_month->format("Y-m"), $plannings)) {
-				$plannings[$date_by_month->format("Y-m")] = $this->getPlanningsStartAfter($date_by_month);
+			$plannings = $cache->getItem("plannings-{$this->id}-{$date_by_month->format('Y-m')}");
+			if (! $plannings->isHit()) {
+				$plannings->set($this->getPlanningsStartAfter($date_by_month));
+				$plannings->expiresAfter(3600);
+				$cache->save($plannings);
 			}
 
 			// find planning who are in period
-			foreach ($plannings[$date_by_month->format("Y-m")] as $planning) {
+			foreach ($plannings->get() as $planning) {
 				if (
 					$date->format("Y-m-d") < ($planning->getStart())->format("Y-m-d") ||
 					$date->format("Y-m-d") > ($planning->getEnd())->format("Y-m-d")
