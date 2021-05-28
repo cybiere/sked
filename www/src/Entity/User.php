@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Repository\PlanningRepository;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -155,6 +156,7 @@ class User
 		);
 
 		$holidays = array();
+		$plannings = array();
 
 		// iterate over period day by day
 		foreach ($daterange as $date) {
@@ -169,8 +171,16 @@ class User
 
 			$denom++;
 
+			// query must be by month instead of by day to be cached over iteration
+			$date_by_month = clone $date;
+			$date_by_month->modify("first day of this month");
+
+			if (! array_key_exists($date_by_month->format("Y-m"), $plannings)) {
+				$plannings[$date_by_month->format("Y-m")] = $this->getPlanningsStartAfter($date_by_month);
+			}
+
 			// find planning who are in period
-			foreach ($this->getPlannings() as $planning) {
+			foreach ($plannings[$date_by_month->format("Y-m")] as $planning) {
 				if (
 					$date->format("Y-m-d") < ($planning->getStart())->format("Y-m-d") ||
 					$date->format("Y-m-d") > ($planning->getEnd())->format("Y-m-d")
@@ -227,6 +237,13 @@ class User
     public function getPlannings()
     {
         return $this->plannings;
+	}
+
+	/**
+	 * @return Collection|Planning[]
+	 */
+	public function getPlanningsStartAfter(\Datetime $date) {
+		return $this->getPlannings()->matching(PlanningRepository::getStartAfter($date));
 	}
 
 	/**
