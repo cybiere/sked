@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TeamRepository")
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE")
  */
 class Team
 {

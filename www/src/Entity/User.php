@@ -10,6 +10,7 @@ use App\Repository\PlanningRepository;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE")
  */
 class User
 {
