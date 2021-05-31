@@ -211,7 +211,12 @@ class User
 		if ($denom === 0)
 			return 0;
 
-		return (($num / $denom) * 100);
+		$percent = (($num / $denom) * 100);
+
+		if ($percent > 100)
+			return 100;
+
+		return $percent;
 	}
 
 	/**
