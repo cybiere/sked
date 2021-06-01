@@ -59,6 +59,7 @@ class User
 
 	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="user", orphanRemoval=true)
+     * @ORM\Cache(usage="NONSTRICT_READ_WRITE")
 	 */
 	private $plannings;
 

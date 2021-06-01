@@ -364,7 +364,10 @@ class PlanningController extends Controller
 		}
 		$planning->setComments($data['comments']);
 
+
 		$em->persist($planning);
+		$user->getPlannings()->add($planning);
+
 		$em->flush();
 		$arrData = ['success' => true,'id' => $planning->getId()];
 		return new JsonResponse($arrData);
