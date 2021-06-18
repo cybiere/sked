@@ -187,8 +187,17 @@ class PlanningController extends Controller
 					$value = "absence";
 				} else {
 					$value = ($planning->getProject())->getReference();
+
 					if ($planning->getTask()) {
 						$value .= " - " . ($planning->getTask())->getName();
+					}
+
+					if (($planning->getProject())->getClient()) {
+						$value .= " | " . ($planning->getProject())->getClient();
+					}
+
+					if ($planning->getComments()) {
+						$value .= " (" . $planning->getComments() . ")";
 					}
 				}
 
@@ -355,7 +364,10 @@ class PlanningController extends Controller
 		}
 		$planning->setComments($data['comments']);
 
+
 		$em->persist($planning);
+		$user->getPlannings()->add($planning);
+
 		$em->flush();
 		$arrData = ['success' => true,'id' => $planning->getId()];
 		return new JsonResponse($arrData);

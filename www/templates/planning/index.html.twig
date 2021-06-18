@@ -59,7 +59,7 @@
 			{% for i in range(0,(startDate|date('t')|number_format)-1) %}
             {% set x = startDate|date_modify('+'~ i ~' days') %}
 			{% if x|date('N') < 6 %}
-			<td class="schedHour{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+			<td class="schedHour{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %} day-am">
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
@@ -89,7 +89,7 @@
 					{% endfor %}
 				</div>
 			</td>
-			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %} day-pm2">
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="pm2" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}

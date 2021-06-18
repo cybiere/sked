@@ -32,7 +32,6 @@ class MonitoringController extends Controller{
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
-		$teams = $teamRepository->findAll();
 		$users = $userRepository->findAll();
 
 		try {
@@ -47,8 +46,9 @@ class MonitoringController extends Controller{
 
 		for ($nbmonth = 0; $nbmonth < $renderMonths; $nbmonth++) {
 			$month = clone $startDateObj;
+			$month->modify("first day of this month");
 			$month->modify("+{$nbmonth} month");
-			$from = clone $month->modify("first day of this month");
+			$from = clone $month;
 			$from->modify('midnight');
 			$to = clone $month->modify("last day of this month");
 			$to->modify('tomorrow');
@@ -145,7 +145,6 @@ class MonitoringController extends Controller{
 		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 		$userRepository = $this->getDoctrine()->getRepository(User::class);
 		$me = $userRepository->find($this->get('session')->get('user')->getId());
-		$teams = $teamRepository->findAll();
 		$users = $userRepository->findAll();
 
 		try {

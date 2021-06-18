@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\TaskRepository")
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE")
  */
 class Task
 {
