@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Planning;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -31,4 +32,10 @@ class PlanningRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    static public function getStartAfter(\Datetime $date)
+    {
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->gte('startDate', $date));
+    }
 }

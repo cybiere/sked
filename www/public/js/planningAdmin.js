@@ -276,11 +276,13 @@ resizeOptions = {
 		$(this).find('i').text(newSize/2);
 		$(this).outerHeight(30);
 	},
-	stop : function(event, ui){
+	stop : function(e, ui){
 		newSize = Math.round(((ui.size.width-(ui.size.width%$(this).parent().parent().outerWidth()))/$(this).parent().parent().outerWidth())+1) / 2;
+/*
 		if(newSize > $(this).parent().data("remainingslices")+1){
 			newSize = $(this).parent().data("remainingslices")+1;
 		}
+*/
 		url= urlDict["planning_resize"];
 		url = url.replace("idPlaceHold", ui.element.data('planningid'));
 		url = url.replace("sizePlaceHold", newSize);

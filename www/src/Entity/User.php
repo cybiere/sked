@@ -6,9 +6,11 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Repository\PlanningRepository;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE")
  */
 class User
 {
@@ -48,7 +50,7 @@ class User
 	/**
      * @ORM\Column(name="`order`", type="integer")
      */
-	private $order;
+	private $order=0;
 
 	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Project", mappedBy="projectManager", orphanRemoval=false)
@@ -57,6 +59,7 @@ class User
 
 	/**
      * @ORM\OneToMany(targetEntity="App\Entity\Planning", mappedBy="user", orphanRemoval=true)
+     * @ORM\Cache(usage="NONSTRICT_READ_WRITE")
 	 */
 	private $plannings;
 
@@ -154,11 +157,18 @@ class User
 			'off' => array()
 		);
 
+		$holidays = array();
+
 		// iterate over period day by day
 		foreach ($daterange as $date) {
 			// pass over weekend
 			if (in_array($date->format('N'), array(6, 7))) continue;
-			if (in_array($date->format("Y-m-d"), \App\Controller\CommonController::getHolidays($date->format('Y'), "Y-m-d"))) continue;
+
+			if (! array_key_exists($date->format('Y'), $holidays)) {
+				$holidays[$date->format('Y')] = \App\Controller\CommonController::getHolidays($date->format('Y'), "Y-m-d");
+			}
+
+			if (in_array($date->format("Y-m-d"), $holidays[$date->format('Y')])) continue;
 
 			$denom++;
 
@@ -203,7 +213,12 @@ class User
 		if ($denom === 0)
 			return 0;
 
-		return (($num / $denom) * 100);
+		$percent = (($num / $denom) * 100);
+
+		if ($percent > 100)
+			return 100;
+
+		return $percent;
 	}
 
 	/**
@@ -220,6 +235,13 @@ class User
     public function getPlannings()
     {
         return $this->plannings;
+	}
+
+	/**
+	 * @return Collection|Planning[]
+	 */
+	public function getPlanningsStartAfter(\Datetime $date) {
+		return $this->getPlannings()->matching(PlanningRepository::getStartAfter($date));
 	}
 
 	/**
