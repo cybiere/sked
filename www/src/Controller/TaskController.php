@@ -125,7 +125,7 @@ class TaskController extends Controller
 				$calendar
 			);
 
-			if (! $key) continue; // out of calendar range
+			if (false === $key) continue; // out of calendar range
 
 			if (isset($calendars[($planning->getTask())->getName()][$key])) {
 				$calendars[($planning->getTask())->getName()][$key] .= " | " . ($planning->getUser())->getFullname();

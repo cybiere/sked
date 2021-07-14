@@ -244,7 +244,7 @@ class ProjectController extends Controller
 				$calendar
 			);
 
-			if (! $key) continue; // out of calendar range
+			if (false === $key) continue; // out of calendar range
 
 			if (isset($calendars[$project->getName()][$key])) {
 				$calendars[$project->getName()][$key] .= " | " . ($planning->getUser())->getFullname();
