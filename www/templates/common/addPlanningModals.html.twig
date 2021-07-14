@@ -37,7 +37,7 @@
 
 					<dt class="col-sm-5">Équipe :</dt>
 					<dd class="col-sm-7">
-						<select id="project_team" name="project[team]">
+						<select id="project_ajax_team" name="project[team]">
 							{% for team in teams %}
 								<option value="{{ team.id }}">{{ team.name }}</option>
 							{% endfor %}
@@ -46,22 +46,22 @@
 
 					<dt class="col-sm-5">Code projet :</dt>
 					<dd class="col-sm-7">
-						<input type="text" id="project_reference" name="project[reference]" required="required">
+						<input type="text" id="project_ajax_reference" name="project[reference]" required="required">
 					</dd>
 
 					<dt class="col-sm-5">Nom du projet :</dt>
 					<dd class="col-sm-7">
-						<input type="text" id="project_name" name="project[name]" required="required">
+						<input type="text" id="project_ajax_name" name="project[name]" required="required">
 					</dd>
 
 					<dt class="col-sm-5">Client :</dt>
 					<dd class="col-sm-7">
-						<input type="text" id="project_client" name="project[client]" required="required">
+						<input type="text" id="project_ajax_client" name="project[client]" required="required">
 					</dd>
 
 					<dt class="col-sm-5">Responsable projet :</dt>
 					<dd class="col-sm-7">
-						<select id="project_projectManager" name="project[projectManager]">
+						<select id="project_ajax_projectManager" name="project[projectManager]">
 							{% for user in users %}
 								<option value="{{ user.id }}">{{ user.fullname }}</option>
 							{% endfor %}
@@ -70,25 +70,25 @@
 
 					<dt class="col-sm-5">Facturable :</dt>
 						<dd class="col-sm-7">
-							<input id="project_billable" name="project[billable]" type="checkbox" value="1" checked="checked">
+							<input id="project_ajax_billable" name="project[billable]" type="checkbox" value="1" checked="checked">
 						</dd>
 					<dt class="col-sm-5">Archivé :</dt>
 						<dd class="col-sm-7">
-							<input id="project_archived" name="project[archived]" type="checkbox" value="1">
+							<input id="project_ajax_archived" name="project[archived]" type="checkbox" value="1">
 						</dd>
 
 					<dt class="col-sm-5">Jours vendus :</dt>
 					<dd class="col-sm-7">
-						<input type="text" id="project_nbDays" name="project[nbDays]" required="required">
+						<input type="text" id="project_ajax_nbDays" name="project[nbDays]" required="required">
 					</dd>
 
 					<dt class="col-sm-5">Commentaires :</dt>
 						<dd class="col-sm-7">
-							<textarea id="project_comments" name="project[comments]" class="form-control"></textarea>
+							<textarea id="project_ajax_comments" name="project[comments]" class="form-control"></textarea>
 						</dd>
 					</dl>
 	
-					<input type="hidden" id="project_token" name="project[_token]" value="{{ csrf_token('project_add') }}"/>
+					<input type="hidden" id="project_ajax_token" name="project[_token]" value="{{ csrf_token('project_add') }}"/>
 
 					<button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#addProject" aria-expanded="false" aria-controls="addProject">Annuler</button>
 					<button type="button" class="btn btn-primary float-right" onclick="projectAdd()">Ajouter</button>
