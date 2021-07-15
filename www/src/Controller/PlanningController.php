@@ -181,7 +181,7 @@ class PlanningController extends Controller
 					$calendar
 				);
 	
-				if (! $key) continue; // out of calendar range
+				if (false === $key) continue; // out of calendar range
 
 				if (! $planning->getProject()) {
 					$value = "absence";

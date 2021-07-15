@@ -480,7 +480,7 @@ function projectAdd(){
 	$.ajax({
 		type: "POST",
 		url:urlDict["project_index"],
-		data:$("[id^='project_']").serialize(),
+		data:$("[id^='project_ajax_']").serialize(),
 		error:function(xhr,status,error){
 			message='<div class="alert alert-danger alert-dismissible fade show" role="alert">\nErreur : ' + error + '\n<button type="button" class="close" data-dismiss="alert" aria-label="Close">\n<span aria-hidden="true">&times;</span>\n</button>\n</div>';
 			$('#flashMessages').append(message);

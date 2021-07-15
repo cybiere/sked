@@ -56,7 +56,7 @@
 			{% for i in range(0,(startDate|date('t')|number_format)-1) %}
 			{% set x = startDate|date_modify('+'~ i ~' days') %}
 			{% if x|date('N') < 6 %}
-			<td class="schedHour{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+			<td class="schedHour{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %} day-am">
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="am" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
@@ -86,7 +86,7 @@
 					{% endfor %}
 				</div>
 			</td>
-			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %}">
+			<td class="schedHour{% if x|date('N') == 5 %} friday{% endif %}{% if x|date('U') in holidays%} holiday{% endif %}{% if x|date('U') == today|date('U') %} today{% endif %} day-pm2">
 				{% set slicesShown = slicesShown+1 %}
 				<div class="projectContainer{% if me.canAdmin(user) %} projectContainerAdmin{% endif %}" data-date="{{x|date('Y-m-d')}}" data-hour="pm2" data-user="{{user.id}}" data-sliceNumber="{{ slicesShown }}" data-remainingSlices="{{ nbSlices - slicesShown }}">
 					{% for planning in user.plannings %}
@@ -107,13 +107,13 @@
 
 <h2>Projets
 	{% if me.isAdmin or me.managedTeams is not empty %}
-	<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addProject" role="button" aria-expanded="false" aria-controls="addButton">
+	<a class="btn btn-outline-primary float-right" data-toggle="collapse" href="#addProject2" role="button" aria-expanded="false" aria-controls="addButton">
 		Ajouter un projet
 	</a>
 	{% endif %}
 </h2>
 {% if me.isAdmin or me.managedTeams is not empty %}
-<div class="collapse" id="addProject">
+<div class="collapse" id="addProject2">
 	<div class="card bg-light">
 		<h2 class="card-header">Ajouter un projet</h2>
 		<div class="card-body">
