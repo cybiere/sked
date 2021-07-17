@@ -28,6 +28,7 @@ class TaskController extends Controller
 		}
 		$em = $this->getDoctrine()->getManager();
 		$taskRepository = $this->getDoctrine()->getRepository(Task::class);
+		$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 
 		$options = array();
 
@@ -37,7 +38,6 @@ class TaskController extends Controller
 				return $this->redirectToRoute('task_index');
 			}
 
-			$projectRepository = $this->getDoctrine()->getRepository(Project::class);
 			$teamRepository = $this->getDoctrine()->getRepository(Team::class);
 
 			$project = $projectRepository->find($task->getProject());
@@ -60,10 +60,10 @@ class TaskController extends Controller
 			return $this->redirectToRoute('task_index');
 		}
 
-		$tasks = $taskRepository->findAll();
 		return $this->render('task/index.html.twig', [
 			'form' => $form->createView(),
-			'tasks'=>$tasks
+			'tasks'=> $taskRepository->findAll(),
+			'projects' => $projectRepository->findAll()
 		]);
 	}
 

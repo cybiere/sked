@@ -63,6 +63,26 @@
 		</tr>
 		{% endfor %}
 	</tbody>
+	<tr>
+		<th colspan="6">
+			Sans tâches
+		</th>
+	</tr>
+	</thead>
+	<tbody>
+		{% for project in projects if project.tasks is empty %}
+		<tr>
+			<td><a href="{{ path('project_view',{'projectId':project.id}) }}"> {{ project.name }}</a></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td class="actions">
+				<a href="#" onclick="javascript:$('#task_project').val({{ project.id }})"><span class="fas fa-plus"></span></a>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
 </table>
 {% endblock %}
 
