@@ -411,7 +411,9 @@ class PlanningController extends Controller
 		$planning->setStartDate(new \DateTime($newStart));
 		$planning->setStartHour($newHour);
 		$planning->setNbSlices($newSize);
+		$planning->getUser()->getPlannings()->removeElement($planning);
 		$planning->setUser($user);
+		$user->getPlannings()->add($planning);
 		$em->flush();
 		$arrData = ['success' => true];
 		return new JsonResponse($arrData);
