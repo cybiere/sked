@@ -11,6 +11,7 @@
 	{% if me.canAdmin(project) %}
 	<a class="btn btn-outline-primary float-right mx-2" href="{{ path('project_edit',{'projectId':project.id})}}">Modifier</a>
 	{% endif %}
+	<a href="#" class="btn btn-outline-secondary float-right mx-2" onclick="javascript:$('.project.otherProject').toggle();"><i class="fas fa-low-vision"></i></a>
 </h1>
 
 {% if me.canAdmin(project) %}
