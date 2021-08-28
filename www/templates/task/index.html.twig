@@ -26,7 +26,7 @@
 	</tr>
 	</thead>
 	<tbody>
-		{% for task in tasks if not task.closed %}
+		{% for task in tasks|sort((a, b) => a.project.client <=> b.project.client) if not task.closed %}
 		<tr{% if task.done %} class="table-secondary"{% endif %}>
 			<td>{% if task.project %}<a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}{% endif %}</a></td>
 			<td>{% if task.comments %}<a href="#" data-toggle="tooltip" title="{{ task.comments }}">{{ task.name }}</a>{% else %}{{ task.name }}{% endif %}</td>
@@ -49,7 +49,7 @@
 	</tr>
 	</thead>
 	<tbody>
-		{% for task in tasks if task.closed %}
+		{% for task in tasks|sort((a, b) => a.project.client <=> b.project.client) if task.closed %}
 		<tr{% if task.done %} class="table-secondary"{% endif %}>
 			<td>{% if task.project %}<a href="{{ path('project_view',{'projectId':task.project.id}) }}">{{ task.project.client }} {{ task.project.name }}</a>{% endif %}</td>
 			<td>{% if task.comments %}<a href="#" data-toggle="tooltip" title="{{ task.comments }}">{{ task.name }}</a>{% else %}{{ task.name }}{% endif %}</td>
@@ -70,9 +70,9 @@
 	</tr>
 	</thead>
 	<tbody>
-		{% for project in projects if project.tasks is empty %}
+		{% for project in projects|sort((a, b) => a.client <=> b.client) if project.tasks is empty %}
 		<tr>
-			<td><a href="{{ path('project_view',{'projectId':project.id}) }}"> {{ project.name }}</a></td>
+			<td><a href="{{ path('project_view',{'projectId':project.id}) }}"> {{ project.client }} {{ project.name }}</a></td>
 			<td></td>
 			<td></td>
 			<td></td>
